@@ -7,6 +7,10 @@ apps/api/__pycache__/
 apps/api/.coverage
 apps/api/htmlcov/
 apps/api/.venv/
+apps/api/tests/*.db
+*.tsbuildinfo
+apps/web/vite.config.js
+apps/web/vite.config.d.ts
 *.pyc
 .env
 .env.*
