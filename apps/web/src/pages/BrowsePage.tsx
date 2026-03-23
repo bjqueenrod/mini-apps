@@ -64,7 +64,11 @@ export function BrowsePage() {
       {!session.isTelegram && <TelegramDevBanner />}
       <section className="hero">
         <p className="hero__eyebrow">{import.meta.env.VITE_APP_NAME ?? 'Clip Search'}</p>
-        <h1>Mistress BJQueen&apos;s Femdom Clip Library</h1>
+        <h1>
+          Mistress BJQueen&apos;s
+          <br />
+          Femdom Clip Library
+        </h1>
       </section>
 
       <section className="toolbar">
