@@ -213,6 +213,12 @@ button {
   box-shadow: var(--shadow-card);
 }
 
+.clip-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .clip-card__media,
 .skeleton-card {
   aspect-ratio: 16 / 9;
@@ -254,6 +260,9 @@ button {
 }
 
 .clip-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   padding: 14px 14px 16px;
   background: linear-gradient(180deg, rgba(33, 27, 39, 0.96), rgba(24, 19, 30, 0.98));
 }
@@ -280,6 +289,15 @@ button {
   margin: 0;
   color: var(--muted);
   line-height: 1.45;
+}
+
+.clip-card p {
+  margin-bottom: 14px;
+}
+
+.clip-card__footer {
+  margin-top: auto;
+  align-items: flex-end;
 }
 
 .load-more {
