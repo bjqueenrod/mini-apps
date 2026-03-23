@@ -1,11 +1,16 @@
 import { Link, useLocation } from 'react-router-dom';
 import { ClipItem } from '../features/clips/types';
+import { toSearchParams } from '../features/clips/queryState';
 import { formatDuration, formatPrice } from '../utils/format';
 import { PreviewPlayer } from './PreviewPlayer';
 
 export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: boolean }) {
   const location = useLocation();
   const backTarget = `/${location.search}`;
+  const tagHref = (tag: string) =>
+    `/?${new URLSearchParams({
+      tags: tag,
+    }).toString()}`;
 
   return (
     <div className="detail-sheet__backdrop">
@@ -34,7 +39,12 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
               <p>{clip.description || clip.shortDescription}</p>
               <div className="detail-sheet__tags">
                 {clip.tags.map((tag) => (
-                  <span key={tag}>#{tag}</span>
+                  <Link
+                    key={tag}
+                    to={tagHref(tag)}
+                  >
+                    #{tag}
+                  </Link>
                 ))}
               </div>
             </div>
