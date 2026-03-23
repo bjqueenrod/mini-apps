@@ -143,6 +143,12 @@ button {
   margin-bottom: 12px;
 }
 
+.results-summary {
+  margin: 2px 0 16px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
 .filter-bar button,
 .recent-searches button,
 .load-more {

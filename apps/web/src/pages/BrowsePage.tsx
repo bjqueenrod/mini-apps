@@ -51,6 +51,13 @@ export function BrowsePage() {
 
   const loadMore = () => setSearchParams(toSearchParams({ ...queryState, page: queryState.page + 1 }));
   const updateState = (patch: Partial<typeof queryState>) => setSearchParams(toSearchParams({ ...queryState, ...patch, page: 1 }));
+  const loadedCount = clipsQuery.data?.items.length ?? 0;
+  const totalCount = clipsQuery.data?.total ?? 0;
+  const resultsLabel = clipsQuery.data
+    ? clipsQuery.data.hasMore
+      ? `Showing ${loadedCount} of ${totalCount} results`
+      : `${totalCount} result${totalCount === 1 ? '' : 's'}`
+    : null;
 
   return (
     <AppShell>
@@ -75,6 +82,7 @@ export function BrowsePage() {
           onChange={(value) => updateState({ tags: value ? [value] : [] })}
         />
       )}
+      {resultsLabel && <p className="results-summary">{resultsLabel}</p>}
 
       {session.error && <ErrorState message={session.error} />}
       {clipsQuery.isError && <ErrorState message={(clipsQuery.error as Error).message} />}
