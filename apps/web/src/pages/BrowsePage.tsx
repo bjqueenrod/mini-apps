@@ -77,12 +77,18 @@ export function BrowsePage() {
       </section>
 
       <RecentSearches items={recent} onPick={setSearchValue} />
-      <FilterBar items={clipsQuery.data?.categories ?? []} value={queryState.category} onChange={(value) => updateState({ category: value })} />
+      <FilterBar
+        items={clipsQuery.data?.categories ?? []}
+        value={queryState.category}
+        onChange={(value) => updateState({ category: value })}
+        variant="category"
+      />
       {tagOptions.length > 0 && (
         <FilterBar
           items={tagOptions}
           value={queryState.tags[0] ?? ''}
           onChange={(value) => updateState({ tags: value ? [value] : [] })}
+          variant="tag"
         />
       )}
       {resultsLabel && <p className="results-summary">{resultsLabel}</p>}

@@ -157,6 +157,7 @@ button {
   color: var(--text);
   border-radius: 999px;
   padding: 10px 14px;
+  white-space: nowrap;
 }
 
 .filter-bar .is-active,
@@ -165,6 +166,37 @@ button {
   color: #130f17;
   border-color: transparent;
   box-shadow: 0 10px 24px rgba(176, 106, 214, 0.24);
+}
+
+.filter-bar--category button {
+  padding: 9px 12px;
+  border-radius: 16px;
+  background: rgba(176, 106, 214, 0.10);
+  border-color: rgba(176, 106, 214, 0.24);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+}
+
+.filter-bar--category .is-active {
+  background: var(--accent);
+  color: #130f17;
+  border-color: transparent;
+}
+
+.filter-bar--tag button {
+  padding: 8px 12px;
+  font-size: 0.86rem;
+  background: rgba(31, 25, 36, 0.92);
+  color: var(--muted);
+}
+
+.filter-bar--tag .is-active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--text);
+  box-shadow: none;
 }
 
 .clip-grid {
@@ -312,6 +344,7 @@ button {
   color: var(--muted);
   font-size: 0.82rem;
   line-height: 1;
+  white-space: nowrap;
   transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
 }
 
