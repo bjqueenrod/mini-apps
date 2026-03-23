@@ -65,7 +65,6 @@ export function BrowsePage() {
       <section className="hero">
         <p className="hero__eyebrow">{import.meta.env.VITE_APP_NAME ?? 'Clip Search'}</p>
         <h1>Mistress BJQueen&apos;s Femdom Clip Library</h1>
-        <p>Search the catalog, filter by category, and preview public-safe Bunny Stream teasers before buying inside the bot.</p>
       </section>
 
       <section className="toolbar">
