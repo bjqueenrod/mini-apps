@@ -178,15 +178,26 @@ button {
 
 .top-sellers__body {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   padding: 14px;
   background: linear-gradient(180deg, rgba(33, 27, 39, 0.96), rgba(24, 19, 30, 0.98));
 }
 
 .top-sellers__body h3 {
   margin: 0;
-  font-size: 1.15rem;
-  line-height: 1.1;
+  font-size: 1rem;
+  line-height: 1.18;
+}
+
+.top-sellers__body p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .top-sellers__prices {
