@@ -83,11 +83,10 @@ export function BrowsePage() {
     <AppShell>
       {!session.isTelegram && <TelegramDevBanner />}
       <section className="hero">
-        <h1>
-          Mistress BJQueen&apos;s
-          <br />
-          Femdom Clip Library
-        </h1>
+        <div className="hero__brand">
+          <img className="hero__avatar" src="/mistress.jpg" alt="Mistress BJQueen" />
+          <h1>🎬 Femdom Clip Library</h1>
+        </div>
       </section>
 
       {topSellersQuery.data?.items?.length ? <TopSellersCarousel items={topSellersQuery.data.items} /> : null}
