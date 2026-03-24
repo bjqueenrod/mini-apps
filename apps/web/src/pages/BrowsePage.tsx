@@ -17,19 +17,7 @@ import { useTelegramSession } from '../features/auth/hooks';
 import { useClipDetail, useClipSearch, useTopSellers } from '../features/clips/hooks';
 import { DEFAULT_SORT, readQueryState, toSearchParams } from '../features/clips/queryState';
 import { pushRecentSearch, readRecentSearches } from '../utils/storage';
-
-const FEATURED_TAGS = [
-  'chastity',
-  'ruinedorgasm',
-  'milking',
-  'bondage',
-  'cuckold',
-  'joi',
-  'strapon',
-  'blowjob',
-  'magicwand',
-  'compilation',
-];
+import { FEATURED_TAGS } from '../utils/tags';
 
 export function BrowsePage() {
   const [searchParams, setSearchParams] = useSearchParams();

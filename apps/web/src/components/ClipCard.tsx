@@ -2,15 +2,18 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ClipItem } from '../features/clips/types';
 import { formatDuration, formatPrice } from '../utils/format';
+import { pickPrimaryTags } from '../utils/tags';
 import { safeBackground } from '../utils/theme';
 
 export function ClipCard({ clip }: { clip: ClipItem }) {
   const location = useLocation();
+  const selectedTag = new URLSearchParams(location.search).get('tags')?.split(',')[0] ?? undefined;
   const mediaCandidates = useMemo(
     () => [clip.thumbnailUrl, clip.previewWebpUrl].filter(Boolean) as string[],
     [clip.previewWebpUrl, clip.thumbnailUrl],
   );
   const [mediaIndex, setMediaIndex] = useState(0);
+  const displayTags = useMemo(() => pickPrimaryTags(clip.tags, selectedTag), [clip.tags, selectedTag]);
 
   useEffect(() => {
     setMediaIndex(0);
@@ -52,7 +55,7 @@ export function ClipCard({ clip }: { clip: ClipItem }) {
             <span className="clip-card__price-separator">•</span>
             <span>{`📥 ${formatPrice(clip.downloadPrice ?? clip.price)}`}</span>
           </div>
-          <span className="clip-card__tags">{clip.tags.slice(0, 2).map((tag) => `#${tag}`).join(' ')}</span>
+          <span className="clip-card__tags">{displayTags.map((tag) => `#${tag}`).join(' ')}</span>
         </div>
       </div>
     </Link>
