@@ -300,6 +300,23 @@ button {
   align-items: flex-end;
 }
 
+.clip-card__prices {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.clip-card__prices span {
+  white-space: nowrap;
+}
+
+.clip-card__tags {
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .load-more {
   width: 100%;
   margin-top: 16px;

@@ -48,8 +48,11 @@ export function ClipCard({ clip }: { clip: ClipItem }) {
         <h3>{clip.title}</h3>
         <p>{clip.shortDescription || clip.description || 'Preview this clip in Telegram.'}</p>
         <div className="clip-card__footer">
-          <span>{formatPrice(clip.streamPrice ?? clip.price)}</span>
-          <span>{clip.tags.slice(0, 2).map((tag) => `#${tag}`).join(' ')}</span>
+          <div className="clip-card__prices">
+            <span>{`🎬 ${formatPrice(clip.streamPrice ?? clip.price)}`}</span>
+            <span>{`📥 ${formatPrice(clip.downloadPrice ?? clip.price)}`}</span>
+          </div>
+          <span className="clip-card__tags">{clip.tags.slice(0, 2).map((tag) => `#${tag}`).join(' ')}</span>
         </div>
       </div>
     </Link>
