@@ -22,7 +22,7 @@ export function FilterBar({
         <button
           key={item}
           className={value === item ? 'is-active' : ''}
-          onClick={() => onChange(item)}
+          onClick={() => onChange(value === item ? '' : item)}
           type="button"
         >
           {variant === 'tag' ? `#${item}` : item}

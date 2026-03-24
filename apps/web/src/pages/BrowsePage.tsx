@@ -28,8 +28,16 @@ export function BrowsePage() {
   const clipsQuery = useClipSearch(queryState);
   const topSellersQuery = useTopSellers();
   const clipDetailQuery = useClipDetail(clipId);
+  const featuredTagSet = useMemo(() => new Set(FEATURED_TAGS.map((tag) => tag.toLowerCase())), []);
+  const selectedFeaturedTag = useMemo(
+    () => queryState.tags.find((tag) => featuredTagSet.has(tag.toLowerCase())) ?? '',
+    [featuredTagSet, queryState.tags],
+  );
+  const selectedSecondaryTag = useMemo(
+    () => queryState.tags.find((tag) => !featuredTagSet.has(tag.toLowerCase())) ?? '',
+    [featuredTagSet, queryState.tags],
+  );
   const remainingTagOptions = useMemo(() => {
-    const featured = new Set(FEATURED_TAGS.map((tag) => tag.toLowerCase()));
     const excluded = new Set(['and', 'in', 'made', 'bar']);
     const tagCounts = new Map<string, { tag: string; count: number }>();
 
@@ -38,7 +46,7 @@ export function BrowsePage() {
       for (const rawTag of item.tags) {
         const tag = rawTag.trim();
         const normalized = tag.toLowerCase();
-        if (!tag || featured.has(normalized) || excluded.has(normalized) || seenInClip.has(normalized)) {
+        if (!tag || featuredTagSet.has(normalized) || excluded.has(normalized) || seenInClip.has(normalized)) {
           continue;
         }
         seenInClip.add(normalized);
@@ -55,7 +63,7 @@ export function BrowsePage() {
       .sort((left, right) => right.count - left.count || left.tag.localeCompare(right.tag))
       .slice(0, 30)
       .map((entry) => entry.tag);
-  }, [clipsQuery.data?.items]);
+  }, [clipsQuery.data?.items, featuredTagSet]);
 
   useEffect(() => {
     applyTelegramTheme();
@@ -74,6 +82,14 @@ export function BrowsePage() {
 
   const loadMore = () => setSearchParams(toSearchParams({ ...queryState, page: queryState.page + 1 }));
   const updateState = (patch: Partial<typeof queryState>) => setSearchParams(toSearchParams({ ...queryState, ...patch, page: 1 }));
+  const updateFeaturedTag = (value: string) => {
+    const tags = [value, selectedSecondaryTag].filter(Boolean);
+    updateState({ tags, category: '' });
+  };
+  const updateSecondaryTag = (value: string) => {
+    const tags = [selectedFeaturedTag, value].filter(Boolean);
+    updateState({ tags, category: '' });
+  };
   const loadedCount = clipsQuery.data?.items.length ?? 0;
   const totalCount = clipsQuery.data?.total ?? 0;
   const resultsLabel = clipsQuery.data
@@ -104,15 +120,15 @@ export function BrowsePage() {
       <RecentSearches items={recent} onPick={setSearchValue} />
       <FilterBar
         items={FEATURED_TAGS}
-        value={queryState.tags[0] ?? ''}
-        onChange={(value) => updateState({ tags: value ? [value] : [], category: '' })}
+        value={selectedFeaturedTag}
+        onChange={updateFeaturedTag}
         variant="tag"
       />
       {remainingTagOptions.length > 0 && (
         <FilterBar
           items={remainingTagOptions}
-          value={queryState.tags[0] ?? ''}
-          onChange={(value) => updateState({ tags: value ? [value] : [], category: '' })}
+          value={selectedSecondaryTag}
+          onChange={updateSecondaryTag}
           variant="tag"
           includeAll={false}
         />
