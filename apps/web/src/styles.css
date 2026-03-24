@@ -128,14 +128,15 @@ button {
   margin-bottom: 18px;
 }
 
-.search-panel {
+.search-panel,
+.top-sellers {
   margin: 4px 0 18px;
   padding: 14px;
   border: 1px solid rgba(176, 106, 214, 0.12);
   border-radius: 28px;
   background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.07), transparent 40%),
-    linear-gradient(180deg, rgba(31, 25, 36, 0.56), rgba(24, 19, 30, 0.64));
+    radial-gradient(circle at top left, rgba(176, 106, 214, 0.08), transparent 38%),
+    linear-gradient(180deg, rgba(31, 25, 36, 0.54), rgba(24, 19, 30, 0.62));
 }
 
 .search-panel .toolbar {
@@ -154,16 +155,6 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-size: 0.72rem;
-}
-
-.top-sellers {
-  margin: 4px 0 18px;
-  padding: 14px;
-  border: 1px solid rgba(176, 106, 214, 0.12);
-  border-radius: 28px;
-  background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.08), transparent 38%),
-    linear-gradient(180deg, rgba(31, 25, 36, 0.54), rgba(24, 19, 30, 0.62));
 }
 
 .top-sellers__header {
@@ -343,6 +334,7 @@ button {
 
 .recent-searches button {
   font-size: 0.86rem;
+  line-height: 1;
 }
 
 .filter-bar--tag .is-active {
