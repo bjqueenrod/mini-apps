@@ -427,6 +427,10 @@ button {
 .clip-card p {
   margin-bottom: 14px;
   text-wrap: wrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .clip-card__footer {
@@ -590,7 +594,7 @@ button {
   border: 1px solid var(--line);
 }
 
-@media (min-width: 720px) {
+@media (min-width: 880px) {
   .toolbar {
     grid-template-columns: 1fr 220px;
     align-items: start;

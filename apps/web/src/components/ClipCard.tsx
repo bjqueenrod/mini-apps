@@ -48,7 +48,7 @@ export function ClipCard({ clip }: { clip: ClipItem }) {
           <span>{formatDuration(clip.durationLabel, clip.durationSeconds)}</span>
         </div>
         <h3>{clip.title}</h3>
-        <p>{clip.shortDescription || clip.description || 'Preview this clip in Telegram.'}</p>
+        <p>{clip.description || clip.shortDescription || 'Preview this clip in Telegram.'}</p>
         <div className="clip-card__footer">
           <div className="clip-card__prices">
             <span>{`🎬 ${formatPrice(clip.streamPrice ?? clip.price)}`}</span>
