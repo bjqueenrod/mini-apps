@@ -31,6 +31,7 @@ export function BrowsePage() {
   const clipDetailQuery = useClipDetail(clipId);
   const remainingTagOptions = useMemo(() => {
     const featured = new Set(FEATURED_TAGS.map((tag) => tag.toLowerCase()));
+    const excluded = new Set(['and']);
     const tagCounts = new Map<string, { tag: string; count: number }>();
 
     for (const item of clipsQuery.data?.items ?? []) {
@@ -38,7 +39,7 @@ export function BrowsePage() {
       for (const rawTag of item.tags) {
         const tag = rawTag.trim();
         const normalized = tag.toLowerCase();
-        if (!tag || featured.has(normalized) || seenInClip.has(normalized)) {
+        if (!tag || featured.has(normalized) || excluded.has(normalized) || seenInClip.has(normalized)) {
           continue;
         }
         seenInClip.add(normalized);
@@ -53,7 +54,7 @@ export function BrowsePage() {
 
     return Array.from(tagCounts.values())
       .sort((left, right) => right.count - left.count || left.tag.localeCompare(right.tag))
-      .slice(0, 24)
+      .slice(0, 30)
       .map((entry) => entry.tag);
   }, [clipsQuery.data?.items]);
 
