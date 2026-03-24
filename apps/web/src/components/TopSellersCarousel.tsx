@@ -29,6 +29,7 @@ export function TopSellersCarousel({ items }: { items: ClipItem[] }) {
               <p>{clip.shortDescription || clip.description || 'Preview this clip in Telegram.'}</p>
               <div className="top-sellers__prices">
                 <span>{`🎬 ${formatPrice(clip.streamPrice ?? clip.price)}`}</span>
+                <span className="top-sellers__price-separator">•</span>
                 <span>{`📥 ${formatPrice(clip.downloadPrice ?? clip.price)}`}</span>
               </div>
             </div>

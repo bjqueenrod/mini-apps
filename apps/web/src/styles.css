@@ -201,10 +201,16 @@ button {
 }
 
 .top-sellers__prices {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   color: var(--muted);
-  font-size: 0.86rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.top-sellers__price-separator {
+  color: var(--muted-strong);
 }
 
 .search-bar,
