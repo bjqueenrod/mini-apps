@@ -49,6 +49,7 @@ export function ClipCard({ clip }: { clip: ClipItem }) {
         <div className="clip-card__footer">
           <div className="clip-card__prices">
             <span>{`🎬 ${formatPrice(clip.streamPrice ?? clip.price)}`}</span>
+            <span className="clip-card__price-separator">•</span>
             <span>{`📥 ${formatPrice(clip.downloadPrice ?? clip.price)}`}</span>
           </div>
           <span className="clip-card__tags">{clip.tags.slice(0, 2).map((tag) => `#${tag}`).join(' ')}</span>

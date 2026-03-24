@@ -377,13 +377,15 @@ button {
 }
 
 .clip-card__prices {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   min-width: 0;
+  white-space: nowrap;
 }
 
-.clip-card__prices span {
-  white-space: nowrap;
+.clip-card__price-separator {
+  color: var(--muted-strong);
 }
 
 .clip-card__tags {
