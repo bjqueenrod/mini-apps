@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
 import { SearchBar } from '../components/SearchBar';
@@ -29,6 +29,8 @@ export function BrowsePage() {
   const topSellersQuery = useTopSellers();
   const clipDetailQuery = useClipDetail(clipId);
   const featuredTagSet = useMemo(() => new Set(FEATURED_TAGS.map((tag) => tag.toLowerCase())), []);
+  const lastSecondaryContextRef = useRef('');
+  const [secondaryTagOptions, setSecondaryTagOptions] = useState<string[]>([]);
   const selectedFeaturedTag = useMemo(
     () => queryState.tags.find((tag) => featuredTagSet.has(tag.toLowerCase())) ?? '',
     [featuredTagSet, queryState.tags],
@@ -37,7 +39,7 @@ export function BrowsePage() {
     () => queryState.tags.find((tag) => !featuredTagSet.has(tag.toLowerCase())) ?? '',
     [featuredTagSet, queryState.tags],
   );
-  const remainingTagOptions = useMemo(() => {
+  const computedSecondaryTagOptions = useMemo(() => {
     const excluded = new Set(['and', 'in', 'made', 'bar']);
     const tagCounts = new Map<string, { tag: string; count: number }>();
 
@@ -64,10 +66,51 @@ export function BrowsePage() {
       .slice(0, 30)
       .map((entry) => entry.tag);
   }, [clipsQuery.data?.items, featuredTagSet]);
+  const secondaryTagContextKey = useMemo(
+    () => `${queryState.q.trim().toLowerCase()}::${selectedFeaturedTag.toLowerCase()}`,
+    [queryState.q, selectedFeaturedTag],
+  );
 
   useEffect(() => {
     applyTelegramTheme();
   }, []);
+
+  useEffect(() => {
+    const normalize = (value: string) => value.trim().toLowerCase();
+    const mergeSelectedFirst = (items: string[]) => {
+      const deduped: string[] = [];
+      const seen = new Set<string>();
+      const push = (value: string) => {
+        const tag = value.trim();
+        const normalized = normalize(tag);
+        if (!tag || seen.has(normalized) || featuredTagSet.has(normalized)) {
+          return;
+        }
+        seen.add(normalized);
+        deduped.push(tag);
+      };
+
+      if (selectedSecondaryTag) {
+        push(selectedSecondaryTag);
+      }
+      for (const item of items) {
+        push(item);
+      }
+      return deduped.slice(0, 30);
+    };
+
+    const contextChanged = lastSecondaryContextRef.current !== secondaryTagContextKey;
+    lastSecondaryContextRef.current = secondaryTagContextKey;
+
+    if (contextChanged || !selectedSecondaryTag) {
+      setSecondaryTagOptions(mergeSelectedFirst(computedSecondaryTagOptions));
+      return;
+    }
+
+    setSecondaryTagOptions((current) =>
+      mergeSelectedFirst(current.length ? current : computedSecondaryTagOptions),
+    );
+  }, [computedSecondaryTagOptions, featuredTagSet, secondaryTagContextKey, selectedSecondaryTag]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -124,9 +167,9 @@ export function BrowsePage() {
         onChange={updateFeaturedTag}
         variant="tag"
       />
-      {remainingTagOptions.length > 0 && (
+      {secondaryTagOptions.length > 0 && (
         <FilterBar
-          items={remainingTagOptions}
+          items={secondaryTagOptions}
           value={selectedSecondaryTag}
           onChange={updateSecondaryTag}
           variant="tag"
