@@ -153,29 +153,31 @@ export function BrowsePage() {
 
       {topSellersQuery.data?.items?.length ? <TopSellersCarousel items={topSellersQuery.data.items} /> : null}
 
-      <section className="toolbar">
-        <div className="toolbar__search">
-          <p className="toolbar__eyebrow">🔎 Search Clips</p>
-          <SearchBar value={searchValue} onChange={setSearchValue} />
-        </div>
-      </section>
+      <section className="search-panel">
+        <section className="toolbar">
+          <div className="toolbar__search">
+            <p className="toolbar__eyebrow">🔎 Search Clips</p>
+            <SearchBar value={searchValue} onChange={setSearchValue} />
+          </div>
+        </section>
 
-      <RecentSearches items={recent} onPick={setSearchValue} />
-      <FilterBar
-        items={FEATURED_TAGS}
-        value={selectedFeaturedTag}
-        onChange={updateFeaturedTag}
-        variant="tag"
-      />
-      {secondaryTagOptions.length > 0 && (
+        <RecentSearches items={recent} onPick={setSearchValue} />
         <FilterBar
-          items={secondaryTagOptions}
-          value={selectedSecondaryTag}
-          onChange={updateSecondaryTag}
+          items={FEATURED_TAGS}
+          value={selectedFeaturedTag}
+          onChange={updateFeaturedTag}
           variant="tag"
-          includeAll={false}
         />
-      )}
+        {secondaryTagOptions.length > 0 && (
+          <FilterBar
+            items={secondaryTagOptions}
+            value={selectedSecondaryTag}
+            onChange={updateSecondaryTag}
+            variant="tag"
+            includeAll={false}
+          />
+        )}
+      </section>
       {resultsLabel && <p className="results-summary">{resultsLabel}</p>}
 
       {session.error && <ErrorState message={session.error} />}
