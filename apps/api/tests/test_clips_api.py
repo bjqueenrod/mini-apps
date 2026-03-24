@@ -1,6 +1,18 @@
 from __future__ import annotations
 
 
+def test_top_sellers_returns_ordered_selection(client, monkeypatch) -> None:
+    monkeypatch.setattr(
+        "app.services.clip_service.TOP_SELLER_CLIP_IDS",
+        ("BJQ0002", "BJQ0001", "BJQ0999"),
+    )
+    response = client.get("/api/clips/top-sellers")
+    assert response.status_code == 200
+    payload = response.json()
+    assert [item["id"] for item in payload["items"]] == ["BJQ0002", "BJQ0001"]
+    assert payload["hasMore"] is False
+
+
 
 def test_health(client) -> None:
     response = client.get("/api/health")

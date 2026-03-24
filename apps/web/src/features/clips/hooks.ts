@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchClip, fetchClips } from './api';
+import { fetchClip, fetchClips, fetchTopSellers } from './api';
 import { ClipQueryState } from './types';
 
 export function useClipSearch(queryState: ClipQueryState) {
@@ -16,5 +16,12 @@ export function useClipDetail(clipId?: string) {
     queryKey: ['clip', clipId],
     queryFn: () => fetchClip(clipId!),
     enabled: Boolean(clipId),
+  });
+}
+
+export function useTopSellers() {
+  return useQuery({
+    queryKey: ['clips', 'top-sellers'],
+    queryFn: fetchTopSellers,
   });
 }

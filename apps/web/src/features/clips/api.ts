@@ -24,3 +24,9 @@ export async function fetchClip(id: string): Promise<ClipItem> {
   if (!response.ok) throw new Error('Unable to load clip details.');
   return response.json();
 }
+
+export async function fetchTopSellers(): Promise<ClipListResponse> {
+  const response = await fetch(`${API_BASE}/clips/top-sellers`, { credentials: 'include' });
+  if (!response.ok) throw new Error('Unable to load top sellers.');
+  return response.json();
+}

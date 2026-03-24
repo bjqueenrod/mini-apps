@@ -14,6 +14,18 @@ from app.utils.tags import parse_tags
 
 
 BOT_BASE = "https://t.me/mistressbjqueenbot?start="
+TOP_SELLER_CLIP_IDS: tuple[str, ...] = (
+    "BJQ0005",
+    "BJQ0132",
+    "BJQ0004",
+    "BJQ0139",
+    "BJQ0084",
+    "BJQ0089",
+    "BJQ0060",
+    "BJQ0086",
+    "BJQ0105",
+    "BJQ0083",
+)
 
 
 def _first_column(*values: Any) -> Any:
@@ -181,3 +193,38 @@ def get_clip_detail(db: Session, clip_id: str) -> dict[str, Any] | None:
         return None
     item = _row_to_item(row)
     return item
+
+
+def get_top_seller_clips(db: Session) -> dict[str, Any]:
+    mapping = get_clip_mapping(engine)
+    table = mapping.table
+    clip_id_col = mapping.get("clip_id")
+    if clip_id_col is None:
+        return {
+            "items": [],
+            "page": 1,
+            "limit": len(TOP_SELLER_CLIP_IDS),
+            "total": 0,
+            "hasMore": False,
+            "categories": [],
+        }
+
+    stmt = select(table).where(clip_id_col.in_(TOP_SELLER_CLIP_IDS))
+    active_col = mapping.get("active")
+    if active_col is not None:
+        stmt = stmt.where(active_col == 1)
+
+    rows = db.execute(stmt).all()
+    item_map: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        item = _row_to_item(row)
+        item_map[item["id"].upper()] = item
+    items = [item_map[clip_id] for clip_id in TOP_SELLER_CLIP_IDS if clip_id in item_map]
+    return {
+        "items": items,
+        "page": 1,
+        "limit": len(TOP_SELLER_CLIP_IDS),
+        "total": len(items),
+        "hasMore": False,
+        "categories": [],
+    }

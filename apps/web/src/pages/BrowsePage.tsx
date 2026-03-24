@@ -11,9 +11,10 @@ import { ErrorState } from '../components/ErrorState';
 import { TelegramDevBanner } from '../components/TelegramDevBanner';
 import { SkeletonCard } from '../components/SkeletonCard';
 import { RecentSearches } from '../components/RecentSearches';
+import { TopSellersCarousel } from '../components/TopSellersCarousel';
 import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
-import { useClipDetail, useClipSearch } from '../features/clips/hooks';
+import { useClipDetail, useClipSearch, useTopSellers } from '../features/clips/hooks';
 import { DEFAULT_SORT, readQueryState, toSearchParams } from '../features/clips/queryState';
 import { pushRecentSearch, readRecentSearches } from '../utils/storage';
 
@@ -38,6 +39,7 @@ export function BrowsePage() {
   const [recent, setRecent] = useState<string[]>(() => readRecentSearches());
   const queryState = useMemo(() => readQueryState(searchParams), [searchParams]);
   const clipsQuery = useClipSearch(queryState);
+  const topSellersQuery = useTopSellers();
   const clipDetailQuery = useClipDetail(clipId);
   const remainingTagOptions = useMemo(() => {
     const selectedTag = queryState.tags[0]?.trim().toLowerCase();
@@ -88,6 +90,8 @@ export function BrowsePage() {
           Femdom Clip Library
         </h1>
       </section>
+
+      {topSellersQuery.data?.items?.length ? <TopSellersCarousel items={topSellersQuery.data.items} /> : null}
 
       <section className="toolbar">
         <SearchBar value={searchValue} onChange={setSearchValue} />
