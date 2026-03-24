@@ -3,7 +3,6 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
 import { SearchBar } from '../components/SearchBar';
 import { FilterBar } from '../components/FilterBar';
-import { SortSelect } from '../components/SortSelect';
 import { ClipGrid } from '../components/ClipGrid';
 import { ClipDetailSheet } from '../components/ClipDetailSheet';
 import { EmptyState } from '../components/EmptyState';
@@ -15,7 +14,7 @@ import { TopSellersCarousel } from '../components/TopSellersCarousel';
 import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
 import { useClipDetail, useClipSearch, useTopSellers } from '../features/clips/hooks';
-import { DEFAULT_SORT, readQueryState, toSearchParams } from '../features/clips/queryState';
+import { readQueryState, toSearchParams } from '../features/clips/queryState';
 import { pushRecentSearch, readRecentSearches } from '../utils/storage';
 import { FEATURED_TAGS } from '../utils/tags';
 
@@ -31,7 +30,7 @@ export function BrowsePage() {
   const clipDetailQuery = useClipDetail(clipId);
   const remainingTagOptions = useMemo(() => {
     const featured = new Set(FEATURED_TAGS.map((tag) => tag.toLowerCase()));
-    const excluded = new Set(['and']);
+    const excluded = new Set(['and', 'in']);
     const tagCounts = new Map<string, { tag: string; count: number }>();
 
     for (const item of clipsQuery.data?.items ?? []) {
@@ -100,7 +99,6 @@ export function BrowsePage() {
           <p className="toolbar__eyebrow">🔎 Search Clips</p>
           <SearchBar value={searchValue} onChange={setSearchValue} />
         </div>
-        <SortSelect value={queryState.sort || DEFAULT_SORT} onChange={(value) => updateState({ sort: value })} />
       </section>
 
       <RecentSearches items={recent} onPick={setSearchValue} />

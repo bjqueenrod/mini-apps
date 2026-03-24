@@ -244,20 +244,17 @@ button {
   color: var(--muted-strong);
 }
 
-.search-bar,
-.sort-select {
+.search-bar {
   display: grid;
   gap: 8px;
 }
 
-.search-bar__label,
-.sort-select span {
+.search-bar__label {
   color: var(--muted);
   font-size: 0.82rem;
 }
 
-.search-bar input,
-.sort-select select {
+.search-bar input {
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--line);
