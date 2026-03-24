@@ -410,6 +410,10 @@ button {
   line-height: 1.06;
 }
 
+.clip-card h3 {
+  text-wrap: balance;
+}
+
 .clip-card p,
 .detail-sheet p {
   margin: 0;
@@ -419,6 +423,7 @@ button {
 
 .clip-card p {
   margin-bottom: 14px;
+  text-wrap: pretty;
 }
 
 .clip-card__footer {
