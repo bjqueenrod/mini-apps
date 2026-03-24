@@ -30,17 +30,32 @@ export function BrowsePage() {
   const topSellersQuery = useTopSellers();
   const clipDetailQuery = useClipDetail(clipId);
   const remainingTagOptions = useMemo(() => {
-    const selectedTag = queryState.tags[0]?.trim().toLowerCase();
     const featured = new Set(FEATURED_TAGS.map((tag) => tag.toLowerCase()));
-    const allTags = Array.from(
-      new Set((clipsQuery.data?.items ?? []).flatMap((item) => item.tags).filter(Boolean)),
-    );
-    const filtered = allTags.filter((tag) => !featured.has(tag.toLowerCase()));
-    if (selectedTag && !featured.has(selectedTag) && !filtered.some((tag) => tag.toLowerCase() === selectedTag)) {
-      filtered.unshift(queryState.tags[0]);
+    const tagCounts = new Map<string, { tag: string; count: number }>();
+
+    for (const item of clipsQuery.data?.items ?? []) {
+      const seenInClip = new Set<string>();
+      for (const rawTag of item.tags) {
+        const tag = rawTag.trim();
+        const normalized = tag.toLowerCase();
+        if (!tag || featured.has(normalized) || seenInClip.has(normalized)) {
+          continue;
+        }
+        seenInClip.add(normalized);
+        const current = tagCounts.get(normalized);
+        if (current) {
+          current.count += 1;
+        } else {
+          tagCounts.set(normalized, { tag, count: 1 });
+        }
+      }
     }
-    return filtered.slice(0, 24);
-  }, [clipsQuery.data?.items, queryState.tags]);
+
+    return Array.from(tagCounts.values())
+      .sort((left, right) => right.count - left.count || left.tag.localeCompare(right.tag))
+      .slice(0, 24)
+      .map((entry) => entry.tag);
+  }, [clipsQuery.data?.items]);
 
   useEffect(() => {
     applyTelegramTheme();
