@@ -92,7 +92,7 @@ export function BrowsePage() {
       {topSellersQuery.data?.items?.length ? <TopSellersCarousel items={topSellersQuery.data.items} /> : null}
 
       <section className="toolbar">
-        <p className="toolbar__eyebrow">{import.meta.env.VITE_APP_NAME ?? '🎬 Femdom Clips'}</p>
+        <p className="toolbar__eyebrow">🔎 Search Clips</p>
         <SearchBar value={searchValue} onChange={setSearchValue} />
         <SortSelect value={queryState.sort || DEFAULT_SORT} onChange={(value) => updateState({ sort: value })} />
       </section>
