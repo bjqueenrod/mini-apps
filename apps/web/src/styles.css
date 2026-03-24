@@ -125,7 +125,7 @@ button {
 .toolbar {
   display: grid;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .toolbar__search {
@@ -269,7 +269,7 @@ button {
   gap: 10px;
   overflow-x: auto;
   padding-bottom: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .results-summary {
