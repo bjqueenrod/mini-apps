@@ -189,7 +189,7 @@ button {
 }
 
 .top-sellers__media {
-  aspect-ratio: 16 / 9;
+  height: clamp(180px, 24vw, 230px);
   position: relative;
   background: linear-gradient(135deg, rgba(44, 36, 52, 0.98), rgba(24, 19, 30, 0.96));
 }
