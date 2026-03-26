@@ -2,7 +2,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { ClipItem } from '../features/clips/types';
 import { formatDuration, formatPrice } from '../utils/format';
 
-export function TopSellersCarousel({ items }: { items: ClipItem[] }) {
+export function TopSellersCarousel({
+  items,
+  title = 'Top Sellers',
+}: {
+  items: ClipItem[];
+  title?: string;
+}) {
   const location = useLocation();
 
   if (!items.length) {
@@ -12,7 +18,7 @@ export function TopSellersCarousel({ items }: { items: ClipItem[] }) {
   return (
     <section className="top-sellers">
       <div className="top-sellers__header">
-        <p className="hero__eyebrow">Top Sellers</p>
+        <p className="hero__eyebrow">{title}</p>
       </div>
       <div className="top-sellers__track">
         {items.map((clip) => (

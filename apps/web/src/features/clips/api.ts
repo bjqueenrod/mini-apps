@@ -30,3 +30,9 @@ export async function fetchTopSellers(): Promise<ClipListResponse> {
   if (!response.ok) throw new Error('Unable to load top sellers.');
   return response.json();
 }
+
+export async function fetchNewClips(): Promise<ClipListResponse> {
+  const response = await fetch(`${API_BASE}/clips/new`, { credentials: 'include' });
+  if (!response.ok) throw new Error('Unable to load new clips.');
+  return response.json();
+}

@@ -14,6 +14,14 @@ def test_top_sellers_returns_ordered_selection(client, monkeypatch) -> None:
 
 
 
+def test_new_clips_returns_highest_clip_ids_first(client) -> None:
+    response = client.get("/api/clips/new")
+    assert response.status_code == 200
+    payload = response.json()
+    assert [item["id"] for item in payload["items"]] == ["BJQ0002", "BJQ0001"]
+    assert payload["hasMore"] is False
+
+
 def test_health(client) -> None:
     response = client.get("/api/health")
     assert response.status_code == 200

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchClip, fetchClips, fetchTopSellers } from './api';
+import { fetchClip, fetchClips, fetchNewClips, fetchTopSellers } from './api';
 import { ClipQueryState } from './types';
 
 export function useClipSearch(queryState: ClipQueryState) {
@@ -24,5 +24,12 @@ export function useTopSellers() {
   return useQuery({
     queryKey: ['clips', 'top-sellers'],
     queryFn: fetchTopSellers,
+  });
+}
+
+export function useNewClips() {
+  return useQuery({
+    queryKey: ['clips', 'new'],
+    queryFn: fetchNewClips,
   });
 }

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
 from app.schemas.clips import ClipItemResponse, ClipListResponse, ClipQueryParams
-from app.services.clip_service import get_clip_detail, get_top_seller_clips, search_clips
+from app.services.clip_service import get_clip_detail, get_new_clips, get_top_seller_clips, search_clips
 from app.services.rate_limit import enforce_rate_limit
 
 router = APIRouter(tags=["clips"])
@@ -31,6 +31,12 @@ def list_clips(
 @router.get("/clips/top-sellers", response_model=ClipListResponse)
 def top_seller_clips(db: Session = Depends(get_db)) -> ClipListResponse:
     data = get_top_seller_clips(db)
+    return ClipListResponse(**data)
+
+
+@router.get("/clips/new", response_model=ClipListResponse)
+def new_clips(db: Session = Depends(get_db)) -> ClipListResponse:
+    data = get_new_clips(db, limit=10)
     return ClipListResponse(**data)
 
 

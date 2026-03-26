@@ -12,7 +12,7 @@ import { SkeletonCard } from '../components/SkeletonCard';
 import { TopSellersCarousel } from '../components/TopSellersCarousel';
 import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
-import { useClipDetail, useClipSearch, useTopSellers } from '../features/clips/hooks';
+import { useClipDetail, useClipSearch, useNewClips, useTopSellers } from '../features/clips/hooks';
 import { readQueryState, toSearchParams } from '../features/clips/queryState';
 import { pushRecentSearch } from '../utils/storage';
 import { FEATURED_TAGS } from '../utils/tags';
@@ -24,6 +24,7 @@ export function BrowsePage() {
   const [searchValue, setSearchValue] = useState(readQueryState(searchParams).q);
   const queryState = useMemo(() => readQueryState(searchParams), [searchParams]);
   const clipsQuery = useClipSearch(queryState);
+  const newClipsQuery = useNewClips();
   const topSellersQuery = useTopSellers();
   const clipDetailQuery = useClipDetail(clipId);
   const featuredTagSet = useMemo(() => new Set(FEATURED_TAGS.map((tag) => tag.toLowerCase())), []);
@@ -149,6 +150,9 @@ export function BrowsePage() {
         </div>
       </section>
 
+      {newClipsQuery.data?.items?.length ? (
+        <TopSellersCarousel items={newClipsQuery.data.items} title="New Clips" />
+      ) : null}
       {topSellersQuery.data?.items?.length ? <TopSellersCarousel items={topSellersQuery.data.items} /> : null}
 
       <section className="search-panel">

@@ -231,3 +231,35 @@ def get_top_seller_clips(db: Session) -> dict[str, Any]:
         "hasMore": False,
         "categories": [],
     }
+
+
+def get_new_clips(db: Session, *, limit: int = 10) -> dict[str, Any]:
+    mapping = get_clip_mapping(engine)
+    table = mapping.table
+    clip_id_col = mapping.get("clip_id")
+    if clip_id_col is None:
+        return {
+            "items": [],
+            "page": 1,
+            "limit": limit,
+            "total": 0,
+            "hasMore": False,
+            "categories": [],
+        }
+
+    stmt = select(table)
+    active_col = mapping.get("active")
+    if active_col is not None:
+        stmt = stmt.where(active_col == 1)
+    stmt = stmt.order_by(clip_id_col.desc()).limit(max(1, min(limit, 20)))
+
+    rows = db.execute(stmt).all()
+    items = [_row_to_item(row) for row in rows]
+    return {
+        "items": items,
+        "page": 1,
+        "limit": len(items) or limit,
+        "total": len(items),
+        "hasMore": False,
+        "categories": [],
+    }
