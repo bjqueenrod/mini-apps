@@ -8,8 +8,8 @@ function buildQuery(state: ClipQueryState): string {
   if (state.category) params.set('category', state.category);
   if (state.tags.length) params.set('tags', state.tags.join(','));
   if (state.sort) params.set('sort', state.sort);
-  params.set('page', '1');
-  params.set('limit', String(Math.max(20, state.page * 20)));
+  params.set('page', String(Math.max(1, state.page)));
+  params.set('limit', '20');
   return params.toString();
 }
 

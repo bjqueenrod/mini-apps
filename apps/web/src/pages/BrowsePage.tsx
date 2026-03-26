@@ -14,6 +14,7 @@ import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
 import { useClipDetail, useClipSearch, useNewClips, useTopSellers } from '../features/clips/hooks';
 import { readQueryState, toSearchParams } from '../features/clips/queryState';
+import { ClipItem } from '../features/clips/types';
 import { pushRecentSearch } from '../utils/storage';
 import { FEATURED_TAGS } from '../utils/tags';
 
@@ -23,8 +24,11 @@ export function BrowsePage() {
   const session = useTelegramSession();
   const [searchValue, setSearchValue] = useState(readQueryState(searchParams).q);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const [page, setPage] = useState(1);
+  const [visibleClips, setVisibleClips] = useState<ClipItem[]>([]);
   const queryState = useMemo(() => readQueryState(searchParams), [searchParams]);
-  const clipsQuery = useClipSearch(queryState);
+  const activeQueryState = useMemo(() => ({ ...queryState, page }), [page, queryState]);
+  const clipsQuery = useClipSearch(activeQueryState);
   const newClipsQuery = useNewClips();
   const topSellersQuery = useTopSellers();
   const clipDetailQuery = useClipDetail(clipId);
@@ -43,7 +47,7 @@ export function BrowsePage() {
     const excluded = new Set(['and', 'in', 'made', 'bar']);
     const tagCounts = new Map<string, { tag: string; count: number }>();
 
-    for (const item of clipsQuery.data?.items ?? []) {
+    for (const item of visibleClips) {
       const seenInClip = new Set<string>();
       for (const rawTag of item.tags) {
         const tag = rawTag.trim();
@@ -65,15 +69,23 @@ export function BrowsePage() {
       .sort((left, right) => right.count - left.count || left.tag.localeCompare(right.tag))
       .slice(0, 30)
       .map((entry) => entry.tag);
-  }, [clipsQuery.data?.items, featuredTagSet]);
+  }, [featuredTagSet, visibleClips]);
   const secondaryTagContextKey = useMemo(
     () => `${queryState.q.trim().toLowerCase()}::${selectedFeaturedTag.toLowerCase()}`,
     [queryState.q, selectedFeaturedTag],
+  );
+  const queryIdentity = useMemo(
+    () => `${queryState.q}::${queryState.category}::${queryState.sort}::${queryState.tags.join(',')}`,
+    [queryState.category, queryState.q, queryState.sort, queryState.tags],
   );
 
   useEffect(() => {
     applyTelegramTheme();
   }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [queryIdentity]);
 
   useEffect(() => {
     const normalize = (value: string) => value.trim().toLowerCase();
@@ -115,6 +127,7 @@ export function BrowsePage() {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       const next = { ...queryState, q: searchValue, page: 1 };
+      setPage(1);
       setSearchParams(toSearchParams(next));
       if (searchValue.trim()) {
         pushRecentSearch(searchValue);
@@ -122,6 +135,21 @@ export function BrowsePage() {
     }, 250);
     return () => window.clearTimeout(timer);
   }, [searchValue]);
+
+  useEffect(() => {
+    if (!clipsQuery.data || clipsQuery.data.page !== page) {
+      return;
+    }
+
+    setVisibleClips((current) => {
+      if (page === 1) {
+        return clipsQuery.data?.items ?? [];
+      }
+      const seen = new Set(current.map((item) => item.id));
+      const nextItems = (clipsQuery.data?.items ?? []).filter((item) => !seen.has(item.id));
+      return nextItems.length ? [...current, ...nextItems] : current;
+    });
+  }, [clipsQuery.data, page]);
 
   useEffect(() => {
     const node = loadMoreRef.current;
@@ -133,7 +161,7 @@ export function BrowsePage() {
       (entries) => {
         const [entry] = entries;
         if (entry?.isIntersecting) {
-          setSearchParams(toSearchParams({ ...queryState, page: queryState.page + 1 }));
+          setPage((current) => current + 1);
         }
       },
       { rootMargin: '220px 0px' },
@@ -141,18 +169,20 @@ export function BrowsePage() {
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [clipsQuery.data?.hasMore, clipsQuery.isFetching, queryState, setSearchParams]);
+  }, [clipsQuery.data?.hasMore, clipsQuery.isFetching]);
 
   const updateState = (patch: Partial<typeof queryState>) => setSearchParams(toSearchParams({ ...queryState, ...patch, page: 1 }));
   const updateFeaturedTag = (value: string) => {
     const tags = [value, selectedSecondaryTag].filter(Boolean);
+    setPage(1);
     updateState({ tags, category: '' });
   };
   const updateSecondaryTag = (value: string) => {
     const tags = [selectedFeaturedTag, value].filter(Boolean);
+    setPage(1);
     updateState({ tags, category: '' });
   };
-  const loadedCount = clipsQuery.data?.items.length ?? 0;
+  const loadedCount = visibleClips.length;
   const totalCount = clipsQuery.data?.total ?? 0;
   const resultsLabel = clipsQuery.data
     ? clipsQuery.data.hasMore
@@ -209,8 +239,8 @@ export function BrowsePage() {
           <SkeletonCard />
         </div>
       )}
-      {clipsQuery.data && clipsQuery.data.items.length > 0 && <ClipGrid items={clipsQuery.data.items} />}
-      {clipsQuery.data && clipsQuery.data.items.length === 0 && <EmptyState />}
+      {visibleClips.length > 0 && <ClipGrid items={visibleClips} />}
+      {clipsQuery.data && !clipsQuery.isLoading && visibleClips.length === 0 && <EmptyState />}
 
       {clipsQuery.data?.hasMore && (
         <div ref={loadMoreRef} className="load-more load-more--passive">
