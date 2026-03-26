@@ -140,6 +140,17 @@ button {
 }
 
 .search-panel .toolbar {
+  display: block;
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.search-panel .search-bar,
+.search-panel .search-bar input {
+  width: 100%;
+}
+
+.search-panel .toolbar__search {
   margin-bottom: 0;
 }
 
