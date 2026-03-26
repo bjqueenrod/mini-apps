@@ -12,7 +12,13 @@ export function PreviewPlayer({
   if (embedUrl) {
     return (
       <div className="preview-player">
-        <iframe src={embedUrl} title={title} allow="autoplay; fullscreen" allowFullScreen />
+        <iframe
+          src={embedUrl}
+          title={title}
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
       </div>
     );
   }
