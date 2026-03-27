@@ -118,6 +118,15 @@ button {
   backdrop-filter: blur(12px);
 }
 
+.search-panel--pinned {
+  box-shadow: 0 14px 28px rgba(7, 4, 10, 0.24);
+}
+
+.search-panel__sentinel {
+  height: 1px;
+  margin-top: -1px;
+}
+
 .search-panel .toolbar {
   display: block;
   width: 100%;
@@ -137,6 +146,17 @@ button {
   display: grid;
   gap: 8px;
   align-content: start;
+}
+
+.search-panel__toggle {
+  justify-self: start;
+  border: 1px solid var(--line);
+  background: rgba(44, 36, 52, 0.78);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  line-height: 1;
 }
 
 .toolbar__eyebrow {

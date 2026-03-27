@@ -26,7 +26,10 @@ export function BrowsePage() {
     return composeSearchText(initialQueryState.q, initialQueryState.tags);
   });
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const searchPanelSentinelRef = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(1);
+  const [isSearchPinned, setIsSearchPinned] = useState(false);
+  const [filtersExpanded, setFiltersExpanded] = useState(true);
   const [visibleClips, setVisibleClips] = useState<ClipItem[]>([]);
   const queryState = useMemo(() => readQueryState(searchParams), [searchParams]);
   const activeQueryState = useMemo(() => ({ ...queryState, page }), [page, queryState]);
@@ -187,6 +190,28 @@ export function BrowsePage() {
     return () => observer.disconnect();
   }, [clipsQuery.data?.hasMore, clipsQuery.isFetching]);
 
+  useEffect(() => {
+    const node = searchPanelSentinelRef.current;
+    if (!node) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        setIsSearchPinned(!entry?.isIntersecting);
+      },
+      { rootMargin: '-8px 0px 0px 0px', threshold: 0 },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    setFiltersExpanded(!isSearchPinned);
+  }, [isSearchPinned]);
+
   const replaceRowTag = (current: string, selectedTag: string, nextTag: string) => {
     const withoutSelected = selectedTag ? setHashtagToken(current, selectedTag, false) : current;
     return nextTag ? setHashtagToken(withoutSelected, nextTag, true) : withoutSelected;
@@ -217,28 +242,43 @@ export function BrowsePage() {
         <TopSellersCarousel items={topSellersQuery.data?.items ?? []} loading={topSellersQuery.isLoading} />
       ) : null}
 
-      <section className="search-panel">
+      <div ref={searchPanelSentinelRef} className="search-panel__sentinel" aria-hidden="true" />
+      <section className={`search-panel${isSearchPinned ? ' search-panel--pinned' : ''}`}>
         <section className="toolbar">
           <div className="toolbar__search">
             <p className="toolbar__eyebrow">🔎 Search Clips</p>
             <SearchBar value={searchValue} onChange={setSearchValue} />
+            {isSearchPinned && (
+              <button
+                className="search-panel__toggle"
+                type="button"
+                onClick={() => setFiltersExpanded((current) => !current)}
+                aria-expanded={filtersExpanded}
+              >
+                {filtersExpanded ? 'Hide hashtags' : 'Show hashtags'}
+              </button>
+            )}
           </div>
         </section>
 
-        <FilterBar
-          items={FEATURED_TAGS}
-          value={selectedFeaturedTag}
-          onChange={updateFeaturedTag}
-          variant="tag"
-        />
-        {secondaryTagOptions.length > 0 && (
-          <FilterBar
-            items={secondaryTagOptions}
-            value={selectedSecondaryTag}
-            onChange={updateSecondaryTag}
-            variant="tag"
-            includeAll={false}
-          />
+        {filtersExpanded && (
+          <>
+            <FilterBar
+              items={FEATURED_TAGS}
+              value={selectedFeaturedTag}
+              onChange={updateFeaturedTag}
+              variant="tag"
+            />
+            {secondaryTagOptions.length > 0 && (
+              <FilterBar
+                items={secondaryTagOptions}
+                value={selectedSecondaryTag}
+                onChange={updateSecondaryTag}
+                variant="tag"
+                includeAll={false}
+              />
+            )}
+          </>
         )}
       </section>
 
