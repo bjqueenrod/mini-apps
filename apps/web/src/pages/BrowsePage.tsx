@@ -185,14 +185,7 @@ export function BrowsePage() {
     setPage(1);
     updateState({ tags, category: '' });
   };
-  const loadedCount = visibleClips.length;
-  const totalCount = clipsQuery.data?.total ?? 0;
   const showResultsLoading = visibleClips.length === 0 && (clipsQuery.isLoading || (clipsQuery.isFetching && page === 1));
-  const resultsLabel = clipsQuery.data
-    ? clipsQuery.data.hasMore
-      ? `Showing ${loadedCount} of ${totalCount} results`
-      : `${totalCount} result${totalCount === 1 ? '' : 's'}`
-    : null;
 
   return (
     <AppShell>
@@ -236,7 +229,6 @@ export function BrowsePage() {
           />
         )}
       </section>
-      {resultsLabel && <p className="results-summary">{resultsLabel}</p>}
 
       {clipsQuery.isError && <ErrorState message={(clipsQuery.error as Error).message} />}
       {showResultsLoading && (
