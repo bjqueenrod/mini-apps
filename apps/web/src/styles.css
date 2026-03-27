@@ -352,10 +352,10 @@ button {
 .filter-bar,
 .recent-searches {
   display: flex;
-  gap: 10px;
+  gap: 7px;
   overflow-x: auto;
-  padding-bottom: 8px;
-  margin-bottom: 10px;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
