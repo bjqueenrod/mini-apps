@@ -567,6 +567,15 @@ button {
   color: var(--accent);
 }
 
+.detail-sheet__loading {
+  min-height: calc(100% - 58px);
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--muted);
+}
+
 .detail-sheet__body {
   padding: 18px 16px 8px;
 }
