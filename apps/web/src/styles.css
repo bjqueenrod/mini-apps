@@ -113,7 +113,7 @@ button {
 
 .search-panel {
   position: sticky;
-  top: 8px;
+  top: 0;
   z-index: 4;
   backdrop-filter: blur(12px);
 }
