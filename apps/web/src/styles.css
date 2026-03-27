@@ -84,52 +84,13 @@ button {
 }
 
 .hero {
-  padding: 12px 0 18px;
+  padding: 0 0 18px;
 }
 
-.hero__brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.hero__avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid rgba(176, 106, 214, 0.28);
-  box-shadow: 0 10px 24px rgba(7, 4, 10, 0.28);
-  flex: 0 0 auto;
-}
-
-.hero__eyebrow {
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-size: 0.72rem;
-}
-
-.hero h1 {
-  font-size: clamp(1.4rem, 5vw, 3.1rem);
-  margin: 0;
-  line-height: 0.96;
-  white-space: nowrap;
-}
-
-.hero__title-line {
+.hero__banner {
   display: block;
-}
-
-.hero__title-line--secondary {
-  font-size: 1.16em;
-  letter-spacing: 0.1em;
-}
-
-.hero p {
-  margin: 0;
-  color: var(--muted);
-  max-width: 45rem;
+  width: 100%;
+  height: auto;
 }
 
 .toolbar {
