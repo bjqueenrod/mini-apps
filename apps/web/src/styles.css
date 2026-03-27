@@ -178,10 +178,27 @@ button {
   scroll-snap-align: start;
 }
 
+.top-sellers__card--skeleton {
+  pointer-events: none;
+}
+
 .top-sellers__media {
   height: clamp(180px, 24vw, 230px);
   position: relative;
   background: linear-gradient(135deg, rgba(44, 36, 52, 0.98), rgba(24, 19, 30, 0.96));
+}
+
+.top-sellers__media--skeleton,
+.top-sellers__line,
+.skeleton-card {
+  background: linear-gradient(
+    90deg,
+    rgba(59, 49, 68, 0.7) 0%,
+    rgba(176, 106, 214, 0.18) 50%,
+    rgba(59, 49, 68, 0.7) 100%
+  );
+  background-size: 220% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
 }
 
 .top-sellers__media img {
@@ -210,12 +227,41 @@ button {
   background: linear-gradient(180deg, rgba(33, 27, 39, 0.96), rgba(24, 19, 30, 0.98));
 }
 
+.top-sellers__line {
+  display: block;
+  border-radius: 999px;
+}
+
 .top-sellers__eyebrow {
   display: flex;
   justify-content: flex-end;
   color: var(--muted);
   font-size: 0.8rem;
   line-height: 1;
+}
+
+.top-sellers__line--small {
+  width: 56px;
+  height: 12px;
+}
+
+.top-sellers__line--title {
+  width: 100%;
+  height: 18px;
+}
+
+.top-sellers__line--body {
+  width: 100%;
+  height: 14px;
+}
+
+.top-sellers__line--price {
+  width: 92px;
+  height: 14px;
+}
+
+.top-sellers__line--short {
+  width: 72%;
 }
 
 .top-sellers__body h3 {
@@ -322,6 +368,15 @@ button {
   }
 }
 
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -20% 0;
+  }
+}
+
 .filter-bar button,
 .recent-searches button,
 .load-more {
@@ -403,10 +458,6 @@ button {
   background-size: cover;
   background-position: center;
   position: relative;
-}
-
-.skeleton-card {
-  background: linear-gradient(90deg, rgba(59,49,68,0.68), rgba(176,106,214,0.14), rgba(59,49,68,0.68));
 }
 
 .clip-card__media img {

@@ -210,10 +210,12 @@ export function BrowsePage() {
         <img className="hero__banner" src="/header.png?v=20260327a" alt="Mistress BJQueen Clip Store" />
       </section>
 
-      {newClipsQuery.data?.items?.length ? (
-        <TopSellersCarousel items={newClipsQuery.data.items} title="🆕 New Clips" />
+      {(newClipsQuery.isLoading || newClipsQuery.data?.items?.length) ? (
+        <TopSellersCarousel items={newClipsQuery.data?.items ?? []} title="🆕 New Clips" loading={newClipsQuery.isLoading} />
       ) : null}
-      {topSellersQuery.data?.items?.length ? <TopSellersCarousel items={topSellersQuery.data.items} /> : null}
+      {(topSellersQuery.isLoading || topSellersQuery.data?.items?.length) ? (
+        <TopSellersCarousel items={topSellersQuery.data?.items ?? []} loading={topSellersQuery.isLoading} />
+      ) : null}
 
       <section className="search-panel">
         <section className="toolbar">
