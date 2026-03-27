@@ -111,6 +111,13 @@ button {
     linear-gradient(180deg, rgba(31, 25, 36, 0.54), rgba(24, 19, 30, 0.62));
 }
 
+.search-panel {
+  position: sticky;
+  top: 8px;
+  z-index: 4;
+  backdrop-filter: blur(12px);
+}
+
 .search-panel .toolbar {
   display: block;
   width: 100%;

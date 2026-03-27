@@ -199,6 +199,9 @@ export function BrowsePage() {
     setSearchValue((current) => replaceRowTag(current, selectedSecondaryTag, value));
   };
   const showResultsLoading = visibleClips.length === 0 && (clipsQuery.isLoading || (clipsQuery.isFetching && page === 1));
+  const resultsCountLabel = clipsQuery.data
+    ? `${clipsQuery.data.total} result${clipsQuery.data.total === 1 ? '' : 's'}`
+    : '';
 
   return (
     <AppShell>
@@ -237,6 +240,7 @@ export function BrowsePage() {
         )}
       </section>
 
+      {!showResultsLoading && clipsQuery.data && <p className="results-summary">{resultsCountLabel}</p>}
       {clipsQuery.isError && <ErrorState message={(clipsQuery.error as Error).message} />}
       {showResultsLoading && (
         <div className="results-loading" aria-live="polite" aria-busy="true">
