@@ -15,7 +15,7 @@ import { useClipDetail, useClipSearch, useNewClips, useTopSellers } from '../fea
 import { readQueryState, toSearchParams } from '../features/clips/queryState';
 import { ClipItem } from '../features/clips/types';
 import { pushRecentSearch } from '../utils/storage';
-import { FEATURED_TAGS } from '../utils/tags';
+import { extractHashtagTokens, FEATURED_TAGS, setHashtagToken, stripHashtagTokens } from '../utils/tags';
 
 export function BrowsePage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -32,15 +32,16 @@ export function BrowsePage() {
   const topSellersQuery = useTopSellers();
   const clipDetailQuery = useClipDetail(clipId);
   const featuredTagSet = useMemo(() => new Set(FEATURED_TAGS.map((tag) => tag.toLowerCase())), []);
+  const searchTokens = useMemo(() => extractHashtagTokens(searchValue), [searchValue]);
   const lastSecondaryContextRef = useRef('');
   const [secondaryTagOptions, setSecondaryTagOptions] = useState<string[]>([]);
   const selectedFeaturedTag = useMemo(
-    () => queryState.tags.find((tag) => featuredTagSet.has(tag.toLowerCase())) ?? '',
-    [featuredTagSet, queryState.tags],
+    () => searchTokens.find((tag) => featuredTagSet.has(tag.toLowerCase())) ?? '',
+    [featuredTagSet, searchTokens],
   );
   const selectedSecondaryTag = useMemo(
-    () => queryState.tags.find((tag) => !featuredTagSet.has(tag.toLowerCase())) ?? '',
-    [featuredTagSet, queryState.tags],
+    () => searchTokens.find((tag) => !featuredTagSet.has(tag.toLowerCase())) ?? '',
+    [featuredTagSet, searchTokens],
   );
   const computedSecondaryTagOptions = useMemo(() => {
     const excluded = new Set(['and', 'in', 'made', 'bar']);
@@ -70,8 +71,8 @@ export function BrowsePage() {
       .map((entry) => entry.tag);
   }, [featuredTagSet, visibleClips]);
   const secondaryTagContextKey = useMemo(
-    () => `${queryState.q.trim().toLowerCase()}::${selectedFeaturedTag.toLowerCase()}`,
-    [queryState.q, selectedFeaturedTag],
+    () => `${stripHashtagTokens(searchValue).toLowerCase()}::${selectedFeaturedTag.toLowerCase()}`,
+    [searchValue, selectedFeaturedTag],
   );
   const queryIdentity = useMemo(
     () => `${queryState.q}::${queryState.category}::${queryState.sort}::${queryState.tags.join(',')}`,
@@ -133,7 +134,12 @@ export function BrowsePage() {
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      const next = { ...queryState, q: searchValue, page: 1 };
+      const next = {
+        ...queryState,
+        q: searchValue,
+        tags: extractHashtagTokens(searchValue),
+        page: 1,
+      };
       setPage(1);
       setSearchParams(toSearchParams(next));
       if (searchValue.trim()) {
@@ -178,16 +184,11 @@ export function BrowsePage() {
     return () => observer.disconnect();
   }, [clipsQuery.data?.hasMore, clipsQuery.isFetching]);
 
-  const updateState = (patch: Partial<typeof queryState>) => setSearchParams(toSearchParams({ ...queryState, ...patch, page: 1 }));
   const updateFeaturedTag = (value: string) => {
-    const tags = [value, selectedSecondaryTag].filter(Boolean);
-    setPage(1);
-    updateState({ tags, category: '' });
+    setSearchValue((current) => setHashtagToken(current, value || selectedFeaturedTag, Boolean(value)));
   };
   const updateSecondaryTag = (value: string) => {
-    const tags = [selectedFeaturedTag, value].filter(Boolean);
-    setPage(1);
-    updateState({ tags, category: '' });
+    setSearchValue((current) => setHashtagToken(current, value || selectedSecondaryTag, Boolean(value)));
   };
   const showResultsLoading = visibleClips.length === 0 && (clipsQuery.isLoading || (clipsQuery.isFetching && page === 1));
 
