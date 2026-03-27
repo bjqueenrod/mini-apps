@@ -290,7 +290,7 @@ button {
   min-height: 240px;
   display: grid;
   place-items: center;
-  gap: 12px;
+  gap: 4px;
   color: var(--muted);
   text-align: center;
 }
