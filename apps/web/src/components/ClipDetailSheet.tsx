@@ -79,11 +79,11 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
             </div>
             <div className="detail-sheet__actions">
               <a href={clip.botStreamUrl} target="_blank" rel="noreferrer" className="detail-sheet__action detail-sheet__action--stream">
-                <strong>Stream in Bot</strong>
+                <strong>🎬 Stream in Bot</strong>
                 <span>{formatPrice(clip.streamPrice ?? clip.price)}</span>
               </a>
               <a href={clip.botDownloadUrl} target="_blank" rel="noreferrer" className="detail-sheet__action detail-sheet__action--download">
-                <strong>Download in Bot</strong>
+                <strong>📥 Download in Bot</strong>
                 <span>{formatPrice(clip.downloadPrice ?? clip.price)}</span>
               </a>
             </div>
