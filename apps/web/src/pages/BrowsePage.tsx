@@ -8,7 +8,6 @@ import { ClipDetailSheet } from '../components/ClipDetailSheet';
 import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
 import { TelegramDevBanner } from '../components/TelegramDevBanner';
-import { SkeletonCard } from '../components/SkeletonCard';
 import { TopSellersCarousel } from '../components/TopSellersCarousel';
 import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
@@ -85,7 +84,12 @@ export function BrowsePage() {
 
   useEffect(() => {
     setPage(1);
+    setVisibleClips([]);
   }, [queryIdentity]);
+
+  useEffect(() => {
+    setSearchValue(queryState.q);
+  }, [queryState.q]);
 
   useEffect(() => {
     const normalize = (value: string) => value.trim().toLowerCase();
@@ -183,6 +187,7 @@ export function BrowsePage() {
   };
   const loadedCount = visibleClips.length;
   const totalCount = clipsQuery.data?.total ?? 0;
+  const showResultsLoading = visibleClips.length === 0 && (clipsQuery.isLoading || (clipsQuery.isFetching && page === 1));
   const resultsLabel = clipsQuery.data
     ? clipsQuery.data.hasMore
       ? `Showing ${loadedCount} of ${totalCount} results`
@@ -234,15 +239,14 @@ export function BrowsePage() {
       {resultsLabel && <p className="results-summary">{resultsLabel}</p>}
 
       {clipsQuery.isError && <ErrorState message={(clipsQuery.error as Error).message} />}
-      {!clipsQuery.data && clipsQuery.isLoading && (
-        <div className="clip-grid">
-          <SkeletonCard />
-          <SkeletonCard />
-          <SkeletonCard />
+      {showResultsLoading && (
+        <div className="results-loading" aria-live="polite" aria-busy="true">
+          <span className="results-loading__spinner" aria-hidden="true" />
+          <span>Loading clips...</span>
         </div>
       )}
-      {visibleClips.length > 0 && <ClipGrid items={visibleClips} />}
-      {clipsQuery.data && !clipsQuery.isLoading && visibleClips.length === 0 && <EmptyState />}
+      {!showResultsLoading && visibleClips.length > 0 && <ClipGrid items={visibleClips} />}
+      {clipsQuery.data && !clipsQuery.isLoading && !clipsQuery.isFetching && visibleClips.length === 0 && <EmptyState />}
 
       {clipsQuery.data?.hasMore && (
         <div ref={loadMoreRef} className="load-more load-more--passive">

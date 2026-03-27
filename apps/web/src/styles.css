@@ -318,6 +318,30 @@ button {
   font-size: 0.92rem;
 }
 
+.results-loading {
+  min-height: 240px;
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.results-loading__spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid rgba(176, 106, 214, 0.2);
+  border-top-color: var(--accent);
+  animation: results-spin 0.85s linear infinite;
+}
+
+@keyframes results-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .filter-bar button,
 .recent-searches button,
 .load-more {
