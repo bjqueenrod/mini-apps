@@ -184,11 +184,16 @@ export function BrowsePage() {
     return () => observer.disconnect();
   }, [clipsQuery.data?.hasMore, clipsQuery.isFetching]);
 
+  const replaceRowTag = (current: string, selectedTag: string, nextTag: string) => {
+    const withoutSelected = selectedTag ? setHashtagToken(current, selectedTag, false) : current;
+    return nextTag ? setHashtagToken(withoutSelected, nextTag, true) : withoutSelected;
+  };
+
   const updateFeaturedTag = (value: string) => {
-    setSearchValue((current) => setHashtagToken(current, value || selectedFeaturedTag, Boolean(value)));
+    setSearchValue((current) => replaceRowTag(current, selectedFeaturedTag, value));
   };
   const updateSecondaryTag = (value: string) => {
-    setSearchValue((current) => setHashtagToken(current, value || selectedSecondaryTag, Boolean(value)));
+    setSearchValue((current) => replaceRowTag(current, selectedSecondaryTag, value));
   };
   const showResultsLoading = visibleClips.length === 0 && (clipsQuery.isLoading || (clipsQuery.isFetching && page === 1));
 
