@@ -298,9 +298,9 @@ export function BrowsePage() {
       {!showResultsLoading && visibleClips.length > 0 && <ClipGrid items={visibleClips} />}
       {clipsQuery.data && !clipsQuery.isLoading && !clipsQuery.isFetching && visibleClips.length === 0 && <EmptyState />}
 
-      {clipsQuery.data?.hasMore && visibleClips.length > 0 && page > 1 && (
+      {clipsQuery.data?.hasMore && (
         <div ref={loadMoreRef} className="load-more load-more--passive">
-          {clipsQuery.isFetching ? 'Loading more...' : ''}
+          {visibleClips.length > 0 && page > 1 && clipsQuery.isFetching ? 'Loading more...' : ''}
         </div>
       )}
 
