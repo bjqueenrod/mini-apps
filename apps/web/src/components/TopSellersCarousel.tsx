@@ -52,6 +52,7 @@ export function TopSellersCarousel({
                 </div>
                 <div className="top-sellers__body">
                   <div className="top-sellers__eyebrow">
+                    <span className="top-sellers__id">{clip.id}</span>
                     <span>{formatDuration(clip.durationLabel, clip.durationSeconds)}</span>
                   </div>
                   <h3>{clip.title}</h3>

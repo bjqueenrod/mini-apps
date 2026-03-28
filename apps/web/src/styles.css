@@ -265,10 +265,15 @@ button {
 
 .top-sellers__eyebrow {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   color: var(--muted);
   font-size: 0.8rem;
   line-height: 1;
+}
+
+.top-sellers__id {
+  color: var(--muted-strong);
+  letter-spacing: 0.06em;
 }
 
 .top-sellers__line--small {
