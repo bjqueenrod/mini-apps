@@ -300,7 +300,14 @@ export function BrowsePage() {
 
       {clipsQuery.data?.hasMore && (
         <div ref={loadMoreRef} className="load-more load-more--passive">
-          {visibleClips.length > 0 && page > 1 && clipsQuery.isFetching ? 'Loading more...' : ''}
+          {visibleClips.length > 0 && page > 1 && clipsQuery.isFetching ? (
+            <>
+              <span className="load-more__spinner" aria-hidden="true" />
+              <span>Loading more...</span>
+            </>
+          ) : (
+            ''
+          )}
         </div>
       )}
 
