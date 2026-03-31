@@ -4,6 +4,7 @@ import { ClipItem } from '../features/clips/types';
 import { formatDuration, formatPrice } from '../utils/format';
 import { pickPrimaryTags } from '../utils/tags';
 import { safeBackground } from '../utils/theme';
+import { toClipPath } from '../utils/links';
 
 export function ClipCard({ clip }: { clip: ClipItem }) {
   const location = useLocation();
@@ -22,7 +23,7 @@ export function ClipCard({ clip }: { clip: ClipItem }) {
   const mediaUrl = mediaCandidates[mediaIndex];
 
   return (
-    <Link className="clip-card" to={`/clips/${clip.id}${location.search}`}>
+    <Link className="clip-card" to={toClipPath(clip.id, location.search)}>
       <div className="clip-card__media" style={!mediaUrl ? { backgroundImage: safeBackground() } : undefined}>
         {mediaUrl ? (
           <img

@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { ClipItem } from '../features/clips/types';
 import { formatDuration, formatPrice } from '../utils/format';
+import { toClipPath } from '../utils/links';
 
 export function TopSellersCarousel({
   items,
@@ -42,7 +43,7 @@ export function TopSellersCarousel({
               </div>
             ))
           : items.map((clip) => (
-              <Link key={clip.id} className="top-sellers__card" to={`/clips/${clip.id}${location.search}`}>
+              <Link key={clip.id} className="top-sellers__card" to={toClipPath(clip.id, location.search)}>
                 <div className="top-sellers__media">
                   {clip.thumbnailUrl || clip.previewWebpUrl ? (
                     <img src={clip.thumbnailUrl || clip.previewWebpUrl} alt={clip.title} loading="lazy" />

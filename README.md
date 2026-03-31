@@ -1,78 +1,88 @@
-# Clip Search Mini App
+# Mistress BJQueen Multi Mini App
 
-Telegram Mini App for browsing, searching, filtering, and previewing a paid clip library. The frontend is a React/Vite Mini App and the backend is a FastAPI service that reads the existing `clips` table, validates Telegram init data, and serves only safe preview metadata.
+Telegram Mini App suite served from a single Railway service. The frontend is one React/Vite SPA mounted by path, and the backend is one FastAPI service that validates Telegram init data, serves both Mini Apps, and reads the existing MySQL tables.
+
+## Mini Apps
+
+- `/`: chooser page for all available Mini Apps
+- `/clips`: Clip Store Mini App
+- `/clips/:clipId`: clip detail sheet route
+- `/tasks`: Custom Obedience Tasks sales Mini App
+- `/tasks/:tierId`: task package detail sheet route
 
 ## Structure
 
-- `apps/web`: Telegram Mini App frontend
-- `apps/api`: FastAPI backend
-- `../payment-system`: upstream clip admin/schema changes for `bunny_stream_preview_id`
+- `apps/web`: shared Telegram Mini App frontend
+- `apps/api`: shared FastAPI backend
+- one Railway service, one repo, one domain, multiple Mini Apps by path
 
 ## Features
 
-- Telegram-aware mobile-first UI with browser fallback banner
-- Search, filters, sort, load-more pagination, recent searches
-- Bunny Stream player preview on the clip detail sheet
-- Exact Telegram bot deep links for stream/download purchase actions
-- FastAPI API with server-side Telegram init data validation
-- Flexible clip field mapping centered on the real payment-system schema
+- Shared Telegram auth and signed session flow
+- Shared dark/plum design system across both Mini Apps
+- Shared Telegram/iPhone-safe bot handoff helper
+- Clip Store preserved under `/clips`
+- Custom Obedience Tasks sales page added under `/tasks`
+- Railway-friendly single-service deployment
+
+## API
+
+### Existing clip endpoints
+
+- `GET /api/health`
+- `POST /api/auth/telegram`
+- `GET /api/clips`
+- `GET /api/clips/new`
+- `GET /api/clips/top-sellers`
+- `GET /api/clips/{id}`
+
+### New task-tier endpoints
+
+- `GET /api/tiers`
+- `GET /api/tiers/featured`
+- `GET /api/tiers/{id}`
+
+The task endpoints read from `premium_tiers`, with field mapping centralized in [`apps/api/app/services/tier_service.py`](/Users/guywatson/Projects/clip-search-mini-app/apps/api/app/services/tier_service.py) and [`apps/api/app/db/tier_mapping.py`](/Users/guywatson/Projects/clip-search-mini-app/apps/api/app/db/tier_mapping.py).
 
 ## Environment
 
-Copy [.env.example](/Users/guywatson/Projects/clip-search-mini-app/.env.example) and provide real values. In production on Railway, set these in the service Variables tab. The backend reads its values from [`apps/api/app/core/config.py`](/Users/guywatson/Projects/clip-search-mini-app/apps/api/app/core/config.py), and the frontend reads `VITE_*` values at build time.
+Copy [.env.example](/Users/guywatson/Projects/clip-search-mini-app/.env.example) and set real values.
 
-### Backend Env Reference
+### Backend env vars
 
-| Variable | Required | Example | Purpose | Railway notes |
-| --- | --- | --- | --- | --- |
-| `PORT` | No | `8000` | Port FastAPI binds to. Railway injects this automatically. | Usually do not set manually on Railway. |
-| `APP_ENV` | Yes | `development` or `production` | Controls local dev behavior, including whether mock Telegram auth is allowed. | Set to `production` on Railway. |
-| `DATABASE_URL` | Yes | `mysql+pymysql://user:password@host:3306/database` | SQLAlchemy connection string for your existing MySQL database. | Point this at the same MySQL instance that contains the `clips` table. |
-| `TELEGRAM_BOT_TOKEN` | Yes | `123456:ABC...` | Used only on the backend to validate Telegram Mini App `initData` before trusting user identity. | Must match the exact bot that opens this Mini App from the menu button. Never expose it in the frontend. |
-| `FRONTEND_URL` | Yes | `http://localhost:5173` | Public web origin used for CORS and cookie settings. | Set this to your Railway HTTPS Mini App URL or custom domain. |
-| `SESSION_SECRET` | Yes | `long-random-secret` | Secret used to sign the session cookie after Telegram auth succeeds. | Use a long random value and rotate carefully because rotation invalidates active sessions. |
-| `CORS_ALLOWED_ORIGINS` | Yes | `http://localhost:5173,https://miniapp.example.com` | Comma-separated list of allowed browser origins for API requests. | Include your Railway domain and any custom domain you attach. |
-| `BUNNY_STREAM_LIBRARY_ID` | Yes | `123456` | Bunny Stream library ID used to resolve preview metadata. | Use the library that contains your preview videos. |
-| `BUNNY_STREAM_API_KEY` | Yes | `bunny-stream-api-key` | Backend-only API key used to fetch Bunny Stream video metadata. | Keep this secret; it should never be exposed to the client. |
-| `BUNNY_STREAM_CDN_HOST` | Yes | `https://vz-yourpullzone.b-cdn.net` | CDN host used to build public-safe thumbnail and preview asset URLs. | Use your actual Bunny Stream pull zone host. |
-| `BUNNY_STREAM_EMBED_TOKEN_KEY` | Yes | `embed-token-key` | Secret/token key used to generate Bunny Stream player embed URLs. | Keep this secret on Railway; it stays server-side. |
-| `BUNNY_PREVIEW_COLLECTION_ID` | Yes | `281a5ee9-db7e-41a2-bce0-97e16a7fd7b9` | Bunny collection ID used by the upstream admin flow to find preview videos. | This is the collection your preview picker and auto-match logic will search. |
+| Variable | Required | Example | Purpose |
+| --- | --- | --- | --- |
+| `PORT` | No | `8000` | Port FastAPI binds to. Railway usually injects this. |
+| `APP_ENV` | Yes | `development` or `production` | Enables dev-only browser fallback behavior locally. |
+| `DATABASE_URL` | Yes | `mysql+pymysql://user:password@host:3306/database` | SQLAlchemy connection string for the shared MySQL database. |
+| `TELEGRAM_BOT_TOKEN` | Yes | `123456:ABC...` | Validates Telegram Mini App `initData` server-side. |
+| `FRONTEND_URL` | Yes | `http://localhost:5173` | Public frontend origin used for cookie/CORS configuration. |
+| `SESSION_SECRET` | Yes | `long-random-secret` | Signs the Telegram session cookie. |
+| `CORS_ALLOWED_ORIGINS` | Yes | `http://localhost:5173,https://mini.example.com` | Comma-separated allowed origins. |
+| `BOT_USERNAME` | Yes | `mistressbjqueenbot` | Bot username used to build all bot handoff deep links. |
+| `FEATURED_TIER_PRODUCT_IDS` | No | `26,23,21` | Manual ordered list of featured `product_id` values for `/tasks`. Leave empty to hide the featured task carousel. |
+| `BUNNY_STREAM_LIBRARY_ID` | Yes for `/clips` previews | `123456` | Bunny Stream library ID for clip previews. |
+| `BUNNY_STREAM_API_KEY` | Yes for `/clips` previews | `bunny-stream-api-key` | Backend-only Bunny metadata key. |
+| `BUNNY_STREAM_CDN_HOST` | Yes for `/clips` previews | `https://vz-yourpullzone.b-cdn.net` | Bunny CDN host used to build safe preview asset URLs. |
+| `BUNNY_STREAM_EMBED_TOKEN_KEY` | Yes for `/clips` previews | `embed-token-key` | Bunny embed token key for preview player URLs. |
+| `BUNNY_PREVIEW_COLLECTION_ID` | No | `281a5ee9-db7e-41a2-bce0-97e16a7fd7b9` | Upstream preview collection ID used by clip admin tooling. |
 
-### Frontend Env Reference
+### Frontend env vars
 
-| Variable | Required | Example | Purpose | Railway notes |
-| --- | --- | --- | --- | --- |
-| `VITE_API_BASE_URL` | Yes | `http://localhost:8000/api` | API base URL used by the frontend during local dev and browser testing. | For single-service Railway deploys, set this to `/api` or leave it aligned with your build strategy. |
-| `VITE_APP_NAME` | No | `Mistress BJ Queen Clips` | Display name used in the Mini App shell and browser metadata. | Safe to change without backend impact. |
+| Variable | Required | Example | Purpose |
+| --- | --- | --- | --- |
+| `VITE_API_BASE_URL` | Yes | `/api` | API base URL used by the frontend. |
+| `VITE_APP_NAME` | No | `Mistress BJQueen Mini Apps` | Display name for browser metadata and shared app labeling. |
 
-### Recommended Railway Values
-
-For a typical single-service Railway deployment:
-
-- `APP_ENV=production`
-- `FRONTEND_URL=https://<your-railway-domain>`
-- `CORS_ALLOWED_ORIGINS=https://<your-railway-domain>`
-- `VITE_API_BASE_URL=/api`
-
-If you later add a custom domain, update both `FRONTEND_URL` and `CORS_ALLOWED_ORIGINS` to match that public origin.
-
-### Local Dev Tips
-
-- Keep `APP_ENV=development` locally so browser fallback and mock auth remain available.
-- Point `DATABASE_URL` at a safe development or read-only database if you do not want to use production data locally.
-- `TELEGRAM_BOT_TOKEN` is still required for real Telegram Mini App testing, but browser-only local testing can use the development fallback path.
-- If Bunny preview metadata is not configured yet, the app still works, but clips without `bunny_stream_preview_id` will show fallback preview states instead of the player.
-
-## Local Development
+## Local development
 
 ### API
 
 ```bash
-cd apps/api
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+python -m pip install -r apps/api/requirements.txt
+uvicorn app.main:app --app-dir apps/api --reload --port 8000
 ```
 
 ### Web
@@ -80,60 +90,56 @@ uvicorn app.main:app --reload --port 8000
 ```bash
 corepack enable
 pnpm install
-pnpm dev:web
+pnpm --dir apps/web dev
 ```
 
-The Vite dev server runs on `http://localhost:5173` and proxies API calls to `http://localhost:8000`.
+Then open:
 
-## Telegram Browser Fallback
+- [http://localhost:5173/](http://localhost:5173/) for the chooser page
+- [http://localhost:5173/clips](http://localhost:5173/clips) for Clip Store
+- [http://localhost:5173/tasks](http://localhost:5173/tasks) for Custom Obedience Tasks
 
-Outside Telegram, the app shows a `Telegram preview mode` banner and can still browse the safe public catalog. In `development`, posting to `/api/auth/telegram` with a `devUser` payload creates a mock session for local testing.
+## Telegram setup
 
-## Bunny Preview Flow
+You can point different Telegram web app buttons or links at different paths on the same domain.
 
-The Mini App does not use Telegram `file_id` for previews. Instead it expects `clips.bunny_stream_preview_id` to point at a Bunny Stream preview video. The backend uses Bunny metadata plus the configured CDN host to generate:
+Examples:
 
-- `thumbnailUrl`
-- `previewWebpUrl`
-- `previewEmbedUrl`
+- `https://your-domain.example.com/clips`
+- `https://your-domain.example.com/tasks`
 
-The frontend uses the Bunny Stream player in the clip detail view.
+Both Mini Apps share the same Telegram auth/session logic.
 
-## Paid Delivery Safety
+## Bot handoff
 
-The Mini App never exposes paid stream or download URLs. Purchase actions deep-link back into the Telegram bot using your existing format:
+All purchases still happen in the bot.
 
-- `https://t.me/mistressbjqueenbot?start=stream_<ID>`
-- `https://t.me/mistressbjqueenbot?start=download_<ID>`
+### Clip Store deep links
 
-## Telegram Setup
+- `https://t.me/<BOT_USERNAME>?start=stream_<CLIP_ID>`
+- `https://t.me/<BOT_USERNAME>?start=download_<CLIP_ID>`
 
-1. Deploy the app on HTTPS.
-2. Set the bot menu button to open the Mini App URL.
-3. Ensure `TELEGRAM_BOT_TOKEN` matches the bot serving the menu button.
-4. The frontend posts Telegram `initData` to `/api/auth/telegram`.
-5. The backend validates `initData` before issuing a signed session cookie.
+### Task package deep links
 
-## Railway Deployment
+- `https://t.me/<BOT_USERNAME>?start=buy_<PRODUCT_ID>`
 
-This repo is designed for a single Railway service.
+Shared bot-link generation lives in [`apps/api/app/utils/bot_links.py`](/Users/guywatson/Projects/clip-search-mini-app/apps/api/app/utils/bot_links.py), and shared frontend Telegram handoff lives in [`apps/web/src/app/telegram.ts`](/Users/guywatson/Projects/clip-search-mini-app/apps/web/src/app/telegram.ts).
 
-1. Create a new Railway service from this repo.
-2. Add the environment variables from `.env.example`.
-3. `railway.json` starts the app with `uvicorn` and points the health check at `/api/health`.
-4. Railway builds the React frontend, then runs FastAPI via the root `Dockerfile`.
-5. Set your public domain as the Mini App URL in BotFather.
+## Railway deployment
 
-## Upstream `payment-system` Changes
+This repo stays a single Railway service.
 
-This implementation also updates `../payment-system` so clip admin can manage `bunny_stream_preview_id`.
+1. Deploy the repo as one service.
+2. Set the environment variables from `.env.example`.
+3. Use one public HTTPS domain.
+4. Open different Mini Apps by path, for example `/clips` and `/tasks`.
+5. Point Railway health checks to `/api/health`.
 
-- `db.py` adds the schema column.
-- `app.py` accepts/saves the field.
-- clip admin UI loads preview videos from Bunny collection `281a5ee9-db7e-41a2-bce0-97e16a7fd7b9`.
-- add/edit forms try to auto-match preview videos by filename and still allow manual override.
+This gives you one service, one origin, and multiple Telegram Mini Apps by path.
 
 ## Notes
 
-- The data mapping is centralized in `apps/api/app/db/clip_mapping.py`.
-- Alembic is included for future app-owned migrations, but this service treats the existing `clips` table as externally managed.
+- Clip Store behavior remains under `/clips`.
+- Custom Obedience Tasks uses the `premium_tiers` table.
+- If `FEATURED_TIER_PRODUCT_IDS` is empty, the featured task carousel is hidden.
+- If Bunny preview settings are missing, `/clips` still works but preview assets fall back gracefully.

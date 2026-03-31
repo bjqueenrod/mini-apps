@@ -7,11 +7,11 @@ import { PreviewPlayer } from './PreviewPlayer';
 
 export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: boolean }) {
   const location = useLocation();
-  const backTarget = `/${location.search}`;
+  const backTarget = `/clips${location.search}`;
   const tagHref = (tag: string) => {
     const params = new URLSearchParams();
     params.set('q', `#${tag}`);
-    return `/?${params.toString()}`;
+    return `/clips?${params.toString()}`;
   };
   const handleBotAction = (url: string) => (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();

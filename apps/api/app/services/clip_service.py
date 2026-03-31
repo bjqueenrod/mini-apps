@@ -9,11 +9,10 @@ from app.db.clip_mapping import DEFAULT_SHORT_DESCRIPTION_LENGTH, get_clip_mappi
 from app.db.session import engine
 from app.schemas.clips import ClipQueryParams
 from app.services.preview_service import build_preview_assets
+from app.utils.bot_links import build_clip_download_url, build_clip_stream_url
 from app.utils.duration import format_duration_label, parse_duration_seconds
 from app.utils.tags import parse_tags
 
-
-BOT_BASE = "https://t.me/mistressbjqueenbot?start="
 TOP_SELLER_CLIP_IDS: tuple[str, ...] = (
     "BJQ0005",
     "BJQ0132",
@@ -149,8 +148,8 @@ def _row_to_item(row: Any) -> dict[str, Any]:
         "previewType": preview.get("previewType"),
         "category": str(data.get("category") or "").strip() or None,
         "tags": tags,
-        "botStreamUrl": f"{BOT_BASE}stream_{clip_id}",
-        "botDownloadUrl": f"{BOT_BASE}download_{clip_id}",
+        "botStreamUrl": build_clip_stream_url(clip_id),
+        "botDownloadUrl": build_clip_download_url(clip_id),
     }
 
 
