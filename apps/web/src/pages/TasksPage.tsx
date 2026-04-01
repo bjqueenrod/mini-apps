@@ -47,6 +47,45 @@ const BUILT_AROUND_YOU_POINTS = [
   { label: 'Your preferred intensity', icon: 'heart' },
 ] as const;
 
+const HERO_VISUAL_POINTS = [
+  {
+    title: 'Tailored brief',
+    detail: 'Your kinks, limits, toys, and preferred intensity shape the assignment.',
+    icon: 'sliders',
+  },
+  {
+    title: 'Personal review',
+    detail: 'Every task is written and checked personally before it reaches you.',
+    icon: 'heart',
+  },
+  {
+    title: 'Bot delivery',
+    detail: 'You receive the next step, send proof, and continue in one guided flow.',
+    icon: 'chat',
+  },
+] as const;
+
+const VISUAL_SPOTLIGHT_CARDS = [
+  {
+    eyebrow: 'Tailored',
+    title: 'Built from your preferences',
+    body: 'No generic bundles. Your package is shaped around what you enjoy, what you avoid, and what you own.',
+    icon: 'wand',
+  },
+  {
+    eyebrow: 'Paced',
+    title: 'One task at a time',
+    body: 'The experience stays focused and interactive instead of dropping a wall of instructions all at once.',
+    icon: 'clock',
+  },
+  {
+    eyebrow: 'Flexible',
+    title: 'Soft to intense',
+    body: 'Beginner-friendly options and heavier intensity can both live in the same system, depending on your level.',
+    icon: 'signal',
+  },
+] as const;
+
 const FAQS = [
   {
     question: 'Do I need lots of toys?',
@@ -235,6 +274,41 @@ export function TasksPage() {
             Back to Bot
           </a>
         </div>
+        <div className="tasks-hero__visuals">
+          <div className="tasks-hero__feature">
+            <p className="tasks-hero__feature-eyebrow">Inside Your Package</p>
+            <strong>A guided experience, not a generic list.</strong>
+            <p className="tasks-hero__feature-copy">
+              The flow is designed to feel personal from the first preference you submit to the final proof you send.
+            </p>
+            <div className="tasks-hero__feature-list">
+              {HERO_VISUAL_POINTS.map((point) => (
+                <div key={point.title} className="tasks-hero__feature-item">
+                  <span className="tasks-hero__feature-icon">
+                    <TaskIcon name={point.icon} />
+                  </span>
+                  <div>
+                    <strong>{point.title}</strong>
+                    <p>{point.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="tasks-hero__mini-grid">
+            {VISUAL_SPOTLIGHT_CARDS.map((card) => (
+              <article key={card.title} className="tasks-hero__mini-card">
+                <span className="tasks-hero__mini-icon">
+                  <TaskIcon name={card.icon} />
+                </span>
+                <p className="tasks-hero__mini-eyebrow">{card.eyebrow}</p>
+                <strong>{card.title}</strong>
+                <p>{card.body}</p>
+              </article>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section className="tasks-strip" aria-label="Why buyers choose custom obedience">
@@ -245,6 +319,19 @@ export function TasksPage() {
             </span>
             <span>{point.label}</span>
           </div>
+        ))}
+      </section>
+
+      <section className="tasks-spotlight" aria-label="Highlights of the custom experience">
+        {VISUAL_SPOTLIGHT_CARDS.map((card) => (
+          <article key={card.title} className="tasks-spotlight-card">
+            <span className="tasks-spotlight-card__icon">
+              <TaskIcon name={card.icon} />
+            </span>
+            <p className="tasks-spotlight-card__eyebrow">{card.eyebrow}</p>
+            <strong>{card.title}</strong>
+            <p>{card.body}</p>
+          </article>
         ))}
       </section>
 
