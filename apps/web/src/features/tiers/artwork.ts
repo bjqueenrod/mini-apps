@@ -52,12 +52,21 @@ function hashTier(tier: TierItem): number {
   return hash;
 }
 
-function buildSvg(tier: TierItem): string {
+function buildSvg(tier: TierItem, badgeLabel?: string): string {
   const palette = PALETTES[hashTier(tier) % PALETTES.length];
   const title = escapeSvgText(tier.name);
   const duration = escapeSvgText(getTierDurationLabel(tier));
   const tasks = escapeSvgText(getTierTasksLabel(tier));
-  const badge = escapeSvgText(tier.badge || 'Custom Obedience');
+  const badge = badgeLabel ? escapeSvgText(badgeLabel) : '';
+  const titleY = badge ? '150' : '112';
+  const tasksY = badge ? '190' : '152';
+  const durationY = badge ? '225' : '187';
+  const badgeMarkup = badge
+    ? `
+      <rect x="42" y="42" width="220" height="44" rx="22" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.12)" />
+      <text x="66" y="70" fill="${palette.glow}" font-size="20" font-family="Avenir Next, Segoe UI, sans-serif" letter-spacing="1.6">${badge}</text>
+    `
+    : '';
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" fill="none">
@@ -82,8 +91,7 @@ function buildSvg(tier: TierItem): string {
 
       <rect width="640" height="420" rx="28" fill="url(#bg)" />
       <rect x="1.5" y="1.5" width="637" height="417" rx="26.5" stroke="rgba(255,255,255,.06)" />
-      <rect x="42" y="42" width="180" height="44" rx="22" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.12)" />
-      <text x="66" y="70" fill="${palette.glow}" font-size="20" font-family="Avenir Next, Segoe UI, sans-serif" letter-spacing="1.6">${badge}</text>
+      ${badgeMarkup}
 
       <circle cx="182" cy="114" r="158" fill="url(#glowA)" />
       <circle cx="532" cy="326" r="126" fill="url(#glowB)" />
@@ -99,13 +107,13 @@ function buildSvg(tier: TierItem): string {
         <path d="M441 112H499" stroke="${palette.glow}" stroke-width="3" stroke-linecap="round" opacity=".55" />
       </g>
 
-      <text x="66" y="150" fill="white" font-size="50" font-weight="700" font-family="Avenir Next, Segoe UI, sans-serif">${title}</text>
-      <text x="66" y="190" fill="rgba(255,255,255,.74)" font-size="26" font-family="Avenir Next, Segoe UI, sans-serif">${tasks}</text>
-      <text x="66" y="225" fill="rgba(255,255,255,.58)" font-size="24" font-family="Avenir Next, Segoe UI, sans-serif">${duration}</text>
+      <text x="66" y="${titleY}" fill="white" font-size="50" font-weight="700" font-family="Avenir Next, Segoe UI, sans-serif">${title}</text>
+      <text x="66" y="${tasksY}" fill="rgba(255,255,255,.74)" font-size="26" font-family="Avenir Next, Segoe UI, sans-serif">${tasks}</text>
+      <text x="66" y="${durationY}" fill="rgba(255,255,255,.58)" font-size="24" font-family="Avenir Next, Segoe UI, sans-serif">${duration}</text>
     </svg>
   `;
 }
 
-export function getTierArtwork(tier: TierItem): string {
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(buildSvg(tier))}`;
+export function getTierArtwork(tier: TierItem, badgeLabel?: string): string {
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(buildSvg(tier, badgeLabel))}`;
 }

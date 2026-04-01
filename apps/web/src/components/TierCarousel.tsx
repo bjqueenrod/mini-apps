@@ -64,24 +64,34 @@ export function TierCarousel({
             ))
           : items.map((tier) => (
               <Link key={tier.id} className="top-sellers__card" to={toTierPath(tier.id)}>
-                <div className="top-sellers__media top-sellers__media--tier">
-                  <img src={getTierArtwork(tier)} alt={`${tier.name} package artwork`} loading="lazy" />
-                </div>
-                <div className="top-sellers__body">
-                  <div className="top-sellers__eyebrow">
-                    <span className="top-sellers__tier-badge top-sellers__tier-badge--inline">
-                      {guideLabels[tier.id] || tier.badge || 'Custom Obedience'}
-                    </span>
-                    <span>{durationLabel(tier)}</span>
-                  </div>
-                  <h3>{tier.name}</h3>
-                  <p>{tier.shortDescription || tier.description || 'A premium obedience package.'}</p>
-                  <div className="top-sellers__prices">
-                    <span>{tasksLabel(tier)}</span>
-                    <span className="top-sellers__price-separator">•</span>
-                    <span>{priceLabel(tier)}</span>
-                  </div>
-                </div>
+                {(() => {
+                  const badgeLabel = guideLabels[tier.id] || tier.badge;
+
+                  return (
+                    <>
+                      <div className="top-sellers__media top-sellers__media--tier">
+                        <img src={getTierArtwork(tier, badgeLabel)} alt={`${tier.name} package artwork`} loading="lazy" />
+                      </div>
+                      <div className="top-sellers__body">
+                        <div className="top-sellers__eyebrow">
+                          {badgeLabel ? (
+                            <span className="top-sellers__tier-badge top-sellers__tier-badge--inline">{badgeLabel}</span>
+                          ) : (
+                            <span />
+                          )}
+                          <span>{durationLabel(tier)}</span>
+                        </div>
+                        <h3>{tier.name}</h3>
+                        <p>{tier.shortDescription || tier.description || 'A premium obedience package.'}</p>
+                        <div className="top-sellers__prices">
+                          <span>{tasksLabel(tier)}</span>
+                          <span className="top-sellers__price-separator">•</span>
+                          <span>{priceLabel(tier)}</span>
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
               </Link>
             ))}
       </div>
