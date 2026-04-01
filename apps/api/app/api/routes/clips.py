@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
-from app.schemas.clips import ClipItemResponse, ClipListResponse, ClipQueryParams
-from app.services.clip_service import get_clip_detail, get_new_clips, get_top_seller_clips, search_clips
+from app.schemas.clips import ClipHashtagListResponse, ClipItemResponse, ClipListResponse, ClipQueryParams
+from app.services.clip_service import get_clip_detail, get_clip_hashtags, get_new_clips, get_top_seller_clips, search_clips
 from app.services.rate_limit import enforce_rate_limit
 
 router = APIRouter(tags=["clips"])
@@ -38,6 +38,12 @@ def top_seller_clips(db: Session = Depends(get_db)) -> ClipListResponse:
 def new_clips(db: Session = Depends(get_db)) -> ClipListResponse:
     data = get_new_clips(db, limit=10)
     return ClipListResponse(**data)
+
+
+@router.get("/clips/hashtags", response_model=ClipHashtagListResponse)
+def clip_hashtags(db: Session = Depends(get_db)) -> ClipHashtagListResponse:
+    data = get_clip_hashtags(db)
+    return ClipHashtagListResponse(**data)
 
 
 @router.get("/clips/{clip_id}", response_model=ClipItemResponse)

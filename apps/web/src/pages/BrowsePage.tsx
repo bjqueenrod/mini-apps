@@ -11,7 +11,7 @@ import { TelegramDevBanner } from '../components/TelegramDevBanner';
 import { TopSellersCarousel } from '../components/TopSellersCarousel';
 import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
-import { useClipDetail, useClipSearch, useNewClips, useTopSellers } from '../features/clips/hooks';
+import { useClipDetail, useClipHashtags, useClipSearch, useNewClips, useTopSellers } from '../features/clips/hooks';
 import { readQueryState, toSearchParams } from '../features/clips/queryState';
 import { ClipItem } from '../features/clips/types';
 import { pushRecentSearch } from '../utils/storage';
@@ -36,6 +36,7 @@ export function BrowsePage() {
   const queryState = useMemo(() => readQueryState(searchParams), [searchParams]);
   const activeQueryState = useMemo(() => ({ ...queryState, page }), [page, queryState]);
   const clipsQuery = useClipSearch(activeQueryState);
+  const clipHashtagsQuery = useClipHashtags();
   const newClipsQuery = useNewClips();
   const topSellersQuery = useTopSellers();
   const clipDetailQuery = useClipDetail(clipId);
@@ -281,7 +282,7 @@ export function BrowsePage() {
                 </button>
               )}
             </div>
-            <SearchBar value={searchValue} onChange={setSearchValue} />
+            <SearchBar value={searchValue} onChange={setSearchValue} hashtagOptions={clipHashtagsQuery.data?.items ?? []} />
           </div>
         </section>
 

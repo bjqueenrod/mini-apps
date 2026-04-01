@@ -67,6 +67,19 @@ def test_search_matches_clip_id(client) -> None:
 
 
 
+def test_clip_hashtags_returns_all_active_tags(client) -> None:
+    response = client.get("/api/clips/hashtags")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["items"] == [
+        {"tag": "chastity", "count": 1},
+        {"tag": "countdown", "count": 1},
+        {"tag": "denial", "count": 1},
+        {"tag": "joi", "count": 1},
+        {"tag": "tease", "count": 1},
+    ]
+
+
 def test_clip_detail_returns_bot_links_and_hides_paid_urls(client) -> None:
     response = client.get("/api/clips/BJQ0001")
     assert response.status_code == 200

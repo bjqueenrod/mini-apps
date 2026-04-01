@@ -27,6 +27,15 @@ export type ClipListResponse = {
   categories: string[];
 };
 
+export type ClipHashtagOption = {
+  tag: string;
+  count: number;
+};
+
+export type ClipHashtagListResponse = {
+  items: ClipHashtagOption[];
+};
+
 export type ClipQueryState = {
   q: string;
   category: string;

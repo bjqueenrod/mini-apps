@@ -41,6 +41,15 @@ class ClipItemResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
+class ClipHashtagOptionResponse(BaseModel):
+    tag: str
+    count: int
+
+
+class ClipHashtagListResponse(BaseModel):
+    items: list[ClipHashtagOptionResponse]
+
+
 class ClipListResponse(BaseModel):
     items: list[ClipItemResponse]
     page: int

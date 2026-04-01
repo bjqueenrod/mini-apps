@@ -1,4 +1,4 @@
-import { ClipItem, ClipListResponse, ClipQueryState } from './types';
+import { ClipHashtagListResponse, ClipItem, ClipListResponse, ClipQueryState } from './types';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
@@ -34,5 +34,11 @@ export async function fetchTopSellers(): Promise<ClipListResponse> {
 export async function fetchNewClips(): Promise<ClipListResponse> {
   const response = await fetch(`${API_BASE}/clips/new`, { credentials: 'include' });
   if (!response.ok) throw new Error('Unable to load new clips.');
+  return response.json();
+}
+
+export async function fetchClipHashtags(): Promise<ClipHashtagListResponse> {
+  const response = await fetch(`${API_BASE}/clips/hashtags`, { credentials: 'include' });
+  if (!response.ok) throw new Error('Unable to load clip hashtags.');
   return response.json();
 }

@@ -192,6 +192,28 @@ def search_clips(db: Session, params: ClipQueryParams) -> dict[str, Any]:
 
 
 
+def get_clip_hashtags(db: Session, *, limit: int = 250) -> dict[str, Any]:
+    mapping = get_clip_mapping(engine)
+    table = mapping.table
+    stmt = select(table)
+    active_col = mapping.get("active")
+    if active_col is not None:
+        stmt = stmt.where(active_col == 1)
+
+    rows = db.execute(stmt).all()
+    tag_counts: dict[str, int] = {}
+    for row in rows:
+        data = dict(row._mapping)
+        for tag in parse_tags(data.get("keywords"), data.get("hashtags")):
+            tag_counts[tag] = tag_counts.get(tag, 0) + 1
+
+    items = [
+        {"tag": tag, "count": count}
+        for tag, count in sorted(tag_counts.items(), key=lambda item: (-item[1], item[0]))
+    ][: max(1, min(limit, 500))]
+    return {"items": items}
+
+
 def get_clip_detail(db: Session, clip_id: str) -> dict[str, Any] | None:
     mapping = get_clip_mapping(engine)
     table = mapping.table

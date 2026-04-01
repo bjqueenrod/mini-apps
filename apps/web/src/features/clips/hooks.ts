@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchClip, fetchClips, fetchNewClips, fetchTopSellers } from './api';
+import { fetchClip, fetchClipHashtags, fetchClips, fetchNewClips, fetchTopSellers } from './api';
 import { ClipQueryState } from './types';
 
 export function useClipSearch(queryState: ClipQueryState) {
@@ -31,5 +31,13 @@ export function useNewClips() {
   return useQuery({
     queryKey: ['clips', 'new'],
     queryFn: fetchNewClips,
+  });
+}
+
+export function useClipHashtags() {
+  return useQuery({
+    queryKey: ['clips', 'hashtags'],
+    queryFn: fetchClipHashtags,
+    staleTime: 5 * 60 * 1000,
   });
 }
