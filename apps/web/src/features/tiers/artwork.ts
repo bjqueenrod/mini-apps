@@ -5,18 +5,18 @@ export type TierArtworkVariant = 'light' | 'base';
 
 const PALETTES: Record<TierArtworkVariant, { backgroundStart: string; backgroundEnd: string; accent: string; accentSoft: string; glow: string }> = {
   light: {
-    backgroundStart: '#56406f',
+    backgroundStart: '#4d3762',
     backgroundEnd: '#241b31',
-    accent: '#d3a7ff',
-    accentSoft: '#8d63b3',
-    glow: '#f0d9ff',
+    accent: '#c997f0',
+    accentSoft: '#9367b8',
+    glow: '#eed7ff',
   },
   base: {
-    backgroundStart: '#2f2142',
+    backgroundStart: '#352545',
     backgroundEnd: '#17111f',
     accent: '#b985e2',
-    accentSoft: '#714f94',
-    glow: '#ddbcff',
+    accentSoft: '#7c58a1',
+    glow: '#dcc0fa',
   },
 };
 
