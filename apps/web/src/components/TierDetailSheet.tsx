@@ -1,12 +1,20 @@
 import { MouseEvent, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { openBotDeepLink } from '../app/telegram';
-import { getTierArtwork } from '../features/tiers/artwork';
+import { getTierArtwork, TierArtworkVariant } from '../features/tiers/artwork';
 import { getTierDurationLabel, getTierSummary, getTierTasksLabel } from '../features/tiers/presentation';
 import { TierItem } from '../features/tiers/types';
 import { formatPrice } from '../utils/format';
 
-export function TierDetailSheet({ tier, loading }: { tier?: TierItem; loading?: boolean }) {
+export function TierDetailSheet({
+  tier,
+  loading,
+  artworkVariant = 'base',
+}: {
+  tier?: TierItem;
+  loading?: boolean;
+  artworkVariant?: TierArtworkVariant;
+}) {
   const handleBotAction = (url?: string) => (event: MouseEvent<HTMLAnchorElement>) => {
     if (!url) {
       event.preventDefault();
@@ -57,9 +65,9 @@ export function TierDetailSheet({ tier, loading }: { tier?: TierItem; loading?: 
         {!loading && tier && (
           <>
             <div className="detail-sheet__body detail-sheet__body--tier">
-              <div className="detail-sheet__tier-hero">
+              <div className={`detail-sheet__tier-hero ${artworkVariant === 'light' ? 'detail-sheet__tier-hero--light' : 'detail-sheet__tier-hero--base'}`}>
                 <div className="detail-sheet__tier-media">
-                  <img src={getTierArtwork(tier, tier.badge)} alt={`${tier.name} package artwork`} />
+                  <img src={getTierArtwork(tier, tier.badge, artworkVariant)} alt={`${tier.name} package artwork`} />
                 </div>
                 <div className="detail-sheet__tier-summary">
                   <div className="detail-sheet__eyebrow">

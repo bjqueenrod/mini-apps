@@ -1,36 +1,24 @@
 import { getTierDurationLabel, getTierTasksLabel } from './presentation';
 import { TierItem } from './types';
 
-const PALETTES = [
-  {
+export type TierArtworkVariant = 'light' | 'base';
+
+const PALETTES: Record<TierArtworkVariant, { backgroundStart: string; backgroundEnd: string; accent: string; accentSoft: string; glow: string }> = {
+  light: {
+    backgroundStart: '#56406f',
+    backgroundEnd: '#241b31',
+    accent: '#d3a7ff',
+    accentSoft: '#8d63b3',
+    glow: '#f0d9ff',
+  },
+  base: {
     backgroundStart: '#2f2142',
     backgroundEnd: '#17111f',
-    accent: '#d896ff',
-    accentSoft: '#8d63b3',
-    glow: '#f3b2ff',
+    accent: '#b985e2',
+    accentSoft: '#714f94',
+    glow: '#ddbcff',
   },
-  {
-    backgroundStart: '#43274a',
-    backgroundEnd: '#16111d',
-    accent: '#ffbfdc',
-    accentSoft: '#9d5d7d',
-    glow: '#ffd6eb',
-  },
-  {
-    backgroundStart: '#23283f',
-    backgroundEnd: '#12111a',
-    accent: '#9ab4ff',
-    accentSoft: '#5567ab',
-    glow: '#c7d4ff',
-  },
-  {
-    backgroundStart: '#1f3640',
-    backgroundEnd: '#101319',
-    accent: '#8fe7df',
-    accentSoft: '#4f8d89',
-    glow: '#cbfffb',
-  },
-] as const;
+};
 
 function escapeSvgText(value: string): string {
   return value
@@ -41,19 +29,12 @@ function escapeSvgText(value: string): string {
     .replace(/'/g, '&apos;');
 }
 
-function hashTier(tier: TierItem): number {
-  const source = `${tier.id}:${tier.productId ?? ''}:${tier.name}`;
-  let hash = 0;
-
-  for (const character of source) {
-    hash = (hash * 31 + character.charCodeAt(0)) >>> 0;
-  }
-
-  return hash;
+export function getTierArtworkVariant(index: number): TierArtworkVariant {
+  return index % 2 === 0 ? 'light' : 'base';
 }
 
-function buildSvg(tier: TierItem, badgeLabel?: string): string {
-  const palette = PALETTES[hashTier(tier) % PALETTES.length];
+function buildSvg(tier: TierItem, badgeLabel?: string, variant: TierArtworkVariant = 'base'): string {
+  const palette = PALETTES[variant];
   const title = escapeSvgText(tier.name);
   const duration = escapeSvgText(getTierDurationLabel(tier));
   const tasks = escapeSvgText(getTierTasksLabel(tier));
@@ -114,6 +95,6 @@ function buildSvg(tier: TierItem, badgeLabel?: string): string {
   `;
 }
 
-export function getTierArtwork(tier: TierItem, badgeLabel?: string): string {
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(buildSvg(tier, badgeLabel))}`;
+export function getTierArtwork(tier: TierItem, badgeLabel?: string, variant: TierArtworkVariant = 'base'): string {
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(buildSvg(tier, badgeLabel, variant))}`;
 }

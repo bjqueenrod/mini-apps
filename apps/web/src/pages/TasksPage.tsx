@@ -8,6 +8,7 @@ import { TelegramDevBanner } from '../components/TelegramDevBanner';
 import { TierDetailSheet } from '../components/TierDetailSheet';
 import { applyTelegramTheme, openBotDeepLink } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
+import { getTierArtworkVariant } from '../features/tiers/artwork';
 import { useTierDetail, useTiers } from '../features/tiers/hooks';
 import { getBotRootUrl } from '../features/tiers/presentation';
 
@@ -253,6 +254,11 @@ export function TasksPage() {
   const tiersQuery = useTiers();
   const tierDetailQuery = useTierDetail(tierId);
   const botRootUrl = useMemo(() => getBotRootUrl(tiersQuery.data?.items ?? []), [tiersQuery.data?.items]);
+  const tierArtworkVariants = useMemo(
+    () =>
+      Object.fromEntries((tiersQuery.data?.items ?? []).map((item, index) => [item.id, getTierArtworkVariant(index)])),
+    [tiersQuery.data?.items],
+  );
 
   useEffect(() => {
     applyTelegramTheme();
@@ -488,7 +494,13 @@ export function TasksPage() {
         </div>
       </div>
 
-      {tierId && <TierDetailSheet tier={tierDetailQuery.data} loading={tierDetailQuery.isLoading} />}
+      {tierId && (
+        <TierDetailSheet
+          tier={tierDetailQuery.data}
+          loading={tierDetailQuery.isLoading}
+          artworkVariant={tierArtworkVariants[tierId]}
+        />
+      )}
     </AppShell>
   );
 }

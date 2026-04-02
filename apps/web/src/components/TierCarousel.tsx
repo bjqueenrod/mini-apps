@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { getTierArtwork } from '../features/tiers/artwork';
+import { getTierArtwork, getTierArtworkVariant } from '../features/tiers/artwork';
 import { getTierGuideLabels } from '../features/tiers/presentation';
 import { TierItem } from '../features/tiers/types';
 import { formatPrice } from '../utils/format';
@@ -62,38 +62,39 @@ export function TierCarousel({
                 </div>
               </div>
             ))
-          : items.map((tier) => (
-              <Link key={tier.id} className="top-sellers__card" to={toTierPath(tier.id)}>
-                {(() => {
-                  const badgeLabel = guideLabels[tier.id] || tier.badge;
+          : items.map((tier, index) => {
+              const badgeLabel = guideLabels[tier.id] || tier.badge;
+              const artworkVariant = getTierArtworkVariant(index);
 
-                  return (
-                    <>
-                      <div className="top-sellers__media top-sellers__media--tier">
-                        <img src={getTierArtwork(tier, badgeLabel)} alt={`${tier.name} package artwork`} loading="lazy" />
-                      </div>
-                      <div className="top-sellers__body">
-                        <div className="top-sellers__eyebrow">
-                          {badgeLabel ? (
-                            <span className="top-sellers__tier-badge top-sellers__tier-badge--inline">{badgeLabel}</span>
-                          ) : (
-                            <span />
-                          )}
-                          <span>{durationLabel(tier)}</span>
-                        </div>
-                        <h3>{tier.name}</h3>
-                        <p>{tier.shortDescription || tier.description || 'A premium obedience package.'}</p>
-                        <div className="top-sellers__prices">
-                          <span>{tasksLabel(tier)}</span>
-                          <span className="top-sellers__price-separator">•</span>
-                          <span>{priceLabel(tier)}</span>
-                        </div>
-                      </div>
-                    </>
-                  );
-                })()}
-              </Link>
-            ))}
+              return (
+                <Link
+                  key={tier.id}
+                  className={`top-sellers__card ${artworkVariant === 'light' ? 'top-sellers__card--light' : 'top-sellers__card--base'}`}
+                  to={toTierPath(tier.id)}
+                >
+                  <div className="top-sellers__media top-sellers__media--tier">
+                    <img src={getTierArtwork(tier, badgeLabel, artworkVariant)} alt={`${tier.name} package artwork`} loading="lazy" />
+                  </div>
+                  <div className="top-sellers__body">
+                    <div className="top-sellers__eyebrow">
+                      {badgeLabel ? (
+                        <span className="top-sellers__tier-badge top-sellers__tier-badge--inline">{badgeLabel}</span>
+                      ) : (
+                        <span />
+                      )}
+                      <span>{durationLabel(tier)}</span>
+                    </div>
+                    <h3>{tier.name}</h3>
+                    <p>{tier.shortDescription || tier.description || 'A premium obedience package.'}</p>
+                    <div className="top-sellers__prices">
+                      <span>{tasksLabel(tier)}</span>
+                      <span className="top-sellers__price-separator">•</span>
+                      <span>{priceLabel(tier)}</span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
       </div>
     </section>
   );

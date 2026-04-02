@@ -695,6 +695,18 @@ button {
   scroll-snap-align: start;
 }
 
+.top-sellers__card--light {
+  background: #2a2231;
+}
+
+.top-sellers__card--light .top-sellers__body {
+  background: linear-gradient(180deg, rgba(49, 40, 59, 0.98), rgba(34, 28, 42, 0.98));
+}
+
+.top-sellers__card--base {
+  background: var(--surface);
+}
+
 .top-sellers__card--skeleton,
 .tier-card--skeleton {
   pointer-events: none;
@@ -1302,8 +1314,15 @@ button {
   overflow: hidden;
   border: 1px solid rgba(176, 106, 214, 0.14);
   border-radius: 24px;
-  background: linear-gradient(180deg, rgba(33, 27, 39, 0.96), rgba(24, 19, 30, 0.98));
   box-shadow: var(--shadow-card);
+}
+
+.detail-sheet__tier-hero--base {
+  background: linear-gradient(180deg, rgba(33, 27, 39, 0.96), rgba(24, 19, 30, 0.98));
+}
+
+.detail-sheet__tier-hero--light {
+  background: linear-gradient(180deg, rgba(49, 40, 59, 0.96), rgba(34, 28, 42, 0.98));
 }
 
 .detail-sheet__tier-media {
@@ -1325,6 +1344,10 @@ button {
   gap: 8px;
   padding: 16px;
   background: linear-gradient(180deg, rgba(33, 27, 39, 0.96), rgba(24, 19, 30, 0.98));
+}
+
+.detail-sheet__tier-hero--light .detail-sheet__tier-summary {
+  background: linear-gradient(180deg, rgba(49, 40, 59, 0.96), rgba(34, 28, 42, 0.98));
 }
 
 .detail-sheet__tags {
