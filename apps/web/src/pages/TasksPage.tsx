@@ -87,9 +87,9 @@ const SAMPLE_TASK_CARDS = [
     icon: 'heart',
   },
   {
-    eyebrow: 'Toy Based',
-    title: 'Use what you already own',
-    body: 'A timed assignment built around something from your toy list, with the next step delivered after proof.',
+    eyebrow: 'Real Example',
+    title: 'Temperature-play obedience',
+    body: 'A toy-based assignment built around cold sensation, stillness, timed control, and a discreet proof photo afterward.',
     icon: 'toy',
   },
   {
