@@ -1900,12 +1900,6 @@ button {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .top-sellers--tiers .top-sellers__track {
-    grid-auto-flow: row;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    overflow: visible;
-  }
-
   .tasks-hero__visuals {
     grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
     align-items: stretch;
