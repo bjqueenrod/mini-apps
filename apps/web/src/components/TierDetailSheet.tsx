@@ -106,7 +106,7 @@ export function TierDetailSheet({
                 className="detail-sheet__action detail-sheet__action--stream"
                 onClick={handleBotAction(tier.botBuyUrl)}
               >
-                <strong>Choose in Bot</strong>
+                <strong>Continue in Bot</strong>
                 <span>{tier.priceLabel || formatPrice(tier.price)}</span>
               </a>
             </div>

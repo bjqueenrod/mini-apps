@@ -429,15 +429,11 @@ export function TasksPage() {
           <h2>Ready for your first assignment?</h2>
         </div>
         <p className="tasks-panel__body-copy">
-          Choose your package in the bot and get personalised tasks built around your kinks, limits, and toy list.
+          Choose your package here, then continue in the bot for payment and personalised task delivery.
         </p>
         <div className="tasks-hero__actions">
-          <a
-            className="tasks-button tasks-button--primary"
-            href={botRootUrl || '#packages'}
-            onClick={handleBotAction(botRootUrl)}
-          >
-            Choose Package in Bot
+          <a className="tasks-button tasks-button--primary" href="#packages">
+            Choose Your Package
           </a>
           <a
             className="tasks-button tasks-button--secondary"
@@ -452,12 +448,8 @@ export function TasksPage() {
       <div className="sticky-mobile-cta">
         <div className="sticky-mobile-cta__content">
           <span>{tiersQuery.data ? `${tiersQuery.data.total} packages ready` : 'Custom Obedience Tasks'}</span>
-          <a
-            className="tasks-button tasks-button--primary sticky-mobile-cta__button"
-            href={botRootUrl || '#packages'}
-            onClick={handleBotAction(botRootUrl)}
-          >
-            Choose Package in Bot
+          <a className="tasks-button tasks-button--primary sticky-mobile-cta__button" href="#packages">
+            Choose Your Package
           </a>
         </div>
       </div>
