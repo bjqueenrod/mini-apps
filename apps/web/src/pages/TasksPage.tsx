@@ -28,7 +28,7 @@ type TaskIconName =
 
 const VALUE_POINTS = [
   { label: 'Tailored to you', icon: 'wand' },
-  { label: 'Reviewed personally', icon: 'heart' },
+  { label: 'Proof checked personally', icon: 'heart' },
   { label: 'One task at a time', icon: 'clock' },
   { label: 'Beginner to intense', icon: 'sparkles' },
 ] as const;
@@ -41,7 +41,7 @@ const WHAT_YOU_GET_POINTS = [
   },
   {
     title: 'Personal review',
-    detail: 'Every task is checked personally before it reaches you.',
+    detail: 'Every proof you send is checked personally by Mistress BJQueen before the next step continues.',
     icon: 'heart',
   },
   {
@@ -118,7 +118,7 @@ const FAQS = [
   },
   {
     question: 'What kind of proof is required?',
-    answer: 'It depends on the task. You will be told what proof is needed before you continue.',
+    answer: 'It depends on the task. You will be told what proof is needed, and each proof is checked personally before the flow continues.',
     icon: 'shield',
   },
   {
@@ -284,7 +284,8 @@ export function TasksPage() {
         <p className="hero__eyebrow">Custom Obedience Tasks</p>
         <h1>Custom obedience tasks built around your kinks, limits, and toys</h1>
         <p className="tasks-hero__lead">
-          Personal, guided assignments reviewed by Mistress BJQueen. Beginner-friendly to intense.
+          Personal, guided assignments with every task proof checked personally by Mistress BJQueen. Beginner-friendly
+          to intense.
         </p>
         <div className="tasks-hero__actions">
           <a className="tasks-button tasks-button--primary" href="#packages">
