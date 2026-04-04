@@ -93,9 +93,9 @@ const SAMPLE_TASK_CARDS = [
     icon: 'toy',
   },
   {
-    eyebrow: 'Structured Obedience',
-    title: 'Controlled instructions with proof',
-    body: 'A cleaner sequence of instructions, reporting, and follow-up for a more deliberate obedience flow.',
+    eyebrow: 'Real Example',
+    title: 'Tethered kitchen humiliation',
+    body: 'A controlled humiliation task built around restraint, posture, discomfort, cleanup, and full-body proof afterward.',
     icon: 'scroll',
   },
 ] as const;
