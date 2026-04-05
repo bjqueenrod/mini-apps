@@ -8,6 +8,7 @@ import {
 import { TierItem } from '../features/tiers/types';
 import { formatPrice } from '../utils/format';
 import { toTierPath } from '../utils/links';
+import { usePagedCarousel } from './usePagedCarousel';
 
 function priceLabel(tier: TierItem): string {
   return tier.priceLabel || formatPrice(tier.price);
@@ -82,6 +83,8 @@ export function TierCarousel({
   }
 
   const guideLabels = getTierGuideLabels(items);
+  const pageCount = loading ? 3 : items.length;
+  const { currentPage, scrollToPage, trackRef } = usePagedCarousel(pageCount);
 
   return (
     <section className="top-sellers top-sellers--tiers">
@@ -90,7 +93,7 @@ export function TierCarousel({
           <p className="hero__eyebrow">{title}</p>
         </div>
       ) : null}
-      <div className="top-sellers__track">
+      <div ref={trackRef} className="top-sellers__track">
         {loading
           ? Array.from({ length: 3 }, (_, index) => (
               <div key={index} className="top-sellers__card top-sellers__card--skeleton" aria-hidden="true">
@@ -170,6 +173,20 @@ export function TierCarousel({
               );
             })}
       </div>
+      {pageCount > 1 ? (
+        <div className="top-sellers__pagination" aria-label="Package pages">
+          {Array.from({ length: pageCount }, (_, index) => (
+            <button
+              key={index}
+              type="button"
+              className={`top-sellers__pagination-dot${index === currentPage ? ' is-active' : ''}`}
+              onClick={() => scrollToPage(index)}
+              aria-label={`Go to package page ${index + 1}`}
+              aria-current={index === currentPage ? 'true' : undefined}
+            />
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }

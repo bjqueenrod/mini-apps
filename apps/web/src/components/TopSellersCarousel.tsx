@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { ClipItem } from '../features/clips/types';
 import { formatDuration, formatPrice } from '../utils/format';
 import { toClipPath } from '../utils/links';
+import { usePagedCarousel } from './usePagedCarousel';
 
 export function TopSellersCarousel({
   items,
@@ -13,6 +14,8 @@ export function TopSellersCarousel({
   loading?: boolean;
 }) {
   const location = useLocation();
+  const pageCount = loading ? 3 : items.length;
+  const { currentPage, scrollToPage, trackRef } = usePagedCarousel(pageCount);
 
   if (!items.length && !loading) {
     return null;
@@ -23,7 +26,7 @@ export function TopSellersCarousel({
       <div className="top-sellers__header">
         <p className="hero__eyebrow">{title}</p>
       </div>
-      <div className="top-sellers__track">
+      <div ref={trackRef} className="top-sellers__track">
         {loading
           ? Array.from({ length: 3 }, (_, index) => (
               <div key={index} className="top-sellers__card top-sellers__card--skeleton" aria-hidden="true">
@@ -67,6 +70,20 @@ export function TopSellersCarousel({
               </Link>
             ))}
       </div>
+      {pageCount > 1 ? (
+        <div className="top-sellers__pagination" aria-label={`${title} pages`}>
+          {Array.from({ length: pageCount }, (_, index) => (
+            <button
+              key={index}
+              type="button"
+              className={`top-sellers__pagination-dot${index === currentPage ? ' is-active' : ''}`}
+              onClick={() => scrollToPage(index)}
+              aria-label={`Go to page ${index + 1}`}
+              aria-current={index === currentPage ? 'true' : undefined}
+            />
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }

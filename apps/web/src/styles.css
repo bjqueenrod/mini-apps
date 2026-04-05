@@ -881,9 +881,9 @@ button {
 }
 
 .top-sellers--tiers .top-sellers__track {
-  grid-auto-columns: minmax(304px, 92%);
+  grid-auto-columns: 100%;
   gap: 16px;
-  padding: 8px 2px 10px;
+  padding: 8px 2px 4px;
 }
 
 .top-sellers--tiers .top-sellers__card {
@@ -1023,12 +1023,17 @@ button {
 .top-sellers__track {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(220px, 78%);
+  grid-auto-columns: 100%;
   align-items: stretch;
   gap: 12px;
   overflow-x: auto;
-  padding-bottom: 8px;
-  scroll-snap-type: x proximity;
+  padding-bottom: 4px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.top-sellers__track::-webkit-scrollbar {
+  display: none;
 }
 
 .top-sellers__card {
@@ -1041,6 +1046,7 @@ button {
   overflow: hidden;
   box-shadow: var(--shadow-card);
   scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .top-sellers__card--light {
@@ -1064,6 +1070,30 @@ button {
   height: clamp(180px, 24vw, 230px);
   position: relative;
   background: linear-gradient(135deg, rgba(44, 36, 52, 0.98), rgba(24, 19, 30, 0.96));
+}
+
+.top-sellers__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.top-sellers__pagination-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(234, 216, 247, 0.24);
+  transition: width 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.top-sellers__pagination-dot.is-active {
+  width: 24px;
+  background: var(--accent);
+  transform: translateY(-1px);
 }
 
 .top-sellers__media--tier {
