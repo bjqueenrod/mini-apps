@@ -10,6 +10,7 @@ from app.core.security import get_session_serializer
 from app.core.telegram import TelegramUser, TelegramInitDataError
 from app.schemas.auth import AuthUserResponse, TelegramAuthRequest, TelegramAuthResponse
 from app.services.auth_service import authenticate_telegram, build_session_payload
+from app.services.tracking_service import notify_miniapp_open
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 settings = get_settings()
@@ -29,6 +30,8 @@ def auth_telegram(payload: TelegramAuthRequest, response: Response) -> TelegramA
         user = TelegramUser(id=payload.dev_user.id, username=payload.dev_user.username, first_name=payload.dev_user.first_name)
     else:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="initData is required")
+
+    notify_miniapp_open(payload.start_param, user)
 
     serializer = get_session_serializer()
     session_payload = build_session_payload(user, source=source)

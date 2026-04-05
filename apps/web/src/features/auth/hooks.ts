@@ -10,7 +10,7 @@ export function useTelegramSession() {
   useEffect(() => {
     let mounted = true;
     const fallbackUser = context.user ?? { id: 1, username: 'local-preview', firstName: 'Local' };
-    authenticate(context.initData, fallbackUser)
+    authenticate(context.initData, fallbackUser, context.startParam)
       .catch((err: Error) => {
         if (mounted) {
           setError(err.message);
@@ -24,7 +24,7 @@ export function useTelegramSession() {
     return () => {
       mounted = false;
     };
-  }, [context.initData, context.user?.id]);
+  }, [context.initData, context.startParam, context.user?.id]);
 
   return { ...context, ready, error };
 }

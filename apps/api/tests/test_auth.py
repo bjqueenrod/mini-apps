@@ -36,3 +36,37 @@ def test_auth_telegram_dev_mode(client) -> None:
     payload = response.json()
     assert payload["user"]["id"] == 99
     assert "clip_session=" in response.headers.get("set-cookie", "")
+
+
+def test_auth_telegram_tracked_start_param_notifies_cms(client, monkeypatch) -> None:
+    calls: list[tuple[str | None, int]] = []
+
+    def _capture(start_param: str | None, user) -> None:
+        calls.append((start_param, user.id))
+
+    monkeypatch.setattr("app.api.routes.auth.notify_miniapp_open", _capture)
+
+    response = client.post(
+        "/api/auth/telegram",
+        json={"initData": _build_init_data("test-token"), "startParam": "l_1z"},
+    )
+
+    assert response.status_code == 200
+    assert calls == [("l_1z", 123)]
+
+
+def test_auth_telegram_ignores_missing_start_param(client, monkeypatch) -> None:
+    calls: list[tuple[str | None, int]] = []
+
+    def _capture(start_param: str | None, user) -> None:
+        calls.append((start_param, user.id))
+
+    monkeypatch.setattr("app.api.routes.auth.notify_miniapp_open", _capture)
+
+    response = client.post(
+        "/api/auth/telegram",
+        json={"initData": _build_init_data("test-token")},
+    )
+
+    assert response.status_code == 200
+    assert calls == [(None, 123)]

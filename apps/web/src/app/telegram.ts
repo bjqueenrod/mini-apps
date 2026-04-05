@@ -20,23 +20,34 @@ declare global {
 export type TelegramContext = {
   isTelegram: boolean;
   initData?: string;
+  startParam?: string;
   user?: { id: number; username?: string; firstName?: string };
   close?: () => void;
 };
 
+function normalizeStartParam(value?: string | null): string | undefined {
+  const normalized = value?.trim();
+  return normalized ? normalized : undefined;
+}
+
 export function getTelegramContext(): TelegramContext {
   const webApp = window.Telegram?.WebApp;
+  const queryParams = new URLSearchParams(window.location.search);
   try {
     const launch = retrieveLaunchParams() as {
-      initData?: { user?: { id: number; username?: string; firstName?: string } };
+      tgWebAppData?: { user?: { id: number; username?: string; firstName?: string } };
+      tgWebAppStartParam?: string;
       initDataRaw?: string;
     };
-    const user = launch.initData?.user;
+    const user = launch.tgWebAppData?.user;
     webApp?.ready?.();
     webApp?.expand?.();
     return {
       isTelegram: true,
       initData: webApp?.initData || launch.initDataRaw || undefined,
+      startParam: normalizeStartParam(
+        launch.tgWebAppStartParam || queryParams.get('tgWebAppStartParam') || queryParams.get('startapp'),
+      ),
       user: user ? { id: user.id, username: user.username, firstName: user.firstName } : undefined,
       close: () => webApp?.close?.(),
     };
@@ -45,6 +56,7 @@ export function getTelegramContext(): TelegramContext {
     return {
       isTelegram: Boolean(webApp),
       initData: webApp?.initData,
+      startParam: normalizeStartParam(queryParams.get('tgWebAppStartParam') || queryParams.get('startapp')),
       user: unsafe ? { id: unsafe.id, username: unsafe.username, firstName: unsafe.first_name } : undefined,
       close: () => webApp?.close?.(),
     };

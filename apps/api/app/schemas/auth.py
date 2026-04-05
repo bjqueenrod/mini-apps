@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import Annotated
-
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 
 class DevUserPayload(BaseModel):
@@ -13,20 +11,14 @@ class DevUserPayload(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-InitDataField = Annotated[
-    str | None,
-    Field(validation_alias="initData", serialization_alias="initData"),
-]
-
-DevUserField = Annotated[
-    DevUserPayload | None,
-    Field(validation_alias="devUser", serialization_alias="devUser"),
-]
-
-
 class TelegramAuthRequest(BaseModel):
-    init_data: InitDataField = None
-    dev_user: DevUserField = None
+    init_data: str | None = Field(default=None, validation_alias="initData", serialization_alias="initData")
+    dev_user: DevUserPayload | None = Field(default=None, validation_alias="devUser", serialization_alias="devUser")
+    start_param: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("startParam", "start_param"),
+        serialization_alias="startParam",
+    )
 
     model_config = ConfigDict(populate_by_name=True)
 
