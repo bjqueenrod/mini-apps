@@ -55,6 +55,23 @@ def test_auth_telegram_tracked_start_param_notifies_cms(client, monkeypatch) -> 
     assert calls == [("l_1z", 123)]
 
 
+def test_auth_telegram_composite_tracked_start_param_notifies_cms(client, monkeypatch) -> None:
+    calls: list[tuple[str | None, int]] = []
+
+    def _capture(start_param: str | None, user) -> None:
+        calls.append((start_param, user.id))
+
+    monkeypatch.setattr("app.api.routes.auth.notify_miniapp_open", _capture)
+
+    response = client.post(
+        "/api/auth/telegram",
+        json={"initData": _build_init_data("test-token"), "startParam": "l_1z__tier_id_3"},
+    )
+
+    assert response.status_code == 200
+    assert calls == [("l_1z__tier_id_3", 123)]
+
+
 def test_auth_telegram_ignores_missing_start_param(client, monkeypatch) -> None:
     calls: list[tuple[str | None, int]] = []
 

@@ -88,3 +88,20 @@ def test_clip_detail_returns_bot_links_and_hides_paid_urls(client) -> None:
     assert item["botDownloadUrl"].endswith("download_BJQ0001")
     assert "bunny_stream_video_id" not in item
     assert item["previewEmbedUrl"].endswith("preview-1")
+
+
+def test_clip_detail_uses_tracking_redirect_urls_when_configured(client, monkeypatch) -> None:
+    monkeypatch.setattr('app.utils.bot_links._build_tracked_redirect_url', lambda slug, payload=None: f'https://links.mistressbjqueen.com/r/{slug}?payload={payload}')
+    monkeypatch.setattr('app.utils.bot_links.get_settings', lambda: type('S', (), {
+        'tracking_clip_stream_slug': 'clip-stream',
+        'tracking_clip_download_slug': 'clip-download',
+        'tracking_product_buy_slug': '',
+        'normalized_tracking_links_base_url': 'https://links.mistressbjqueen.com',
+        'bot_username': 'mistressbjqueenbot',
+    })())
+
+    response = client.get("/api/clips/BJQ0001")
+    assert response.status_code == 200
+    item = response.json()
+    assert item["botStreamUrl"] == "https://links.mistressbjqueen.com/r/clip-stream?payload=stream_BJQ0001"
+    assert item["botDownloadUrl"] == "https://links.mistressbjqueen.com/r/clip-download?payload=download_BJQ0001"

@@ -39,6 +39,10 @@ class Settings(BaseSettings):
     )
     cms_tracking_timeout_seconds: float = Field(default=4.0, alias='CMS_TRACKING_TIMEOUT_SECONDS')
     featured_tier_product_ids_raw: str = Field(default='', alias='FEATURED_TIER_PRODUCT_IDS')
+    tracking_links_base_url: str = Field(default='', alias='TRACKING_LINKS_BASE_URL')
+    tracking_clip_stream_slug: str = Field(default='', alias='TRACKING_CLIP_STREAM_SLUG')
+    tracking_clip_download_slug: str = Field(default='', alias='TRACKING_CLIP_DOWNLOAD_SLUG')
+    tracking_product_buy_slug: str = Field(default='', alias='TRACKING_PRODUCT_BUY_SLUG')
 
     @property
     def is_dev(self) -> bool:
@@ -67,6 +71,10 @@ class Settings(BaseSettings):
     @property
     def normalized_cms_api_url(self) -> str:
         return self.cms_api_url.strip().rstrip('/')
+
+    @property
+    def normalized_tracking_links_base_url(self) -> str:
+        return self.tracking_links_base_url.strip().rstrip('/')
 
     @property
     def featured_tier_product_ids(self) -> list[str]:
