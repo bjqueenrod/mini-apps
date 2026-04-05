@@ -501,8 +501,8 @@ button {
 .tasks-panel {
   display: grid;
   gap: 14px;
-  margin: 0 2px 26px;
-  padding-top: 18px;
+  margin: 0 2px 34px;
+  padding-top: 24px;
   border-top: 1px solid rgba(176, 106, 214, 0.14);
 }
 
@@ -513,15 +513,16 @@ button {
 
 .tasks-panel__header h2 {
   margin: 0;
-  font-size: clamp(1.2rem, 4.4vw, 1.7rem);
-  line-height: 1.04;
+  font-size: clamp(1.28rem, 4.8vw, 1.9rem);
+  line-height: 1.06;
 }
 
 .tasks-panel__body-copy,
 .tasks-panel__supporting-copy {
   margin: 0;
+  max-width: 40rem;
   color: var(--muted);
-  line-height: 1.48;
+  line-height: 1.58;
 }
 
 .tasks-steps {
@@ -648,11 +649,12 @@ button {
 }
 
 .tasks-section {
-  padding: 18px;
+  padding: 22px;
   border-radius: 30px;
   background:
     radial-gradient(circle at top left, rgba(176, 106, 214, 0.10), transparent 36%),
     linear-gradient(180deg, rgba(28, 23, 33, 0.74), rgba(20, 16, 25, 0.78));
+  box-shadow: var(--shadow-card);
 }
 
 .tasks-section .top-sellers {
@@ -665,36 +667,47 @@ button {
 }
 
 .tasks-hero {
-  gap: 14px;
-  padding: 18px;
-  border-radius: 30px;
+  gap: 16px;
+  padding: 22px 20px;
+  border-radius: 32px;
   background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.16), transparent 40%),
-    linear-gradient(180deg, rgba(31, 25, 36, 0.82), rgba(19, 15, 23, 0.92));
+    radial-gradient(circle at top left, rgba(176, 106, 214, 0.2), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(214, 159, 247, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(34, 27, 41, 0.9), rgba(19, 15, 23, 0.96));
+  box-shadow: var(--shadow-card);
 }
 
 .tasks-hero h1 {
   margin: 2px 0 0;
+  max-width: 12ch;
 }
 
 .tasks-hero__lead {
   margin: 0;
   max-width: 34rem;
   color: var(--text);
-  font-size: 0.98rem;
-  line-height: 1.5;
+  font-size: 1rem;
+  line-height: 1.58;
+}
+
+.tasks-hero__supporting-copy {
+  margin: -4px 0 0;
+  max-width: 34rem;
+  color: var(--muted);
+  line-height: 1.54;
 }
 
 .tasks-hero__actions {
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .tasks-hero__actions .tasks-button {
   flex: 1 1 180px;
+  min-height: 50px;
 }
 
 .tasks-strip--hero {
-  margin: 2px 0 0;
+  margin: 4px 0 0;
 }
 
 .tasks-strip--hero .tasks-chip {
@@ -702,21 +715,15 @@ button {
   border-color: rgba(176, 106, 214, 0.22);
 }
 
-.tasks-panel {
-  gap: 16px;
-  margin: 0 2px 30px;
-  padding-top: 20px;
-}
-
 .tasks-panel--light {
-  gap: 12px;
+  gap: 16px;
 }
 
 .tasks-benefits,
 .tasks-style-grid,
 .tasks-stepper {
   display: grid;
-  gap: 12px;
+  gap: 14px;
 }
 
 .tasks-benefit,
@@ -731,26 +738,28 @@ button {
 .tasks-benefit {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 12px;
+  gap: 14px;
   align-items: start;
-  padding: 16px;
-  background: rgba(28, 23, 33, 0.62);
+  padding: 18px;
+  background:
+    radial-gradient(circle at top left, rgba(176, 106, 214, 0.1), transparent 46%),
+    rgba(28, 23, 33, 0.62);
 }
 
 .tasks-benefit strong,
 .tasks-style-card strong,
 .tasks-stepper__item strong {
   display: block;
-  font-size: 1rem;
-  line-height: 1.22;
+  font-size: 1.04rem;
+  line-height: 1.24;
 }
 
 .tasks-benefit p,
 .tasks-style-card p,
 .tasks-stepper__item p {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   color: var(--muted);
-  line-height: 1.45;
+  line-height: 1.52;
 }
 
 .tasks-benefit__icon,
@@ -776,7 +785,7 @@ button {
 }
 
 .tasks-stepper__item {
-  padding: 16px;
+  padding: 18px;
   background:
     radial-gradient(circle at top left, rgba(176, 106, 214, 0.12), transparent 44%),
     linear-gradient(180deg, rgba(34, 28, 41, 0.94), rgba(21, 17, 27, 0.98));
@@ -806,8 +815,10 @@ button {
 }
 
 .tasks-style-card {
-  padding: 16px;
-  background: rgba(28, 23, 33, 0.54);
+  padding: 18px;
+  background:
+    radial-gradient(circle at top left, rgba(176, 106, 214, 0.08), transparent 42%),
+    rgba(28, 23, 33, 0.54);
 }
 
 .tasks-style-card__header {
@@ -825,6 +836,21 @@ button {
   font-size: 0.72rem;
 }
 
+.tasks-reassurance {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgba(176, 106, 214, 0.16);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(176, 106, 214, 0.1), transparent 42%),
+    rgba(28, 23, 33, 0.56);
+}
+
+.tasks-strip--soft {
+  margin: 0;
+}
+
 .tasks-section {
   padding: 20px;
   border-radius: 32px;
@@ -837,7 +863,7 @@ button {
 
 .tasks-section__copy {
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .tasks-section__copy h2 {
@@ -851,12 +877,13 @@ button {
   border-radius: 999px;
   border: 1px solid rgba(176, 106, 214, 0.18);
   background: rgba(176, 106, 214, 0.08);
+  color: #ead8f7;
 }
 
 .top-sellers--tiers .top-sellers__track {
-  grid-auto-columns: minmax(286px, 88%);
-  gap: 14px;
-  padding: 6px 2px 8px;
+  grid-auto-columns: minmax(304px, 92%);
+  gap: 16px;
+  padding: 8px 2px 10px;
 }
 
 .top-sellers--tiers .top-sellers__card {
@@ -865,8 +892,9 @@ button {
 
 .top-sellers--tiers .top-sellers__card--tier {
   background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.1), transparent 42%),
+    radial-gradient(circle at top left, rgba(176, 106, 214, 0.12), transparent 42%),
     linear-gradient(180deg, rgba(33, 27, 39, 0.98), rgba(20, 16, 25, 0.98));
+  box-shadow: 0 22px 42px rgba(7, 4, 10, 0.32);
 }
 
 .top-sellers--tiers .top-sellers__card--featured {
@@ -881,8 +909,8 @@ button {
 }
 
 .top-sellers--tiers .top-sellers__body--tier {
-  gap: 12px;
-  padding: 18px;
+  gap: 14px;
+  padding: 20px 18px 18px;
 }
 
 .top-sellers--tiers .top-sellers__eyebrow {
@@ -891,7 +919,7 @@ button {
 }
 
 .top-sellers--tiers .top-sellers__body h3 {
-  font-size: 1.16rem;
+  font-size: 1.24rem;
   line-height: 1.08;
 }
 
@@ -904,8 +932,9 @@ button {
 }
 
 .top-sellers--tiers .top-sellers__descriptor {
-  font-size: 0.9rem;
-  line-height: 1.5;
+  color: var(--text);
+  font-size: 0.94rem;
+  line-height: 1.55;
 }
 
 .top-sellers__meta-grid {
@@ -922,7 +951,7 @@ button {
 }
 
 .top-sellers__meta-item {
-  padding: 12px;
+  padding: 13px 12px;
 }
 
 .top-sellers__meta-label {
@@ -941,7 +970,10 @@ button {
 }
 
 .top-sellers__price-block {
-  padding: 14px 16px;
+  padding: 15px 16px;
+  background:
+    radial-gradient(circle at top left, rgba(176, 106, 214, 0.12), transparent 48%),
+    rgba(24, 19, 30, 0.72);
 }
 
 .top-sellers__price-block strong {
@@ -952,8 +984,8 @@ button {
 
 .top-sellers--tiers .top-sellers__value-copy {
   color: var(--muted);
-  font-size: 0.86rem;
-  line-height: 1.45;
+  font-size: 0.88rem;
+  line-height: 1.52;
 }
 
 .top-sellers__cta {
@@ -965,18 +997,19 @@ button {
   margin-top: auto;
   padding: 12px 14px;
   border-radius: 16px;
-  border: 1px solid rgba(176, 106, 214, 0.18);
-  background: rgba(176, 106, 214, 0.12);
+  border: 1px solid rgba(176, 106, 214, 0.22);
+  background: linear-gradient(180deg, rgba(176, 106, 214, 0.18), rgba(176, 106, 214, 0.12));
   color: var(--text);
   font-weight: 700;
-  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 
 .top-sellers--tiers .top-sellers__card:hover .top-sellers__cta,
 .top-sellers--tiers .top-sellers__card:focus-visible .top-sellers__cta {
-  background: rgba(176, 106, 214, 0.2);
+  background: linear-gradient(180deg, rgba(176, 106, 214, 0.24), rgba(176, 106, 214, 0.18));
   border-color: rgba(176, 106, 214, 0.28);
   transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(176, 106, 214, 0.16);
 }
 
 .top-sellers__header {
@@ -1844,6 +1877,10 @@ button {
   box-shadow: var(--shadow-card);
 }
 
+.tasks-panel--cta .tasks-panel__body-copy {
+  color: var(--text);
+}
+
 .sticky-mobile-cta {
   position: fixed;
   left: 0;
@@ -1891,6 +1928,10 @@ button {
     right: 28px;
   }
 
+  .tasks-hero h1 {
+    max-width: 13ch;
+  }
+
   .tasks-benefits,
   .tasks-stepper {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1933,6 +1974,10 @@ button {
 @media (max-width: 719px) {
   .hero__banner-copy {
     max-width: 52%;
+  }
+
+  .tasks-hero h1 {
+    max-width: none;
   }
 
   .tasks-hero__actions .tasks-button {

@@ -3,7 +3,6 @@ import { getTierArtwork, getTierArtworkVariant } from '../features/tiers/artwork
 import {
   getTierDurationLabel,
   getTierGuideLabels,
-  getTierSummary,
   getTierTasksLabel,
 } from '../features/tiers/presentation';
 import { TierItem } from '../features/tiers/types';
@@ -14,6 +13,19 @@ function priceLabel(tier: TierItem): string {
   return tier.priceLabel || formatPrice(tier.price);
 }
 
+function displayBadgeLabel(badgeLabel?: string): string | undefined {
+  switch (badgeLabel) {
+    case 'Best for first timers':
+      return 'Best place to start';
+    case 'Most Popular':
+      return 'Most popular';
+    case 'High Intensity':
+      return 'Deeper intensity';
+    default:
+      return badgeLabel;
+  }
+}
+
 function descriptorLabel(tier: TierItem, badgeLabel?: string): string {
   if (tier.shortDescription?.trim()) {
     return tier.shortDescription.trim();
@@ -21,20 +33,39 @@ function descriptorLabel(tier: TierItem, badgeLabel?: string): string {
 
   switch (badgeLabel) {
     case 'Best for first timers':
-      return 'A softer place to start with clear structure and guided delivery.';
+      return 'Good for a first custom order with a lighter, guided pace.';
     case 'Most Popular':
-      return 'A balanced package when you want a fuller experience without overwhelm.';
+      return 'More structure, more momentum, and a fuller guided experience.';
     case 'High Intensity':
-      return 'A deeper, more immersive option for buyers who want a heavier pace.';
+      return 'For buyers who want a fuller experience with a heavier pace.';
     default:
       if (tier.isUnlimitedTasks) {
-        return 'An open-ended guided flow built for a more immersive obedience session.';
+        return 'For buyers who want a more immersive, open-ended obedience flow.';
       }
       if ((tier.durationDays ?? 0) >= 5) {
-        return 'Extended guidance with more room to build momentum and structure.';
+        return 'For buyers who want more time to build momentum and structure.';
       }
-      return 'A premium custom obedience package shaped around your submitted preferences.';
+      return 'A custom package with clear pacing, personal tailoring, and easy entry.';
   }
+}
+
+function valueCopyLabel(tier: TierItem): string {
+  const description = tier.description?.trim();
+  const shortDescription = tier.shortDescription?.trim();
+
+  if (description && description !== shortDescription) {
+    return description;
+  }
+
+  if (tier.isUnlimitedTasks) {
+    return 'A more immersive flow with personal review, proof checks, and room to settle into the experience.';
+  }
+
+  if ((tier.durationDays ?? 0) >= 5) {
+    return 'A longer package with more room for progression, pacing, and a stronger sense of build.';
+  }
+
+  return 'Custom obedience built around your preferences, limits, and desired intensity from the first step.';
 }
 
 export function TierCarousel({
@@ -83,9 +114,10 @@ export function TierCarousel({
             ))
           : items.map((tier, index) => {
               const badgeLabel = guideLabels[tier.id] || tier.badge;
+              const badgeDisplay = displayBadgeLabel(badgeLabel);
               const artworkVariant = getTierArtworkVariant(index);
               const descriptor = descriptorLabel(tier, badgeLabel);
-              const valueSummary = getTierSummary(tier);
+              const valueSummary = valueCopyLabel(tier);
 
               return (
                 <Link
@@ -101,12 +133,16 @@ export function TierCarousel({
                   to={toTierPath(tier.id)}
                 >
                   <div className="top-sellers__media top-sellers__media--tier">
-                    <img src={getTierArtwork(tier, badgeLabel, artworkVariant)} alt={`${tier.name} package artwork`} loading="lazy" />
+                    <img
+                      src={getTierArtwork(tier, badgeLabel, artworkVariant)}
+                      alt={`${tier.name} package artwork`}
+                      loading="lazy"
+                    />
                   </div>
                   <div className="top-sellers__body top-sellers__body--tier">
                     <div className="top-sellers__eyebrow">
-                      {badgeLabel ? (
-                        <span className="top-sellers__tier-badge top-sellers__tier-badge--inline">{badgeLabel}</span>
+                      {badgeDisplay ? (
+                        <span className="top-sellers__tier-badge top-sellers__tier-badge--inline">{badgeDisplay}</span>
                       ) : (
                         <span />
                       )}
@@ -128,7 +164,7 @@ export function TierCarousel({
                       <strong>{priceLabel(tier)}</strong>
                     </div>
                     <p className="top-sellers__value-copy">{valueSummary}</p>
-                    <span className="top-sellers__cta">Open Package</span>
+                    <span className="top-sellers__cta">Choose Package</span>
                   </div>
                 </Link>
               );
