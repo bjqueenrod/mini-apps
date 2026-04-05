@@ -9,9 +9,11 @@ import { toClipPath } from '../utils/links';
 export function ClipCard({ clip }: { clip: ClipItem }) {
   const location = useLocation();
   const selectedTag = new URLSearchParams(location.search).get('tags')?.split(',')[0] ?? undefined;
+  const staticThumbnailUrl =
+    clip.thumbnailUrl && clip.thumbnailUrl !== clip.previewWebpUrl ? clip.thumbnailUrl : undefined;
   const mediaCandidates = useMemo(
-    () => [clip.thumbnailUrl, clip.previewWebpUrl].filter(Boolean) as string[],
-    [clip.previewWebpUrl, clip.thumbnailUrl],
+    () => [staticThumbnailUrl].filter(Boolean) as string[],
+    [staticThumbnailUrl],
   );
   const [mediaIndex, setMediaIndex] = useState(0);
   const displayTags = useMemo(() => pickPrimaryTags(clip.tags, selectedTag), [clip.tags, selectedTag]);
