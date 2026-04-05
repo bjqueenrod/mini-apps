@@ -120,11 +120,24 @@ def _build_filters(params: ClipQueryParams, mapping):
 
 
 
-def _row_to_item(row: Any) -> dict[str, Any]:
+def _build_preview(preview_id: str | None, *, include_embed_url: bool) -> dict[str, Any]:
+    try:
+        return build_preview_assets(
+            preview_id,
+            include_embed_url=include_embed_url,
+            resolve_thumbnail_metadata=include_embed_url,
+            verify_embed_access=include_embed_url,
+        )
+    except TypeError:
+        # Test fixtures may patch the helper with the older single-argument signature.
+        return build_preview_assets(preview_id)
+
+
+def _row_to_item(row: Any, *, include_embed_url: bool = True) -> dict[str, Any]:
     data = dict(row._mapping)
     clip_id = str(data.get("clip_id") or data.get("id") or "")
     tags = parse_tags(data.get("keywords"), data.get("hashtags"))
-    preview = build_preview_assets(data.get("bunny_stream_preview_id"))
+    preview = _build_preview(data.get("bunny_stream_preview_id"), include_embed_url=include_embed_url)
     custom_thumbnail_url = (
         str(data.get("thumbnail_url") or data.get("custom_thumbnail_url") or "").strip() or None
     )
@@ -171,7 +184,7 @@ def search_clips(db: Session, params: ClipQueryParams) -> dict[str, Any]:
 
     total = int(db.execute(count_query).scalar_one())
     rows = db.execute(query).all()
-    items = [_row_to_item(row) for row in rows]
+    items = [_row_to_item(row, include_embed_url=False) for row in rows]
 
     categories: list[str] = []
     category_col = mapping.get("category")
@@ -251,7 +264,7 @@ def get_top_seller_clips(db: Session) -> dict[str, Any]:
     rows = db.execute(stmt).all()
     item_map: dict[str, dict[str, Any]] = {}
     for row in rows:
-        item = _row_to_item(row)
+        item = _row_to_item(row, include_embed_url=False)
         item_map[item["id"].upper()] = item
     items = [item_map[clip_id] for clip_id in TOP_SELLER_CLIP_IDS if clip_id in item_map]
     return {
@@ -285,7 +298,7 @@ def get_new_clips(db: Session, *, limit: int = 10) -> dict[str, Any]:
     stmt = stmt.order_by(clip_id_col.desc()).limit(max(1, min(limit, 20)))
 
     rows = db.execute(stmt).all()
-    items = [_row_to_item(row) for row in rows]
+    items = [_row_to_item(row, include_embed_url=False) for row in rows]
     return {
         "items": items,
         "page": 1,
