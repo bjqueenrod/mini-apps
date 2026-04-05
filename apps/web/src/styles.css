@@ -1103,6 +1103,11 @@ button {
     linear-gradient(135deg, rgba(44, 36, 52, 0.98), rgba(24, 19, 30, 0.96));
 }
 
+.top-sellers__media--tier img {
+  object-fit: contain;
+  object-position: center top;
+}
+
 .top-sellers__media--skeleton,
 .top-sellers__line,
 .skeleton-card,
