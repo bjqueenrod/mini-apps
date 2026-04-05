@@ -29,21 +29,21 @@ type TaskIconName =
 const VALUE_POINTS = [
   { label: 'Time-limited Telegram access', icon: 'package' },
   { label: 'One active task at a time', icon: 'clock' },
-  { label: 'Proof submission & review', icon: 'shield' },
-  { label: 'Generated from your setup', icon: 'sliders' },
+  { label: 'Proof submission & review by Mistress BJQueen', icon: 'shield' },
+  { label: 'Selected from your setup', icon: 'sliders' },
 ] as const;
 
 const HERO_PRIVATE_POINTS = [
   'Packages define duration and max tasks per day',
   'Setup captures categories, toys, timezone, send times, and auto-send',
-  'Delivery stays inside Telegram with proof reviewed manually',
+  'Delivery stays inside Telegram with proof reviewed by Mistress BJQueen',
 ] as const;
 
 const WHY_CUSTOM_POINTS = [
   {
-    title: 'Preferences drive generation',
+    title: 'Preferences drive selection',
     detail:
-      'Tasks are AI-generated from what you submit: categories, toys, limits, send times, chastity status, and delivery preferences.',
+      'Tasks are selected from a curated collection to match what you submit: categories, toys, limits, send times, chastity status, and delivery preferences.',
     icon: 'sliders',
   },
   {
@@ -54,7 +54,8 @@ const WHY_CUSTOM_POINTS = [
   },
   {
     title: 'Proof keeps it accountable',
-    detail: 'Proof submission is built in. Submissions are checked, so each task feels deliberate and worth completing.',
+    detail:
+      'Proof submission is built in. Submissions are reviewed by Mistress BJQueen so each task stays deliberate and accountable.',
     icon: 'shield',
   },
 ] as const;
@@ -73,12 +74,13 @@ const HOW_IT_WORKS_STEPS = [
   },
   {
     title: 'Receive tasks in Telegram',
-    detail: 'Tasks are generated from your saved setup and delivered in the bot. One task stays active at a time.',
+    detail: 'Tasks are selected from a large collection to fit your saved setup and delivered in the bot. One task stays active at a time.',
     icon: 'scroll',
   },
   {
     title: 'Submit proof and continue',
-    detail: 'Send proof where required. Proof is reviewed, and you move to the next task within your package limits.',
+    detail:
+      'Send proof where required. Proof is reviewed by Mistress BJQueen, and you move to the next task within your package limits.',
     icon: 'chat',
   },
 ] as const;
@@ -87,7 +89,7 @@ const BENEFIT_POINTS = [
   {
     eyebrow: 'Tailored categories',
     title: 'Tasks follow the categories you allow',
-    body: 'Your chosen categories and limits shape every generated instruction.',
+    body: 'Your chosen categories and limits shape every task selected for you.',
     icon: 'wand',
   },
   {
@@ -99,7 +101,7 @@ const BENEFIT_POINTS = [
   {
     eyebrow: 'Delivered in Telegram',
     title: 'No extra apps needed',
-    body: 'Tasks, proof, and pacing live inside the Telegram bot during your access window.',
+    body: 'Tasks, proof (reviewed by Mistress BJQueen), and pacing live inside the Telegram bot during your access window.',
     icon: 'chat',
   },
   {
@@ -111,7 +113,7 @@ const BENEFIT_POINTS = [
   {
     eyebrow: 'Proof baked in',
     title: 'Submission and review included',
-    body: 'Proof is requested where it matters and is manually reviewed before you continue.',
+    body: 'Proof is requested where it matters and is manually reviewed by Mistress BJQueen before you continue.',
     icon: 'shield',
   },
   {
@@ -134,18 +136,18 @@ const WHAT_YOURE_BUYING = [
     icon: 'clock',
   },
   {
-    title: 'Tasks generated from your saved setup',
-    detail: 'Categories, toys, limits, timezone, send times, and auto-send guide each task.',
+    title: 'Tasks selected from your saved setup',
+    detail: 'Categories, toys, limits, timezone, send times, and auto-send guide which tasks are chosen for you.',
     icon: 'sliders',
   },
   {
     title: 'Delivery and proof handled in Telegram',
-    detail: 'Tasks arrive in the bot; proof submission is built in and reviewed.',
+    detail: 'Tasks arrive in the bot; proof submission is built in and reviewed by Mistress BJQueen.',
     icon: 'chat',
   },
   {
     title: 'One active task at a time',
-    detail: 'You progress task by task—finish, abandon, or get reviewed before the next one.',
+    detail: 'You progress task by task—finish, abandon, or get proof reviewed by Mistress BJQueen before the next one.',
     icon: 'shield',
   },
 ] as const;
@@ -153,7 +155,7 @@ const WHAT_YOURE_BUYING = [
 const REASSURANCE_POINTS = [
   'Packages can start softer with fewer daily tasks.',
   'You do not need a big toy collection—tasks use what you have.',
-  'Everything stays in Telegram with clear pacing and proof.',
+  'Everything stays in Telegram with clear pacing and proof reviewed by Mistress BJQueen.',
 ] as const;
 
 const FAQS = [
@@ -177,13 +179,13 @@ const FAQS = [
   {
     question: 'Are tasks based on my preferences?',
     answer:
-      'Yes. Tasks are generated from the preferences you save—categories, toys, limits, send times, chastity status, and delivery style.',
+      'Yes. Tasks are selected from a large collection to fit the preferences you save—categories, toys, limits, send times, chastity status, and delivery style.',
     icon: 'sliders',
   },
   {
     question: 'Is this live chat or sexting?',
     answer:
-      'No. This is not live sexting or domme texting. Tasks are delivered by the Telegram bot with built-in proof submission.',
+      'No. This is not live sexting or domme texting. Tasks are delivered by the Telegram bot with built-in proof submission that is manually reviewed by Mistress BJQueen.',
     icon: 'chat',
   },
   {
@@ -195,7 +197,7 @@ const FAQS = [
   {
     question: 'What happens after payment?',
     answer:
-      'You complete your setup, save preferences, and start receiving generated tasks. Proof is reviewed before you move on, and access ends when your package expires.',
+      'You complete your setup, save preferences, and start receiving tasks selected to match you. Proof is manually reviewed by Mistress BJQueen before you move on, and access ends when your package expires.',
     icon: 'sparkles',
   },
 ] as const;
@@ -359,7 +361,8 @@ export function TasksPage() {
             <h1>Custom Obedience Tasks, delivered in Telegram</h1>
             <p className="tasks-hero__lead">
               Buy a time-limited package, set your categories, toys, schedule, limits, and auto-send preferences, then
-              receive generated obedience tasks one at a time with proof submission built in.
+              receive obedience tasks—hand-picked from a large collection to match your setup—one at a time with proof
+              submission built in and reviewed by Mistress BJQueen.
             </p>
             <p className="tasks-hero__supporting-copy">
               Packages define how long you have and how many tasks you can receive per day. Everything runs inside the
@@ -395,7 +398,8 @@ export function TasksPage() {
               <strong>Structured, premium, and personal—inside Telegram.</strong>
               <p>
                 Buy access, finish setup, and receive tasks that match your categories, toys, limits, and chosen pace.
-                One task stays active until you complete, abandon, or have proof reviewed. No live chat, no auto-renew.
+                One task stays active until you complete, abandon, or have proof reviewed by Mistress BJQueen. No live
+                chat, no auto-renew.
               </p>
               <div className="tasks-hero__private-list" aria-label="Private offering benefits">
                 {HERO_PRIVATE_POINTS.map((point) => (
@@ -416,7 +420,8 @@ export function TasksPage() {
           <h2>Guided, accountable, and written around you</h2>
           <p className="tasks-panel__body-copy">
             You are not buying a generic chatbot or a fixed list of scripts. You are buying a time-limited, structured
-            flow that is generated from your setup and kept accountable with proof.
+            flow where tasks are selected to match your setup and kept accountable with proof reviewed by Mistress
+            BJQueen.
           </p>
         </div>
         <div className="tasks-manifesto__quote">
@@ -486,8 +491,8 @@ export function TasksPage() {
             <p className="hero__eyebrow">Packages</p>
             <h2>Choose the package that fits your pace</h2>
             <p className="tasks-panel__body-copy">
-              Each package sets the access window and maximum tasks per day. Payment, setup, delivery, and proof all
-              happen inside the Telegram bot.
+              Each package sets the access window and maximum tasks per day. Payment, setup, delivery, and proof
+              (reviewed by Mistress BJQueen) all happen inside the Telegram bot.
             </p>
           </div>
           {tiersQuery.data && <span className="tasks-section__count">{tiersQuery.data.total} available</span>}
@@ -578,8 +583,8 @@ export function TasksPage() {
           <h2>Choose your package and start in Telegram</h2>
         </div>
         <p className="tasks-panel__body-copy">
-          Pick the duration and pace, complete setup in the bot, and start receiving generated tasks one at a time with
-          built-in proof.
+          Pick the duration and pace, complete setup in the bot, and start receiving tasks selected to fit you one at a
+          time with built-in proof reviewed by Mistress BJQueen.
         </p>
         <div className="tasks-hero__actions">
           <a className="tasks-button tasks-button--primary" href="#packages">

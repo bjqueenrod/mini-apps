@@ -38,7 +38,7 @@ function descriptorLabel(tier: TierItem, badgeLabel?: string): string {
 
   switch (badgeLabel) {
     case 'Best for first timers':
-      return `${base} Best if you want guidance, softer pacing, and clear proof steps for a first order.`;
+      return `${base} Best if you want guidance, softer pacing, and clear proof steps reviewed by Mistress BJQueen for a first order.`;
     case 'Most Popular':
       return `${base} Balanced control and pacing for buyers who want steady momentum.`;
     case 'High Intensity':
@@ -47,7 +47,7 @@ function descriptorLabel(tier: TierItem, badgeLabel?: string): string {
       if (tier.isUnlimitedTasks) {
         return `${base} Suited to buyers who want an immersive flow with frequent check-ins.`;
       }
-      return `${base} Choose this if you want clear pacing, personal tailoring, and accountable proof.`;
+      return `${base} Choose this if you want clear pacing, personal tailoring, and accountable proof reviewed by Mistress BJQueen.`;
   }
 }
 
@@ -60,10 +60,10 @@ function valueCopyLabel(tier: TierItem): string {
   }
 
   if (tier.isUnlimitedTasks) {
-    return 'Tasks are generated from your saved preferences, with one active at a time and proof reviewed before you move forward.';
+    return 'Tasks are selected from a curated collection to match your saved preferences, with one active at a time and proof reviewed by Mistress BJQueen before you move forward.';
   }
 
-  return 'Time-limited Telegram access. Tasks follow your preferences, one at a time, within the pace and duration you choose.';
+  return 'Time-limited Telegram access. Tasks are selected to follow your preferences, one at a time, within the pace and duration you choose, with proof reviewed by Mistress BJQueen.';
 }
 
 export function TierCarousel({
