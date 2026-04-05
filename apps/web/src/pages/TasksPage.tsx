@@ -27,32 +27,34 @@ type TaskIconName =
   | 'help';
 
 const VALUE_POINTS = [
-  { label: 'Written around you', icon: 'wand' },
-  { label: 'Checked personally', icon: 'shield' },
-  { label: 'One step at a time', icon: 'clock' },
-  { label: 'Soft to strict', icon: 'sparkles' },
+  { label: 'Time-limited Telegram access', icon: 'package' },
+  { label: 'One active task at a time', icon: 'clock' },
+  { label: 'Proof submission & review', icon: 'shield' },
+  { label: 'Generated from your setup', icon: 'sliders' },
 ] as const;
 
 const HERO_PRIVATE_POINTS = [
-  'Start softer or choose something stricter',
-  'Toys optional, limits respected',
-  'Works for first orders and experienced buyers',
+  'Packages define duration and max tasks per day',
+  'Setup captures categories, toys, timezone, send times, and auto-send',
+  'Delivery stays inside Telegram with proof reviewed manually',
 ] as const;
 
 const WHY_CUSTOM_POINTS = [
   {
-    title: 'Your yeses and nos lead',
-    detail: 'What turns you on, what is off-limits, and what toys you actually own shape the task before it is written.',
+    title: 'Preferences drive generation',
+    detail:
+      'Tasks are AI-generated from what you submit: categories, toys, limits, send times, chastity status, and delivery preferences.',
     icon: 'sliders',
   },
   {
-    title: 'The pace is chosen, not guessed',
-    detail: 'You can start softer, stay controlled, or ask for something stricter without being dropped into the wrong intensity.',
+    title: 'Structured pacing, one at a time',
+    detail:
+      'Only one task is active. Each package sets how long access lasts and how many tasks you can receive per day.',
     icon: 'clock',
   },
   {
-    title: 'It unfolds with attention',
-    detail: 'Instead of a dumped script, you get a cleaner step-by-step flow that feels watched, guided, and worth paying for.',
+    title: 'Proof keeps it accountable',
+    detail: 'Proof submission is built in. Submissions are checked, so each task feels deliberate and worth completing.',
     icon: 'shield',
   },
 ] as const;
@@ -60,101 +62,141 @@ const WHY_CUSTOM_POINTS = [
 const HOW_IT_WORKS_STEPS = [
   {
     title: 'Choose your package',
-    detail: 'Choose the level of pacing, structure, and control you want first.',
+    detail: 'Pick the duration and task pace that fits you. Purchase unlocks a time-limited window inside Telegram.',
     icon: 'package',
   },
   {
-    title: 'Set your preferences',
-    detail: 'Submit your kinks, limits, toys, and how far you want the task to go.',
+    title: 'Complete your setup',
+    detail:
+      'Fill in categories, toys, limits, timezone, send times, chastity status, and whether to auto-send or request.',
     icon: 'sliders',
   },
   {
-    title: 'Receive your first instruction',
-    detail: 'Your first assignment arrives in the bot shaped around your setup, pace, and preferences.',
+    title: 'Receive tasks in Telegram',
+    detail: 'Tasks are generated from your saved setup and delivered in the bot. One task stays active at a time.',
     icon: 'scroll',
   },
   {
-    title: 'Submit proof and keep progressing',
-    detail: 'Reply in the bot, send proof where required, and continue from one controlled step to the next.',
+    title: 'Submit proof and continue',
+    detail: 'Send proof where required. Proof is reviewed, and you move to the next task within your package limits.',
     icon: 'chat',
   },
 ] as const;
 
-const SAMPLE_TASK_CARDS = [
+const BENEFIT_POINTS = [
   {
-    eyebrow: 'Soft possession',
-    title: 'A calmer, more guided hold',
-    body: 'A slower start with cleaner handling, steadier pacing, and reassurance built into each step.',
-    icon: 'heart',
+    eyebrow: 'Tailored categories',
+    title: 'Tasks follow the categories you allow',
+    body: 'Your chosen categories and limits shape every generated instruction.',
+    icon: 'wand',
   },
   {
-    eyebrow: 'Toy-led control',
-    title: 'Written for the toys already in your drawer',
-    body: 'Tasks shaped around the toys you already own, so the setup feels immediate, personal, and easy to start.',
+    eyebrow: 'Built for your setup',
+    title: 'Respects the toys and gear you own',
+    body: 'Selections for toys and chastity status keep tasks realistic and immediate.',
     icon: 'toy',
   },
   {
-    eyebrow: 'Formal obedience',
-    title: 'Stricter pacing and clearer control',
-    body: 'A firmer step-by-step flow with proof, cleaner instructions, and a stronger sense of deliberate progression.',
-    icon: 'scroll',
-  },
-] as const;
-
-const OFFER_POINTS = [
-  {
-    title: 'It feels handled, not automated',
-    detail: 'The point is not just receiving a task. It is receiving something that lands on your exact nerve and holds your attention.',
-    icon: 'scroll',
+    eyebrow: 'Delivered in Telegram',
+    title: 'No extra apps needed',
+    body: 'Tasks, proof, and pacing live inside the Telegram bot during your access window.',
+    icon: 'chat',
   },
   {
-    title: 'Proof changes the tension',
-    detail: 'When proof is required, the task stops feeling hypothetical. It becomes active, accountable, and harder to shrug off.',
+    eyebrow: 'Controlled pacing',
+    title: 'Manual or scheduled delivery',
+    body: 'Choose auto-send times or trigger tasks yourself, within your tier’s tasks-per-day cap.',
+    icon: 'clock',
+  },
+  {
+    eyebrow: 'Proof baked in',
+    title: 'Submission and review included',
+    body: 'Proof is requested where it matters and is manually reviewed before you continue.',
     icon: 'shield',
   },
   {
-    title: 'Different packages create different moods',
-    detail: 'You can choose a softer first order, a steadier build, or a stricter package with more control and momentum.',
-    icon: 'sparkles',
+    eyebrow: 'One at a time',
+    title: 'Stay focused on the current task',
+    body: 'A new task appears only after you finish, abandon, or receive a review on the active one.',
+    icon: 'signal',
+  },
+] as const;
+
+const WHAT_YOURE_BUYING = [
+  {
+    title: 'A time-limited Custom Obedience package inside Telegram',
+    detail: 'Access ends when the paid period finishes—no auto-renewals.',
+    icon: 'package',
+  },
+  {
+    title: 'Duration and pace set by the tier',
+    detail: 'Each package defines how long you have and the maximum tasks per day.',
+    icon: 'clock',
+  },
+  {
+    title: 'Tasks generated from your saved setup',
+    detail: 'Categories, toys, limits, timezone, send times, and auto-send guide each task.',
+    icon: 'sliders',
+  },
+  {
+    title: 'Delivery and proof handled in Telegram',
+    detail: 'Tasks arrive in the bot; proof submission is built in and reviewed.',
+    icon: 'chat',
+  },
+  {
+    title: 'One active task at a time',
+    detail: 'You progress task by task—finish, abandon, or get reviewed before the next one.',
+    icon: 'shield',
   },
 ] as const;
 
 const REASSURANCE_POINTS = [
-  'You can start with a lighter pace and a simpler setup.',
-  'You do not need a huge toy collection to buy your first package.',
-  'Every package is still tailored, even when you want something softer.',
+  'Packages can start softer with fewer daily tasks.',
+  'You do not need a big toy collection—tasks use what you have.',
+  'Everything stays in Telegram with clear pacing and proof.',
 ] as const;
 
 const FAQS = [
   {
-    question: 'What makes these tasks custom?',
-    answer: 'They are written around your preferences, limits, toys, and desired intensity instead of being sent as a generic prewritten list.',
-    icon: 'sparkles',
+    question: 'What am I buying?',
+    answer:
+      'A paid, time-limited Custom Obedience package inside the Telegram bot. Access ends automatically when the period you choose is over.',
+    icon: 'package',
   },
   {
-    question: 'How many tasks do I get?',
-    answer: 'That depends on the package you choose. Each tier sets the duration and pace clearly before you buy.',
+    question: 'Do I get one task or multiple?',
+    answer:
+      'You can receive multiple tasks during your access window, capped by your package’s tasks-per-day limit. Only one task is active at a time.',
     icon: 'clock',
   },
   {
-    question: 'Do I need lots of toys?',
-    answer: 'No. Tasks can be shaped around what you already own, even if your setup is simple.',
-    icon: 'toy',
-  },
-  {
-    question: 'What kind of proof is required?',
-    answer: 'It depends on the task and the package. You will be told clearly what is needed, and proof is only used where it fits the flow.',
+    question: 'Is this a subscription?',
+    answer: 'No. There is no auto-renew. You buy a package for a set duration and it expires when that time ends.',
     icon: 'shield',
   },
   {
-    question: 'Can beginners buy?',
-    answer: 'Yes. You can start with a softer, simpler, more guided package and still receive something written personally for you.',
-    icon: 'signal',
+    question: 'Are tasks based on my preferences?',
+    answer:
+      'Yes. Tasks are generated from the preferences you save—categories, toys, limits, send times, chastity status, and delivery style.',
+    icon: 'sliders',
   },
   {
-    question: 'How do I start?',
-    answer: 'Choose your package here, continue in the bot, complete payment, then send your preferences so your first task can be prepared.',
+    question: 'Is this live chat or sexting?',
+    answer:
+      'No. This is not live sexting or domme texting. Tasks are delivered by the Telegram bot with built-in proof submission.',
+    icon: 'chat',
+  },
+  {
+    question: 'How do I receive my tasks?',
+    answer:
+      'After buying, you finish setup in the bot. Tasks are then delivered in Telegram according to your chosen schedule or when you trigger them.',
     icon: 'help',
+  },
+  {
+    question: 'What happens after payment?',
+    answer:
+      'You complete your setup, save preferences, and start receiving generated tasks. Proof is reviewed before you move on, and access ends when your package expires.',
+    icon: 'sparkles',
   },
 ] as const;
 
@@ -305,7 +347,7 @@ export function TasksPage() {
           <div className="hero__banner-copy">
             <span className="hero__banner-kicker">Mistress BJQueen&apos;s</span>
             <strong>Custom Obedience</strong>
-            <span>Tailored private obedience packages</span>
+            <span>Time-limited obedience packages in Telegram</span>
           </div>
         </div>
       </section>
@@ -314,24 +356,25 @@ export function TasksPage() {
         <div className="tasks-hero__grid">
           <div className="tasks-hero__main">
             <p className="hero__eyebrow">Custom Obedience Tasks</p>
-            <h1>Private obedience, written for your kinks, limits, and how far you want to be pushed</h1>
+            <h1>Custom Obedience Tasks, delivered in Telegram</h1>
             <p className="tasks-hero__lead">
-              Not a generic task list. Your order is shaped around what you crave, what you avoid, the toys you own,
-              and whether you want something softer, stricter, or somewhere in between.
+              Buy a time-limited package, set your categories, toys, schedule, limits, and auto-send preferences, then
+              receive generated obedience tasks one at a time with proof submission built in.
             </p>
             <p className="tasks-hero__supporting-copy">
-              Delivered step by step in the bot, with proof and personal review where the package calls for it.
+              Packages define how long you have and how many tasks you can receive per day. Everything runs inside the
+              Telegram bot—no auto-renewals, no live sexting, just structured, custom tasks.
             </p>
             <div className="tasks-hero__actions">
               <a className="tasks-button tasks-button--primary" href="#packages">
-                View Packages
+                Choose Your Package
               </a>
               <a
                 className="tasks-button tasks-button--secondary"
                 href={botRootUrl || '#packages'}
                 onClick={handleBotAction(botRootUrl)}
               >
-                Back to Bot
+                Open in Telegram
               </a>
             </div>
             <div className="tasks-strip tasks-strip--hero" aria-label="Why buyers choose custom obedience">
@@ -349,10 +392,10 @@ export function TasksPage() {
           <aside className="tasks-hero__aside">
             <article className="tasks-hero__private-card">
               <p className="tasks-hero__private-kicker">Private Offering</p>
-              <strong>This should feel like it was prepared for you, not pulled from a generic file.</strong>
+              <strong>Structured, premium, and personal—inside Telegram.</strong>
               <p>
-                A softer first order, a toy-led setup, or something firmer and more obedient. You choose the mood, then
-                the package gives it shape.
+                Buy access, finish setup, and receive tasks that match your categories, toys, limits, and chosen pace.
+                One task stays active until you complete, abandon, or have proof reviewed. No live chat, no auto-renew.
               </p>
               <div className="tasks-hero__private-list" aria-label="Private offering benefits">
                 {HERO_PRIVATE_POINTS.map((point) => (
@@ -370,14 +413,14 @@ export function TasksPage() {
       <section className="tasks-manifesto">
         <div className="tasks-manifesto__intro">
           <p className="hero__eyebrow">Why Custom Feels Different</p>
-          <h2>This should feel like it was written for you</h2>
+          <h2>Guided, accountable, and written around you</h2>
           <p className="tasks-panel__body-copy">
-            You are not buying a random dump of instructions. You are buying attention, pacing, and something shaped
-            around your exact appetite.
+            You are not buying a generic chatbot or a fixed list of scripts. You are buying a time-limited, structured
+            flow that is generated from your setup and kept accountable with proof.
           </p>
         </div>
         <div className="tasks-manifesto__quote">
-          <strong>Not just personalised. More controlled. More intimate. More worth paying for.</strong>
+          <strong>Personalised, paced, and worth paying for because it stays focused on you.</strong>
         </div>
         <div className="tasks-manifesto__grid" aria-label="Why custom feels different">
           {WHY_CUSTOM_POINTS.map((point) => (
@@ -397,7 +440,7 @@ export function TasksPage() {
       <section className="tasks-panel tasks-panel--steps">
         <div className="tasks-panel__header">
           <p className="hero__eyebrow">How It Works</p>
-          <h2>Simple to start. Personal from the first step.</h2>
+          <h2>Simple to start. Clear from the first task.</h2>
         </div>
         <div className="tasks-stepper">
           {HOW_IT_WORKS_STEPS.map((step, index) => (
@@ -417,14 +460,12 @@ export function TasksPage() {
 
       <section className="tasks-panel">
         <div className="tasks-panel__header">
-          <p className="hero__eyebrow">Example Experiences</p>
-          <h2>Choose the flavour of control you want</h2>
+          <p className="hero__eyebrow">Benefits</p>
+          <h2>Why this feels structured and custom</h2>
         </div>
-        <p className="tasks-panel__body-copy">
-          Every package is shaped around your submitted preferences, limits, available toys, and chosen intensity.
-        </p>
+        <p className="tasks-panel__body-copy">Everything here is designed to keep the flow personal, accountable, and inside Telegram.</p>
         <div className="tasks-style-grid" aria-label="Examples of custom task styles">
-          {SAMPLE_TASK_CARDS.map((card) => (
+          {BENEFIT_POINTS.map((card) => (
             <article key={card.title} className="tasks-style-card">
               <div className="tasks-style-card__header">
                 <span className="tasks-style-card__icon">
@@ -443,10 +484,10 @@ export function TasksPage() {
         <div className="tasks-section__header tasks-section__header--stacked">
           <div className="tasks-section__copy">
             <p className="hero__eyebrow">Packages</p>
-            <h2>Choose the package that fits the kind of control you want</h2>
+            <h2>Choose the package that fits your pace</h2>
             <p className="tasks-panel__body-copy">
-              Start with a lighter first order or choose something fuller, stricter, and more paced. Pick the one that
-              matches how you want this to land.
+              Each package sets the access window and maximum tasks per day. Payment, setup, delivery, and proof all
+              happen inside the Telegram bot.
             </p>
           </div>
           {tiersQuery.data && <span className="tasks-section__count">{tiersQuery.data.total} available</span>}
@@ -467,14 +508,11 @@ export function TasksPage() {
       <section className="tasks-panel tasks-panel--light">
         <div className="tasks-panel__header">
           <p className="hero__eyebrow">What You&apos;re Buying</p>
-          <h2>What makes it worth paying for</h2>
+          <h2>Plainly, here&apos;s what this product is</h2>
         </div>
-        <p className="tasks-panel__body-copy">
-          The value is not just in receiving a task. It is in receiving something that feels watched, paced, and built
-          to keep its hold on you.
-        </p>
+        <p className="tasks-panel__body-copy">No surprises, no auto-renewal, and no generic scripts.</p>
         <div className="tasks-benefits" aria-label="Why custom packages feel different">
-          {OFFER_POINTS.map((point) => (
+          {WHAT_YOURE_BUYING.map((point) => (
             <article key={point.title} className="tasks-benefit">
               <span className="tasks-benefit__icon">
                 <TaskIcon name={point.icon} />
@@ -537,22 +575,22 @@ export function TasksPage() {
       <section className="tasks-panel tasks-panel--cta">
         <div className="tasks-panel__header">
           <p className="hero__eyebrow">Ready When You Are</p>
-          <h2>Ready to place your first order?</h2>
+          <h2>Choose your package and start in Telegram</h2>
         </div>
         <p className="tasks-panel__body-copy">
-          Choose your package, step into the bot, and start a custom obedience flow built around your limits, your
-          toys, and the way you want to be handled.
+          Pick the duration and pace, complete setup in the bot, and start receiving generated tasks one at a time with
+          built-in proof.
         </p>
         <div className="tasks-hero__actions">
           <a className="tasks-button tasks-button--primary" href="#packages">
-            View Packages
+            Choose Your Package
           </a>
           <a
             className="tasks-button tasks-button--secondary"
             href={botRootUrl || '#packages'}
             onClick={handleBotAction(botRootUrl)}
           >
-            Back to Bot
+            Open in Telegram
           </a>
         </div>
       </section>
@@ -561,7 +599,7 @@ export function TasksPage() {
         <div className="sticky-mobile-cta__content">
           <span>{tiersQuery.data ? `${tiersQuery.data.total} custom packages ready` : 'Custom Obedience Tasks'}</span>
           <a className="tasks-button tasks-button--primary sticky-mobile-cta__button" href="#packages">
-            View Packages
+            Choose Package
           </a>
         </div>
       </div>

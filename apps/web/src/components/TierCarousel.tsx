@@ -32,21 +32,22 @@ function descriptorLabel(tier: TierItem, badgeLabel?: string): string {
     return tier.shortDescription.trim();
   }
 
+  const duration = getTierDurationLabel(tier).toLowerCase();
+  const pace = getTierTasksLabel(tier).toLowerCase();
+  const base = `Telegram access for ${duration} with ${pace}.`;
+
   switch (badgeLabel) {
     case 'Best for first timers':
-      return 'Good for a first order when you want guidance without overwhelm.';
+      return `${base} Best if you want guidance, softer pacing, and clear proof steps for a first order.`;
     case 'Most Popular':
-      return 'More control, more pacing, and a fuller sense of progression.';
+      return `${base} Balanced control and pacing for buyers who want steady momentum.`;
     case 'High Intensity':
-      return 'For buyers who want stricter pacing and a heavier custom flow.';
+      return `${base} For buyers who want stricter pacing, tighter review, and firmer control.`;
     default:
       if (tier.isUnlimitedTasks) {
-        return 'For buyers who want a more immersive, open-ended level of control.';
+        return `${base} Suited to buyers who want an immersive flow with frequent check-ins.`;
       }
-      if ((tier.durationDays ?? 0) >= 5) {
-        return 'For buyers who want more room for structure, proof, and stronger momentum.';
-      }
-      return 'A private custom package with clear pacing, personal tailoring, and an easier first step.';
+      return `${base} Choose this if you want clear pacing, personal tailoring, and accountable proof.`;
   }
 }
 
@@ -59,14 +60,10 @@ function valueCopyLabel(tier: TierItem): string {
   }
 
   if (tier.isUnlimitedTasks) {
-    return 'A deeper, more immersive package with ongoing steps, proof, and room for a stronger rhythm to build.';
+    return 'Tasks are generated from your saved preferences, with one active at a time and proof reviewed before you move forward.';
   }
 
-  if ((tier.durationDays ?? 0) >= 5) {
-    return 'A longer package with more room for escalation, control, and a stronger sense of build.';
-  }
-
-  return 'Custom tasks shaped around your preferences, toys, limits, and desired intensity from the first instruction.';
+  return 'Time-limited Telegram access. Tasks follow your preferences, one at a time, within the pace and duration you choose.';
 }
 
 export function TierCarousel({
@@ -167,7 +164,7 @@ export function TierCarousel({
                       <strong>{priceLabel(tier)}</strong>
                     </div>
                     <p className="top-sellers__value-copy">{valueSummary}</p>
-                    <span className="top-sellers__cta">Choose This Package</span>
+                    <span className="top-sellers__cta">See Package Details</span>
                   </div>
                 </Link>
               );

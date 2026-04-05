@@ -7,10 +7,11 @@ import { TierItem } from '../features/tiers/types';
 import { formatPrice } from '../utils/format';
 
 const PACKAGE_HIGHLIGHTS = [
-  'Tailored to your preferences, limits, and toy list',
-  'Delivered inside the bot as a guided custom experience',
-  'Clear pacing based on the package you choose',
-  'Proof and review where the task requires it',
+  'Time-limited access inside Telegram; no auto-renewal',
+  'Duration and maximum tasks per day are set by this tier',
+  'Tasks are generated from your saved categories, toys, limits, and schedule',
+  'Delivery and proof submission happen in the Telegram bot',
+  'Only one task is active at a time, with proof manually reviewed',
 ] as const;
 
 export function TierDetailSheet({
@@ -84,8 +85,8 @@ export function TierDetailSheet({
                   <h2>{tier.name}</h2>
                   <p>{getTierSummary(tier)}</p>
                   <p className="detail-sheet__supporting-copy">
-                    Choose your package here, then continue in the bot for payment, setup, and tailored custom task
-                    delivery.
+                    Choose your package here, then continue in the bot for payment, setup, and delivery. One task stays
+                    active at a time, and access ends when the package duration ends.
                   </p>
                 </div>
               </div>
@@ -124,7 +125,7 @@ export function TierDetailSheet({
                 className="detail-sheet__action detail-sheet__action--stream"
                 onClick={handleBotAction(tier.botBuyUrl)}
               >
-                <strong>Unlock in Bot</strong>
+                <strong>Open in Telegram</strong>
                 <span>{tier.priceLabel || formatPrice(tier.price)}</span>
               </a>
             </div>
