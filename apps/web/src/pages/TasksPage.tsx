@@ -26,7 +26,7 @@ const VALUE_POINTS = [
   { label: 'Time-limited Telegram access', icon: 'package' },
   { label: 'One active task at a time', icon: 'clock' },
   { label: 'Proof submission & review by Mistress BJQueen', icon: 'shield' },
-  { label: 'Selected from your setup', icon: 'sliders' },
+  { label: 'Tailored to your selected preferences', icon: 'sliders' },
 ] as const;
 
 const HERO_PRIVATE_POINTS = [
