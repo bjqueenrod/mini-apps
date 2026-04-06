@@ -1185,11 +1185,12 @@ button {
 .top-sellers__cta {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   width: 100%;
-  min-height: 48px;
+  min-height: 56px;
   margin-top: auto;
-  padding: 12px 14px;
+  gap: 10px;
+  padding: 13px 14px;
   border-radius: 16px;
   border: 1px solid rgba(176, 106, 214, 0.22);
   background: linear-gradient(180deg, rgba(176, 106, 214, 0.18), rgba(176, 106, 214, 0.12));
@@ -1197,6 +1198,22 @@ button {
   font-weight: 700;
   letter-spacing: 0.01em;
   transition: background 160ms ease, border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.top-sellers__cta strong,
+.top-sellers__cta span {
+  display: block;
+}
+
+.top-sellers__cta strong {
+  font-size: 0.95rem;
+  line-height: 1.15;
+}
+
+.top-sellers__cta span {
+  flex: 0 0 auto;
+  font-size: 0.92rem;
+  line-height: 1;
 }
 
 .top-sellers--tiers .top-sellers__card:hover .top-sellers__cta,

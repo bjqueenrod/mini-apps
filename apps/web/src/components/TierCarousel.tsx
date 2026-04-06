@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { MouseEvent } from 'react';
+import { openBotDeepLink } from '../app/telegram';
 import { getTierArtwork, getTierArtworkVariant } from '../features/tiers/artwork';
 import {
   getTierDurationLabel,
@@ -7,7 +8,6 @@ import {
 } from '../features/tiers/presentation';
 import { TierItem } from '../features/tiers/types';
 import { formatPrice } from '../utils/format';
-import { toTierPath } from '../utils/links';
 import { usePagedCarousel } from './usePagedCarousel';
 
 function priceLabel(tier: TierItem): string {
@@ -82,6 +82,14 @@ export function TierCarousel({
   const guideLabels = getTierGuideLabels(items);
   const pageCount = loading ? 3 : items.length;
   const { currentPage, scrollToPage, trackRef } = usePagedCarousel(pageCount);
+  const handleBotAction = (url?: string) => (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!url) {
+      event.preventDefault();
+      return;
+    }
+    event.preventDefault();
+    openBotDeepLink(url);
+  };
 
   return (
     <section className="top-sellers top-sellers--tiers">
@@ -120,7 +128,7 @@ export function TierCarousel({
               const valueSummary = valueCopyLabel(tier);
 
               return (
-                <Link
+                <article
                   key={tier.id}
                   className={[
                     'top-sellers__card',
@@ -130,7 +138,6 @@ export function TierCarousel({
                   ]
                     .filter(Boolean)
                     .join(' ')}
-                  to={toTierPath(tier.id)}
                 >
                   <div className="top-sellers__media top-sellers__media--tier">
                     <img
@@ -164,9 +171,17 @@ export function TierCarousel({
                       <strong>{priceLabel(tier)}</strong>
                     </div>
                     <p className="top-sellers__value-copy">{valueSummary}</p>
-                    <span className="top-sellers__cta">See Package Details</span>
+                    <a
+                      href={tier.botBuyUrl || '#'}
+                      className="top-sellers__cta"
+                      onClick={handleBotAction(tier.botBuyUrl)}
+                      aria-label={`Continue to payment for ${tier.name}`}
+                    >
+                      <strong>Continue to Payment</strong>
+                      <span>{priceLabel(tier)}</span>
+                    </a>
                   </div>
-                </Link>
+                </article>
               );
             })}
       </div>

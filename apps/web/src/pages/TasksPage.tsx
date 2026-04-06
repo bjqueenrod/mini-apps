@@ -1,16 +1,12 @@
-import { MouseEvent, useEffect, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
 import { AppShell } from '../components/AppShell';
 import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
 import { TierCarousel } from '../components/TierCarousel';
 import { TelegramDevBanner } from '../components/TelegramDevBanner';
-import { TierDetailSheet } from '../components/TierDetailSheet';
-import { applyTelegramTheme, openBotDeepLink } from '../app/telegram';
+import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
-import { getTierArtworkVariant } from '../features/tiers/artwork';
-import { useTierDetail, useTiers } from '../features/tiers/hooks';
-import { getBotRootUrl } from '../features/tiers/presentation';
+import { useTiers } from '../features/tiers/hooks';
 
 type TaskIconName =
   | 'wand'
@@ -343,27 +339,11 @@ function TaskIcon({ name }: { name: TaskIconName }) {
 
 export function TasksPage() {
   const session = useTelegramSession();
-  const { tierId } = useParams();
   const tiersQuery = useTiers();
-  const tierDetailQuery = useTierDetail(tierId);
-  const botRootUrl = useMemo(() => getBotRootUrl(tiersQuery.data?.items ?? []), [tiersQuery.data?.items]);
-  const tierArtworkVariants = useMemo(
-    () =>
-      Object.fromEntries((tiersQuery.data?.items ?? []).map((item, index) => [item.id, getTierArtworkVariant(index)])),
-    [tiersQuery.data?.items],
-  );
 
   useEffect(() => {
     applyTelegramTheme();
   }, []);
-
-  const handleBotAction = (url?: string) => (event: MouseEvent<HTMLAnchorElement>) => {
-    if (!url) {
-      return;
-    }
-    event.preventDefault();
-    openBotDeepLink(url);
-  };
 
   return (
     <AppShell>
@@ -647,14 +627,6 @@ export function TasksPage() {
           </a>
         </div>
       </div>
-
-      {tierId && (
-        <TierDetailSheet
-          tier={tierDetailQuery.data}
-          loading={tierDetailQuery.isLoading}
-          artworkVariant={tierArtworkVariants[tierId]}
-        />
-      )}
     </AppShell>
   );
 }
