@@ -9,6 +9,7 @@ import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
 import { TelegramDevBanner } from '../components/TelegramDevBanner';
 import { TopSellersCarousel } from '../components/TopSellersCarousel';
+import { setAnalyticsContext } from '../app/analytics';
 import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
 import {
@@ -100,6 +101,14 @@ export function BrowsePage() {
   useEffect(() => {
     applyTelegramTheme();
   }, []);
+
+  useEffect(() => {
+    setAnalyticsContext({
+      enabled: session.ready && !session.error,
+      isTelegram: session.isTelegram,
+      startParam: session.startParam,
+    });
+  }, [session.error, session.isTelegram, session.ready, session.startParam]);
 
   useEffect(() => {
     if (didTrackOpenRef.current) {

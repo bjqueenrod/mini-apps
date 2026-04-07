@@ -1,6 +1,7 @@
 import { MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { openBotDeepLink } from '../app/telegram';
+import { trackTierBotCtaClick, trackTierSelect } from '../features/tiers/analytics';
 import { TierItem } from '../features/tiers/types';
 import { getTierDurationLabel, getTierSummary, getTierTasksLabel } from '../features/tiers/presentation';
 import { formatPrice } from '../utils/format';
@@ -13,6 +14,7 @@ export function TierCard({ tier, guideLabel }: { tier: TierItem; guideLabel?: st
       return;
     }
     event.preventDefault();
+    trackTierBotCtaClick({ tier, source: 'tier_card' });
     openBotDeepLink(tier.botBuyUrl);
   };
 
@@ -25,7 +27,7 @@ export function TierCard({ tier, guideLabel }: { tier: TierItem; guideLabel?: st
         </div>
         <span>{getTierDurationLabel(tier)}</span>
       </div>
-      <Link to={toTierPath(tier.id)} className="tier-card__content">
+      <Link to={toTierPath(tier.id)} className="tier-card__content" onClick={() => trackTierSelect({ tier, source: 'tier_card' })}>
         <h3>{tier.name}</h3>
         <p>{getTierSummary(tier)}</p>
       </Link>
@@ -34,7 +36,7 @@ export function TierCard({ tier, guideLabel }: { tier: TierItem; guideLabel?: st
         <strong>{tier.priceLabel || formatPrice(tier.price)}</strong>
       </div>
       <div className="tier-card__actions">
-        <Link to={toTierPath(tier.id)} className="tier-card__link">
+        <Link to={toTierPath(tier.id)} className="tier-card__link" onClick={() => trackTierSelect({ tier, source: 'tier_card' })}>
           View package
         </Link>
         <a href={tier.botBuyUrl || '#'} className="tier-card__cta" onClick={handleBotAction}>

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Generator
 
-from fastapi import Cookie, Depends
+from fastapi import Cookie, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.security import get_session_serializer
@@ -28,3 +28,9 @@ def get_optional_session(session_token: str | None = Cookie(default=None, alias=
         return serializer.loads(session_token, max_age=60 * 60 * 24 * 7)
     except Exception:
         return None
+
+
+def get_session(session: dict | None = Depends(get_optional_session)) -> dict:
+    if not session:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+    return session

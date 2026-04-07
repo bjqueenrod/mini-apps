@@ -1,9 +1,20 @@
-import { trackEvent } from '../../app/analytics';
+import { trackEntryStarted, trackInteraction, trackScreenView } from '../../app/analytics';
 import { ClipItem } from './types';
 
 const TRACKED_START_PARAM_PATTERN = /^l_[0-9a-z]+(?:__[A-Za-z0-9_-]{1,64})?$/;
 
 type ClipListType = 'search_results' | 'new_clips' | 'top_sellers';
+
+function entryScreen(entryPath: string) {
+  const pathname = entryPath.split('?')[0] || '/clips';
+  if (/^\/clips\/[^/]+$/.test(pathname)) {
+    return 'clip_detail';
+  }
+  if (pathname === '/tasks') {
+    return 'tasks_home';
+  }
+  return 'clips_home';
+}
 
 function clipParams(clip: ClipItem) {
   return {
@@ -40,11 +51,15 @@ export function trackMiniAppOpenAttributed(params: {
   isTelegram: boolean;
   entryPath: string;
 }) {
-  trackEvent('miniapp_open_attributed', {
-    entry_path: params.entryPath,
-    is_telegram: params.isTelegram,
-    start_param_present: Boolean(params.startParam),
-    start_param_type: classifyStartParam(params.startParam),
+  trackEntryStarted({
+    screen: entryScreen(params.entryPath),
+    receivedStartParam: params.startParam,
+    properties: {
+      entry_path: params.entryPath,
+      is_telegram: params.isTelegram,
+      start_param_present: Boolean(params.startParam),
+      start_param_type: classifyStartParam(params.startParam),
+    },
   });
 }
 
@@ -56,14 +71,17 @@ export function trackClipListView(params: {
   query?: string;
   tags?: string[];
 }) {
-  trackEvent('clip_list_view', {
-    list_type: params.listType,
-    item_count: params.itemCount,
-    total_count: params.totalCount,
-    page: params.page,
-    query: params.query || undefined,
-    tags: params.tags?.join(',') || undefined,
-    has_filters: Boolean(params.query || params.tags?.length),
+  trackScreenView({
+    screen: `clip_list_${params.listType}`,
+    properties: {
+      list_type: params.listType,
+      item_count: params.itemCount,
+      total_count: params.totalCount,
+      page: params.page,
+      query: params.query || undefined,
+      tags: params.tags?.join(',') || undefined,
+      has_filters: Boolean(params.query || params.tags?.length),
+    },
   });
 }
 
@@ -74,11 +92,15 @@ export function trackClipSearch(params: {
 }) {
   const tags = params.tags ?? [];
   const query = params.query?.trim() ?? '';
-  trackEvent('clip_search', {
-    query: query || undefined,
-    tags: tags.join(',') || undefined,
-    result_count: params.resultCount,
-    search_type: query && tags.length ? 'text_and_tag' : query ? 'text' : 'tag',
+  trackInteraction({
+    screen: 'clips_home',
+    actionKey: 'clip_search',
+    properties: {
+      query: query || undefined,
+      tags: tags.join(',') || undefined,
+      result_count: params.resultCount,
+      search_type: query && tags.length ? 'text_and_tag' : query ? 'text' : 'tag',
+    },
   });
 }
 
@@ -89,20 +111,27 @@ export function trackClipSelect(params: {
   query?: string;
   tags?: string[];
 }) {
-  trackEvent('clip_select', {
-    ...clipParams(params.clip),
-    source_list: params.sourceList,
-    list_position: params.position,
-    query: params.query || undefined,
-    tags: params.tags?.join(',') || undefined,
+  trackInteraction({
+    screen: `clip_list_${params.sourceList}`,
+    actionKey: 'clip_select',
+    properties: {
+      ...clipParams(params.clip),
+      source_list: params.sourceList,
+      list_position: params.position,
+      query: params.query || undefined,
+      tags: params.tags?.join(',') || undefined,
+    },
   });
 }
 
 export function trackClipDetailView(clip: ClipItem) {
-  trackEvent('clip_detail_view', {
-    ...clipParams(clip),
-    has_public_preview: Boolean(clip.previewEmbedUrl),
-    tag_count: clip.tags.length,
+  trackScreenView({
+    screen: 'clip_detail',
+    properties: {
+      ...clipParams(clip),
+      has_public_preview: Boolean(clip.previewEmbedUrl),
+      tag_count: clip.tags.length,
+    },
   });
 }
 
@@ -111,11 +140,15 @@ export function trackClipTagSelect(params: {
   source: 'featured_filter' | 'secondary_filter' | 'detail_sheet';
   clip?: ClipItem;
 }) {
-  trackEvent('clip_tag_select', {
-    tag: params.tag,
-    source: params.source,
-    clip_id: params.clip?.id,
-    clip_title: params.clip?.title,
+  trackInteraction({
+    screen: params.source === 'detail_sheet' ? 'clip_detail' : 'clips_home',
+    actionKey: 'clip_tag_select',
+    properties: {
+      tag: params.tag,
+      source: params.source,
+      clip_id: params.clip?.id,
+      clip_title: params.clip?.title,
+    },
   });
 }
 
@@ -123,9 +156,13 @@ export function trackClipBotCtaClick(params: {
   clip: ClipItem;
   ctaType: 'stream' | 'download';
 }) {
-  trackEvent('clip_bot_cta_click', {
-    ...clipParams(params.clip),
-    cta_type: params.ctaType,
-    price: params.ctaType === 'stream' ? params.clip.streamPrice ?? params.clip.price : params.clip.downloadPrice ?? params.clip.price,
+  trackInteraction({
+    screen: 'clip_detail',
+    actionKey: 'clip_bot_cta_click',
+    properties: {
+      ...clipParams(params.clip),
+      cta_type: params.ctaType,
+      price: params.ctaType === 'stream' ? params.clip.streamPrice ?? params.clip.price : params.clip.downloadPrice ?? params.clip.price,
+    },
   });
 }

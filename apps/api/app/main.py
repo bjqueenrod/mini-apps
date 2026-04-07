@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from app.api.routes.analytics import router as analytics_router
 from app.api.routes.auth import router as auth_router
 from app.api.routes.clips import router as clips_router
 from app.api.routes.health import router as health_router
@@ -26,6 +27,7 @@ app.add_middleware(
 )
 app.include_router(health_router, prefix='/api')
 app.include_router(auth_router, prefix='/api')
+app.include_router(analytics_router, prefix='/api')
 app.include_router(clips_router, prefix='/api')
 app.include_router(tiers_router, prefix='/api')
 

@@ -1,5 +1,6 @@
 import { MouseEvent } from 'react';
 import { openBotDeepLink } from '../app/telegram';
+import { trackTierBotCtaClick } from '../features/tiers/analytics';
 import { getTierArtwork, getTierArtworkVariant } from '../features/tiers/artwork';
 import {
   getTierDurationLabel,
@@ -82,12 +83,13 @@ export function TierCarousel({
   const guideLabels = getTierGuideLabels(items);
   const pageCount = loading ? 3 : items.length;
   const { currentPage, scrollToPage, trackRef } = usePagedCarousel(pageCount);
-  const handleBotAction = (url?: string) => (event: MouseEvent<HTMLAnchorElement>) => {
+  const handleBotAction = (tier: TierItem, url?: string) => (event: MouseEvent<HTMLAnchorElement>) => {
     if (!url) {
       event.preventDefault();
       return;
     }
     event.preventDefault();
+    trackTierBotCtaClick({ tier, source: 'tier_carousel' });
     openBotDeepLink(url);
   };
 
@@ -174,7 +176,7 @@ export function TierCarousel({
                     <a
                       href={tier.botBuyUrl || '#'}
                       className="top-sellers__cta"
-                      onClick={handleBotAction(tier.botBuyUrl)}
+                      onClick={handleBotAction(tier, tier.botBuyUrl)}
                       aria-label={`Continue to payment for ${tier.name}`}
                     >
                       <strong>Continue to Payment</strong>

@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
 import { TelegramDevBanner } from '../components/TelegramDevBanner';
+import { setAnalyticsContext } from '../app/analytics';
 import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
 import { useEffect } from 'react';
@@ -36,6 +37,14 @@ export function HomePage() {
   useEffect(() => {
     applyTelegramTheme();
   }, []);
+
+  useEffect(() => {
+    setAnalyticsContext({
+      enabled: session.ready && !session.error,
+      isTelegram: session.isTelegram,
+      startParam: session.startParam,
+    });
+  }, [session.error, session.isTelegram, session.ready, session.startParam]);
 
   useEffect(() => {
     navigate(redirectTarget, { replace: true });

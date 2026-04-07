@@ -1,7 +1,8 @@
-import { MouseEvent, useEffect } from 'react';
+import { MouseEvent, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { openBotDeepLink } from '../app/telegram';
 import { getTierArtwork, TierArtworkVariant } from '../features/tiers/artwork';
+import { trackTierBotCtaClick, trackTierDetailView } from '../features/tiers/analytics';
 import { getTierDurationLabel, getTierSummary, getTierTasksLabel } from '../features/tiers/presentation';
 import { TierItem } from '../features/tiers/types';
 import { formatPrice } from '../utils/format';
@@ -23,12 +24,17 @@ export function TierDetailSheet({
   loading?: boolean;
   artworkVariant?: TierArtworkVariant;
 }) {
+  const lastTrackedTierIdRef = useRef('');
+
   const handleBotAction = (url?: string) => (event: MouseEvent<HTMLAnchorElement>) => {
     if (!url) {
       event.preventDefault();
       return;
     }
     event.preventDefault();
+    if (tier) {
+      trackTierBotCtaClick({ tier, source: 'detail_sheet' });
+    }
     openBotDeepLink(url);
   };
 
@@ -59,6 +65,14 @@ export function TierDetailSheet({
       window.scrollTo(0, scrollY);
     };
   }, []);
+
+  useEffect(() => {
+    if (!tier || lastTrackedTierIdRef.current === tier.id) {
+      return;
+    }
+    lastTrackedTierIdRef.current = tier.id;
+    trackTierDetailView(tier);
+  }, [tier]);
 
   return (
     <div className="detail-sheet__backdrop">

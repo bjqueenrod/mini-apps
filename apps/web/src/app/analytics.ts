@@ -1,61 +1,198 @@
-const MEASUREMENT_ID = 'G-64CLVK0GHE';
-const ANALYTICS_ENABLED = import.meta.env.PROD;
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
-declare global {
-  interface Window {
-    dataLayer?: unknown[];
-    gtag?: (...args: unknown[]) => void;
+type MiniAppAnalyticsEventName = 'entry_started' | 'screen_viewed' | 'interaction_triggered';
+
+type MiniAppAnalyticsEvent = {
+  eventName: MiniAppAnalyticsEventName;
+  screen?: string;
+  flowId?: string;
+  actionKey?: string;
+  occurredAt?: string;
+  dedupeKey?: string;
+  receivedStartParam?: string;
+  properties?: Record<string, unknown>;
+};
+
+type AnalyticsContext = {
+  enabled: boolean;
+  isTelegram: boolean;
+  startParam?: string;
+};
+
+let lastTrackedPath = '';
+let initialized = false;
+let context: AnalyticsContext = {
+  enabled: false,
+  isTelegram: false,
+  startParam: undefined,
+};
+const pendingEvents: MiniAppAnalyticsEvent[] = [];
+let flushPromise: Promise<void> | null = null;
+
+function buildDedupeKey(eventName: MiniAppAnalyticsEventName) {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return `miniapp:${eventName}:${crypto.randomUUID()}`;
+  }
+  return `miniapp:${eventName}:${Date.now()}:${Math.random().toString(16).slice(2)}`;
+}
+
+function screenFromPath(path: string) {
+  const pathname = path.split('?')[0] || '/';
+
+  if (pathname === '/') {
+    return 'home';
+  }
+  if (pathname === '/clips') {
+    return 'clips_home';
+  }
+  if (pathname === '/tasks') {
+    return 'tasks_home';
+  }
+  if (/^\/clips\/[^/]+$/.test(pathname)) {
+    return 'clip_detail';
+  }
+  if (/^\/tasks\/[^/]+$/.test(pathname)) {
+    return 'tier_detail';
+  }
+
+  return pathname.replace(/^\//, '').replace(/\//g, '_') || 'home';
+}
+
+function buildEventPayload(event: MiniAppAnalyticsEvent) {
+  return {
+    eventName: event.eventName,
+    screen: event.screen,
+    flowId: event.flowId,
+    actionKey: event.actionKey,
+    occurredAt: event.occurredAt || new Date().toISOString(),
+    dedupeKey: event.dedupeKey || buildDedupeKey(event.eventName),
+    receivedStartParam: event.receivedStartParam ?? context.startParam,
+    properties: {
+      ...(event.properties || {}),
+      is_telegram: context.isTelegram,
+    },
+  };
+}
+
+async function postEvent(event: MiniAppAnalyticsEvent) {
+  try {
+    await fetch(`${API_BASE}/analytics/events`, {
+      method: 'POST',
+      credentials: 'include',
+      keepalive: true,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(buildEventPayload(event)),
+    });
+  } catch {
+    // Analytics should never block the mini-app experience.
   }
 }
 
-let initialized = false;
-let lastTrackedPath = '';
+function flushPendingEvents() {
+  if (!context.enabled || flushPromise) {
+    return;
+  }
 
-function gtag(...args: unknown[]) {
-  window.gtag?.(...args);
+  flushPromise = (async () => {
+    while (context.enabled && pendingEvents.length) {
+      const next = pendingEvents.shift();
+      if (!next) {
+        continue;
+      }
+      await postEvent(next);
+    }
+  })().finally(() => {
+    flushPromise = null;
+    if (context.enabled && pendingEvents.length) {
+      flushPendingEvents();
+    }
+  });
+}
+
+function queueOrSend(event: MiniAppAnalyticsEvent) {
+  if (!context.enabled) {
+    pendingEvents.push(event);
+    return;
+  }
+
+  void postEvent(event);
 }
 
 export function initializeAnalytics() {
-  if (!ANALYTICS_ENABLED || initialized || typeof window === 'undefined') {
+  if (initialized) {
     return;
   }
 
   initialized = true;
-  window.dataLayer = window.dataLayer || [];
-  window.gtag =
-    window.gtag ||
-    function (...args: unknown[]) {
-      window.dataLayer?.push(args);
-    };
-
-  gtag('js', new Date());
-  gtag('config', MEASUREMENT_ID, { send_page_view: false });
-
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`;
-  document.head.appendChild(script);
-
   trackPageView(`${window.location.pathname}${window.location.search}`);
 }
 
+export function setAnalyticsContext(next: AnalyticsContext) {
+  context = next;
+  if (context.enabled) {
+    flushPendingEvents();
+  }
+}
+
+export function trackEntryStarted(params: {
+  screen: string;
+  flowId?: string;
+  receivedStartParam?: string;
+  properties?: Record<string, unknown>;
+}) {
+  queueOrSend({
+    eventName: 'entry_started',
+    screen: params.screen,
+    flowId: params.flowId,
+    receivedStartParam: params.receivedStartParam,
+    properties: params.properties,
+  });
+}
+
+export function trackScreenView(params: {
+  screen: string;
+  flowId?: string;
+  receivedStartParam?: string;
+  properties?: Record<string, unknown>;
+}) {
+  queueOrSend({
+    eventName: 'screen_viewed',
+    screen: params.screen,
+    flowId: params.flowId,
+    receivedStartParam: params.receivedStartParam,
+    properties: params.properties,
+  });
+}
+
+export function trackInteraction(params: {
+  actionKey: string;
+  screen?: string;
+  flowId?: string;
+  receivedStartParam?: string;
+  properties?: Record<string, unknown>;
+}) {
+  queueOrSend({
+    eventName: 'interaction_triggered',
+    screen: params.screen,
+    flowId: params.flowId,
+    actionKey: params.actionKey,
+    receivedStartParam: params.receivedStartParam,
+    properties: params.properties,
+  });
+}
+
 export function trackPageView(path: string) {
-  if (!ANALYTICS_ENABLED || !window.gtag || path === lastTrackedPath) {
+  if (path === lastTrackedPath) {
     return;
   }
 
   lastTrackedPath = path;
-  gtag('event', 'page_view', {
-    page_path: path,
-    page_title: document.title,
-    page_location: window.location.href,
+  trackScreenView({
+    screen: screenFromPath(path),
+    properties: {
+      page_path: path,
+      page_title: document.title,
+      page_location: window.location.href,
+    },
   });
-}
-
-export function trackEvent(eventName: string, params?: Record<string, unknown>) {
-  if (!ANALYTICS_ENABLED || !window.gtag) {
-    return;
-  }
-
-  gtag('event', eventName, params);
 }

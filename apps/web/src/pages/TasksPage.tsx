@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { AppShell } from '../components/AppShell';
 import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
 import { TierCarousel } from '../components/TierCarousel';
 import { TelegramDevBanner } from '../components/TelegramDevBanner';
+import { setAnalyticsContext } from '../app/analytics';
 import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
+import { trackMiniAppOpenAttributed } from '../features/clips/analytics';
 import { useTiers } from '../features/tiers/hooks';
 
 type TaskIconName =
@@ -343,10 +345,31 @@ function TaskIcon({ name }: { name: TaskIconName }) {
 export function TasksPage() {
   const session = useTelegramSession();
   const tiersQuery = useTiers();
+  const didTrackOpenRef = useRef(false);
 
   useEffect(() => {
     applyTelegramTheme();
   }, []);
+
+  useEffect(() => {
+    setAnalyticsContext({
+      enabled: session.ready && !session.error,
+      isTelegram: session.isTelegram,
+      startParam: session.startParam,
+    });
+  }, [session.error, session.isTelegram, session.ready, session.startParam]);
+
+  useEffect(() => {
+    if (didTrackOpenRef.current) {
+      return;
+    }
+    didTrackOpenRef.current = true;
+    trackMiniAppOpenAttributed({
+      startParam: session.startParam,
+      isTelegram: session.isTelegram,
+      entryPath: '/tasks',
+    });
+  }, [session.isTelegram, session.startParam]);
 
   return (
     <AppShell>
