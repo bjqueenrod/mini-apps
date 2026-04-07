@@ -11,9 +11,9 @@ class KeyholdingTierResponse(BaseModel):
     duration: str | None = None
     ideal_for: str | None = Field(default=None, alias="idealFor")
     includes: list[str] = Field(default_factory=list)
-    price: str | None = None
-    price_label: str | None = Field(default=None, alias="priceLabel")
-    price_per_week: str | None = Field(default=None, alias="pricePerWeek")
+    price: str | float | None = None
+    price_label: str | float | None = Field(default=None, alias="priceLabel")
+    price_per_week: str | float | None = Field(default=None, alias="pricePerWeek")
     price_value: float | None = Field(default=None, alias="priceValue")
     payment_product_id: int | None = Field(default=None, alias="paymentProductId")
     badge: str | None = None
