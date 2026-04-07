@@ -46,7 +46,10 @@ def _get(endpoint: str) -> dict[str, Any]:
 
 
 def fetch_keyholding_tiers() -> dict[str, Any]:
-    data = _get("/api/keyholding/tiers")
+    try:
+        data = _get("/api/keyholding/tiers")
+    except HTTPException:
+        return {"items": [], "total": 0}
     items = data.get("tiers") or data.get("items") or []
     count = data.get("count")
     parsed_items = []
