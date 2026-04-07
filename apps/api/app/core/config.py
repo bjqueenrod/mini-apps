@@ -28,6 +28,8 @@ class Settings(BaseSettings):
         default='281a5ee9-db7e-41a2-bce0-97e16a7fd7b9',
         alias='BUNNY_PREVIEW_COLLECTION_ID',
     )
+    keyholding_api_base_url: str = Field(default='', alias='KEYHOLDING_API_BASE_URL')
+    keyholding_api_token: str = Field(default='', alias='KEYHOLDING_API_TOKEN')
     payment_system_api_url: str = Field(default='', alias='PAYMENT_SYSTEM_API_URL')
     payment_system_api_token: str = Field(default='', alias='PAYMENT_SYSTEM_API_TOKEN')
     payment_system_timeout_seconds: float = Field(default=4.0, alias='PAYMENT_SYSTEM_TIMEOUT_SECONDS')
