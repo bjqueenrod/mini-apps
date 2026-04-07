@@ -34,9 +34,11 @@ def _get(endpoint: str) -> dict[str, Any]:
             response.raise_for_status()
             data = response.json()
     except httpx.HTTPStatusError as exc:
-        raise HTTPException(status_code=exc.response.status_code, detail="Upstream keyholding API error") from exc
+        text = exc.response.text
+        status = exc.response.status_code
+        raise HTTPException(status_code=status, detail=f"Upstream keyholding API error ({status}): {text}") from exc
     except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=502, detail="Unable to reach keyholding API") from exc
+        raise HTTPException(status_code=502, detail=f"Unable to reach keyholding API: {exc}") from exc
 
     if not isinstance(data, dict):
         raise HTTPException(status_code=502, detail="Invalid keyholding API response")
@@ -46,10 +48,7 @@ def _get(endpoint: str) -> dict[str, Any]:
 
 
 def fetch_keyholding_tiers() -> dict[str, Any]:
-    try:
-        data = _get("/api/keyholding/tiers")
-    except HTTPException:
-        return {"items": [], "total": 0}
+    data = _get("/api/keyholding/tiers")
     items = data.get("tiers") or data.get("items") or []
     count = data.get("count")
     parsed_items = []
