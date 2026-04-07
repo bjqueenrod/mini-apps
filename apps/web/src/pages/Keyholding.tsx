@@ -132,7 +132,7 @@ export function Keyholding() {
           <h2>The path to locking your cock in a cage for me</h2>
         </div>
         <div className="tasks-stepper">
-          {["Apply", "Get reviewed", "Get accepted", "Begin your lock period", "Stay accountable"].map((title, index) => {
+          {["Apply", "Screening questions", "Get accepted", "Begin your lock period", "Stay accountable"].map((title, index) => {
             const Icon = () => {
               switch (index) {
                 case 0:
@@ -182,7 +182,7 @@ export function Keyholding() {
               <strong>{title}</strong>
               <p>
                 {index === 0 && 'Submit your application with honest details about your lock, limits, and goals.'}
-                {index === 1 && 'I screen seriousness, readiness, and fit. Only disciplined applicants move forward.'}
+                {index === 1 && 'Complete screening questions to demonstrate seriousness, limits, and readiness.'}
                 {index === 2 && 'Accepted applicants receive onboarding steps, control rules, and first proof check.'}
                 {index === 3 && 'Lock, follow cadence, submit proof on schedule, and stay compliant throughout.'}
                 {index === 4 && 'Maintain proofed check-ins and messaging discipline; consequences apply for slips.'}
