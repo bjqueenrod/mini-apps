@@ -36,7 +36,11 @@ export function TierDetailSheet({
       trackTierBotCtaClick({ tier, source: 'detail_sheet' });
     }
     const payloadId = tier?.productId || tier?.id;
-    if (payloadId && sendBotWebAppData(`buy_${payloadId}`)) {
+    const isTelegramWebApp = Boolean(window.Telegram?.WebApp);
+    if (payloadId && isTelegramWebApp && sendBotWebAppData(`buy_${payloadId}`)) {
+      return;
+    }
+    if (isTelegramWebApp) {
       return;
     }
     openBotDeepLink(url);

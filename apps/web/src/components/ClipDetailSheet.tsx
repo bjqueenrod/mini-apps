@@ -21,7 +21,11 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
       trackClipBotCtaClick({ clip, ctaType });
     }
     const payload = ctaType === 'stream' ? `stream_${clip?.id}` : `download_${clip?.id}`;
-    if (clip && sendBotWebAppData(payload)) {
+    const isTelegramWebApp = Boolean(window.Telegram?.WebApp);
+    if (clip && isTelegramWebApp && sendBotWebAppData(payload)) {
+      return;
+    }
+    if (isTelegramWebApp) {
       return;
     }
     openBotDeepLink(url);

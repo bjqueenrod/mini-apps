@@ -16,7 +16,11 @@ export function TierCard({ tier, guideLabel }: { tier: TierItem; guideLabel?: st
     event.preventDefault();
     trackTierBotCtaClick({ tier, source: 'tier_card' });
     const payloadId = tier.productId || tier.id;
-    if (payloadId && sendBotWebAppData(`buy_${payloadId}`)) {
+    const isTelegramWebApp = Boolean(window.Telegram?.WebApp);
+    if (payloadId && isTelegramWebApp && sendBotWebAppData(`buy_${payloadId}`)) {
+      return;
+    }
+    if (isTelegramWebApp) {
       return;
     }
     openBotDeepLink(tier.botBuyUrl);
