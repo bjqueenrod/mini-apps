@@ -5,10 +5,10 @@ import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
 import { useEffect } from 'react';
 
-function resolveStartParamTarget(startParam?: string): '/clips' | '/tasks' | null {
+function resolveStartParamTarget(startParam?: string): '/clips' | '/tasks' {
   const normalized = startParam?.trim().toLowerCase();
   if (!normalized) {
-    return null;
+    return '/clips';
   }
 
   if (normalized === 'clips' || normalized.startsWith('stream_') || normalized.startsWith('download_')) {
@@ -25,7 +25,7 @@ function resolveStartParamTarget(startParam?: string): '/clips' | '/tasks' | nul
     return '/tasks';
   }
 
-  return null;
+  return '/clips';
 }
 
 export function HomePage() {
@@ -38,9 +38,6 @@ export function HomePage() {
   }, []);
 
   useEffect(() => {
-    if (!redirectTarget) {
-      return;
-    }
     navigate(redirectTarget, { replace: true });
   }, [navigate, redirectTarget]);
 
