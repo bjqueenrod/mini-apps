@@ -11,3 +11,7 @@ def configure_logging() -> None:
         handlers=[logging.StreamHandler(sys.stdout)],
         force=True,
     )
+
+
+def get_logger(name: str) -> logging.Logger:
+    return logging.getLogger(name)
