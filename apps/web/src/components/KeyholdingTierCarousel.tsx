@@ -49,12 +49,16 @@ export function KeyholdingTierCarousel({
               const includes = tier.includes || [];
               const priceLabel = formatMoney(tier.priceLabel ?? tier.price ?? tier.priceValue);
               const pricePerWeekLabel = formatMoney(tier.pricePerWeek);
+              const controlLabel =
+                tier.badge ||
+                (index === 0 ? 'Light structure' : index === 1 ? 'Daily control' : index === 2 ? 'Full enforcement' : undefined);
               return (
                 <article
                   key={tier.id || index}
                   className="top-sellers__card top-sellers__card--tier top-sellers__card--light"
                 >
                   <div className="top-sellers__body top-sellers__body--tier">
+                    {controlLabel ? <span className="top-sellers__tier-badge top-sellers__tier-badge--inline">{controlLabel}</span> : null}
                     <h3>{tier.name}</h3>
                     {tier.desc ? <p className="top-sellers__descriptor">{tier.desc}</p> : null}
                     {tier.duration ? (
