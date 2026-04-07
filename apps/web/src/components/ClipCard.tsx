@@ -1,14 +1,24 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { trackClipSelect } from '../features/clips/analytics';
 import { ClipItem } from '../features/clips/types';
 import { formatDuration, formatPrice } from '../utils/format';
 import { pickPrimaryTags } from '../utils/tags';
 import { safeBackground } from '../utils/theme';
 import { toClipPath } from '../utils/links';
 
-export function ClipCard({ clip }: { clip: ClipItem }) {
+export function ClipCard({
+  clip,
+  position,
+  sourceList,
+}: {
+  clip: ClipItem;
+  position: number;
+  sourceList: 'search_results' | 'new_clips' | 'top_sellers';
+}) {
   const location = useLocation();
-  const selectedTag = new URLSearchParams(location.search).get('tags')?.split(',')[0] ?? undefined;
+  const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const selectedTag = searchParams.get('tags')?.split(',')[0] ?? undefined;
   const mediaCandidates = useMemo(
     () => [clip.thumbnailUrl, clip.previewWebpUrl].filter(Boolean) as string[],
     [clip.previewWebpUrl, clip.thumbnailUrl],
@@ -23,7 +33,19 @@ export function ClipCard({ clip }: { clip: ClipItem }) {
   const mediaUrl = mediaCandidates[mediaIndex];
 
   return (
-    <Link className="clip-card" to={toClipPath(clip.id, location.search)}>
+    <Link
+      className="clip-card"
+      to={toClipPath(clip.id, location.search)}
+      onClick={() =>
+        trackClipSelect({
+          clip,
+          sourceList,
+          position,
+          query: searchParams.get('q') ?? '',
+          tags: (searchParams.get('tags') ?? '').split(',').filter(Boolean),
+        })
+      }
+    >
       <div className="clip-card__media" style={!mediaUrl ? { backgroundImage: safeBackground() } : undefined}>
         {mediaUrl ? (
           <img

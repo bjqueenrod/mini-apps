@@ -11,6 +11,12 @@ import { TelegramDevBanner } from '../components/TelegramDevBanner';
 import { TopSellersCarousel } from '../components/TopSellersCarousel';
 import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
+import {
+  trackClipListView,
+  trackClipSearch,
+  trackClipTagSelect,
+  trackMiniAppOpenAttributed,
+} from '../features/clips/analytics';
 import { useClipDetail, useClipHashtags, useClipSearch, useNewClips, useTopSellers } from '../features/clips/hooks';
 import { readQueryState, toSearchParams } from '../features/clips/queryState';
 import { ClipItem } from '../features/clips/types';
@@ -52,6 +58,9 @@ export function BrowsePage() {
     () => searchTokens.find((tag) => !featuredTagSet.has(tag.toLowerCase())) ?? '',
     [featuredTagSet, searchTokens],
   );
+  const trackedListViewKeysRef = useRef(new Set<string>());
+  const trackedSearchKeysRef = useRef(new Set<string>());
+  const didTrackOpenRef = useRef(false);
   const computedSecondaryTagOptions = useMemo(() => {
     const excluded = new Set(['and', 'in', 'made', 'bar']);
     const tagCounts = new Map<string, { tag: string; count: number }>();
@@ -91,6 +100,18 @@ export function BrowsePage() {
   useEffect(() => {
     applyTelegramTheme();
   }, []);
+
+  useEffect(() => {
+    if (didTrackOpenRef.current) {
+      return;
+    }
+    didTrackOpenRef.current = true;
+    trackMiniAppOpenAttributed({
+      startParam: session.startParam,
+      isTelegram: session.isTelegram,
+      entryPath: `${location.pathname}${location.search}`,
+    });
+  }, [location.pathname, location.search, session.isTelegram, session.startParam]);
 
   useEffect(() => {
     setPage(1);
@@ -174,6 +195,72 @@ export function BrowsePage() {
   }, [clipsQuery.data, page]);
 
   useEffect(() => {
+    if (newClipsQuery.isFetching || !newClipsQuery.data?.items.length) {
+      return;
+    }
+
+    const key = `new_clips:${newClipsQuery.data.items.length}`;
+    if (trackedListViewKeysRef.current.has(key)) {
+      return;
+    }
+    trackedListViewKeysRef.current.add(key);
+    trackClipListView({
+      listType: 'new_clips',
+      itemCount: newClipsQuery.data.items.length,
+    });
+  }, [newClipsQuery.data, newClipsQuery.isFetching]);
+
+  useEffect(() => {
+    if (topSellersQuery.isFetching || !topSellersQuery.data?.items.length) {
+      return;
+    }
+
+    const key = `top_sellers:${topSellersQuery.data.items.length}`;
+    if (trackedListViewKeysRef.current.has(key)) {
+      return;
+    }
+    trackedListViewKeysRef.current.add(key);
+    trackClipListView({
+      listType: 'top_sellers',
+      itemCount: topSellersQuery.data.items.length,
+    });
+  }, [topSellersQuery.data, topSellersQuery.isFetching]);
+
+  useEffect(() => {
+    if (!clipsQuery.data || clipsQuery.isFetching || clipsQuery.data.page !== page) {
+      return;
+    }
+
+    const listViewKey = `search_results:${queryIdentity}:${page}:${clipsQuery.data.items.length}:${clipsQuery.data.total}`;
+    if (!trackedListViewKeysRef.current.has(listViewKey)) {
+      trackedListViewKeysRef.current.add(listViewKey);
+      trackClipListView({
+        listType: 'search_results',
+        itemCount: clipsQuery.data.items.length,
+        totalCount: clipsQuery.data.total,
+        page,
+        query: queryState.q,
+        tags: queryState.tags,
+      });
+    }
+
+    if (!queryState.q && queryState.tags.length === 0) {
+      return;
+    }
+
+    const searchKey = `${queryIdentity}:${clipsQuery.data.total}`;
+    if (trackedSearchKeysRef.current.has(searchKey)) {
+      return;
+    }
+    trackedSearchKeysRef.current.add(searchKey);
+    trackClipSearch({
+      query: queryState.q,
+      tags: queryState.tags,
+      resultCount: clipsQuery.data.total,
+    });
+  }, [clipsQuery.data, clipsQuery.isFetching, page, queryIdentity, queryState.q, queryState.tags]);
+
+  useEffect(() => {
     const node = loadMoreRef.current;
     if (!node || !clipsQuery.data?.hasMore || clipsQuery.isFetching) {
       return;
@@ -239,9 +326,15 @@ export function BrowsePage() {
   };
 
   const updateFeaturedTag = (value: string) => {
+    if (value) {
+      trackClipTagSelect({ tag: value, source: 'featured_filter' });
+    }
     setSearchValue((current) => replaceRowTag(current, selectedFeaturedTag, value));
   };
   const updateSecondaryTag = (value: string) => {
+    if (value) {
+      trackClipTagSelect({ tag: value, source: 'secondary_filter' });
+    }
     setSearchValue((current) => replaceRowTag(current, selectedSecondaryTag, value));
   };
   const showResultsLoading = visibleClips.length === 0 && (clipsQuery.isLoading || (clipsQuery.isFetching && page === 1));
@@ -257,10 +350,15 @@ export function BrowsePage() {
       </section>
 
       {(newClipsQuery.isLoading || newClipsQuery.data?.items?.length) ? (
-        <TopSellersCarousel items={newClipsQuery.data?.items ?? []} title="🆕 New Clips" loading={newClipsQuery.isLoading} />
+        <TopSellersCarousel
+          items={newClipsQuery.data?.items ?? []}
+          title="🆕 New Clips"
+          loading={newClipsQuery.isLoading}
+          listType="new_clips"
+        />
       ) : null}
       {(topSellersQuery.isLoading || topSellersQuery.data?.items?.length) ? (
-        <TopSellersCarousel items={topSellersQuery.data?.items ?? []} loading={topSellersQuery.isLoading} />
+        <TopSellersCarousel items={topSellersQuery.data?.items ?? []} loading={topSellersQuery.isLoading} listType="top_sellers" />
       ) : null}
 
       <div ref={searchPanelSentinelRef} className="search-panel__sentinel" aria-hidden="true" />

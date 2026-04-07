@@ -1,20 +1,25 @@
-import { MouseEvent, useEffect } from 'react';
+import { MouseEvent, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { openBotDeepLink } from '../app/telegram';
+import { trackClipBotCtaClick, trackClipDetailView, trackClipTagSelect } from '../features/clips/analytics';
 import { ClipItem } from '../features/clips/types';
 import { formatDuration, formatPrice } from '../utils/format';
 import { PreviewPlayer } from './PreviewPlayer';
 
 export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: boolean }) {
   const location = useLocation();
+  const lastTrackedClipIdRef = useRef('');
   const backTarget = `/clips${location.search}`;
   const tagHref = (tag: string) => {
     const params = new URLSearchParams();
     params.set('q', `#${tag}`);
     return `/clips?${params.toString()}`;
   };
-  const handleBotAction = (url: string) => (event: MouseEvent<HTMLAnchorElement>) => {
+  const handleBotAction = (url: string, ctaType: 'stream' | 'download') => (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
+    if (clip) {
+      trackClipBotCtaClick({ clip, ctaType });
+    }
     openBotDeepLink(url);
   };
 
@@ -45,6 +50,14 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
       window.scrollTo(0, scrollY);
     };
   }, []);
+
+  useEffect(() => {
+    if (!clip || lastTrackedClipIdRef.current === clip.id) {
+      return;
+    }
+    lastTrackedClipIdRef.current = clip.id;
+    trackClipDetailView(clip);
+  }, [clip]);
 
   return (
     <div className="detail-sheet__backdrop">
@@ -77,6 +90,7 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
                     key={tag}
                     to={tagHref(tag)}
                     state={{ pinSearchPanel: true }}
+                    onClick={() => trackClipTagSelect({ tag, source: 'detail_sheet', clip })}
                   >
                     #{tag}
                   </Link>
@@ -89,7 +103,7 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
                 target="_blank"
                 rel="noreferrer"
                 className="detail-sheet__action detail-sheet__action--stream"
-                onClick={handleBotAction(clip.botStreamUrl)}
+                onClick={handleBotAction(clip.botStreamUrl, 'stream')}
               >
                 <strong>🎬 Stream in Bot</strong>
                 <span>{formatPrice(clip.streamPrice ?? clip.price)}</span>
@@ -99,7 +113,7 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
                 target="_blank"
                 rel="noreferrer"
                 className="detail-sheet__action detail-sheet__action--download"
-                onClick={handleBotAction(clip.botDownloadUrl)}
+                onClick={handleBotAction(clip.botDownloadUrl, 'download')}
               >
                 <strong>📥 Download in Bot</strong>
                 <span>{formatPrice(clip.downloadPrice ?? clip.price)}</span>

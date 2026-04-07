@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { trackClipSelect } from '../features/clips/analytics';
 import { ClipItem } from '../features/clips/types';
 import { formatDuration, formatPrice } from '../utils/format';
 import { toClipPath } from '../utils/links';
@@ -8,12 +9,15 @@ export function TopSellersCarousel({
   items,
   title = '⭐ Top Sellers',
   loading = false,
+  listType = 'top_sellers',
 }: {
   items: ClipItem[];
   title?: string;
   loading?: boolean;
+  listType?: 'new_clips' | 'top_sellers';
 }) {
   const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
   const pageCount = loading ? 3 : items.length;
   const { currentPage, scrollToPage, trackRef } = usePagedCarousel(pageCount);
 
@@ -45,8 +49,21 @@ export function TopSellersCarousel({
                 </div>
               </div>
             ))
-          : items.map((clip) => (
-              <Link key={clip.id} className="top-sellers__card" to={toClipPath(clip.id, location.search)}>
+          : items.map((clip, index) => (
+              <Link
+                key={clip.id}
+                className="top-sellers__card"
+                to={toClipPath(clip.id, location.search)}
+                onClick={() =>
+                  trackClipSelect({
+                    clip,
+                    sourceList: listType,
+                    position: index + 1,
+                    query: searchParams.get('q') ?? '',
+                    tags: (searchParams.get('tags') ?? '').split(',').filter(Boolean),
+                  })
+                }
+              >
                 <div className="top-sellers__media">
                   {clip.thumbnailUrl || clip.previewWebpUrl ? (
                     <img src={clip.thumbnailUrl || clip.previewWebpUrl} alt={clip.title} loading="lazy" />
