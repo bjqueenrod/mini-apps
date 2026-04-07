@@ -132,11 +132,16 @@ export function Keyholding() {
           <h2>The path to locking your cock in a cage for me</h2>
         </div>
         <div className="tasks-stepper">
-          {["Apply", "Get reviewed", "Get accepted", "Begin your lock period"].map((title, index) => (
+          {["Apply", "Get reviewed", "Get accepted", "Begin your lock period"].map((title, index) => {
+            const icons = ["🔒", "👁️", "✅", "🚀"];
+            const icon = icons[index] ?? "➡️";
+            return (
             <article key={title} className="tasks-stepper__item">
               <div className="tasks-stepper__topline">
                 <span className="tasks-stepper__number">0{index + 1}</span>
-                <span className="tasks-stepper__icon">{index + 1}</span>
+                <span className="tasks-stepper__icon" aria-hidden="true">
+                  {icon}
+                </span>
               </div>
               <strong>{title}</strong>
               <p>
@@ -146,7 +151,8 @@ export function Keyholding() {
                 {index === 3 && 'Lock, follow cadence, submit proof on schedule, and stay compliant throughout.'}
               </p>
             </article>
-          ))}
+            );
+          })}
         </div>
       </section>
 
