@@ -133,14 +133,44 @@ export function Keyholding() {
         </div>
         <div className="tasks-stepper">
           {["Apply", "Get reviewed", "Get accepted", "Begin your lock period"].map((title, index) => {
-            const icons = ["🔒", "👁️", "✅", "🚀"];
-            const icon = icons[index] ?? "➡️";
+            const Icon = () => {
+              switch (index) {
+                case 0:
+                  return (
+                    <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
+                      <rect x="5" y="10" width="14" height="10" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                      <path d="M9 10V7a3 3 0 0 1 6 0v3" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                      <circle cx="12" cy="15" r="1" fill="currentColor" />
+                      <path d="M12 16v2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                  );
+                case 1:
+                  return (
+                    <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
+                      <path d="M3 12s3.5-5 9-5 9 5 9 5-3.5 5-9 5-9-5-9-5Z" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                      <circle cx="12" cy="12" r="2.6" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                    </svg>
+                  );
+                case 2:
+                  return (
+                    <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
+                      <path d="m5 13 4 4 10-10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  );
+                default:
+                  return (
+                    <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
+                      <path d="M12 3l3 6.5 7 .9-5.2 4.7 1.4 7.4L12 18l-6.2 4.5 1.4-7.4L2 10.4l7-.9Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+                    </svg>
+                  );
+              }
+            };
             return (
             <article key={title} className="tasks-stepper__item">
               <div className="tasks-stepper__topline">
                 <span className="tasks-stepper__number">0{index + 1}</span>
                 <span className="tasks-stepper__icon" aria-hidden="true">
-                  {icon}
+                  <Icon />
                 </span>
               </div>
               <strong>{title}</strong>
