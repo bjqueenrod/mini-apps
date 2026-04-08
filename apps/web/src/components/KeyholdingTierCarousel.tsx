@@ -51,7 +51,13 @@ export function KeyholdingTierCarousel({
               const pricePerWeekLabel = formatMoney(tier.pricePerWeek);
               const controlLabel =
                 tier.badge ||
-                (index === 0 ? 'Light structure' : index === 1 ? 'Daily control' : index === 2 ? 'Full enforcement' : undefined);
+                (index === 0
+                  ? 'Newbie trial'
+                  : index === 1
+                    ? 'Daily discipline'
+                    : index === 2
+                      ? 'Full enforcement'
+                      : undefined);
               return (
                 <article
                   key={tier.id || index}
