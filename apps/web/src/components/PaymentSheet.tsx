@@ -110,12 +110,6 @@ export function PaymentSheet({
 
   const retryButtonDisabled = !selectedMethod;
 
-  const paymentButton = (
-    <button type="button" className="payment-sheet__primary" onClick={handleCheckout} disabled={primaryButtonDisabled}>
-      {payButtonLabel}
-    </button>
-  );
-
   useEffect(() => {
     if (state !== 'waiting' || !invoiceId) return undefined;
     const startedAt = Date.now();
@@ -168,6 +162,12 @@ export function PaymentSheet({
       setState('error');
     }
   }, [itemContext, mode, productId, quantity, selectedMethod]);
+
+  const paymentButton = (
+    <button type="button" className="payment-sheet__primary" onClick={handleCheckout} disabled={primaryButtonDisabled}>
+      {payButtonLabel}
+    </button>
+  );
 
   const showRetry = state === 'error' && !!botFallbackUrl;
 
