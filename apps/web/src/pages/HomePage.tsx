@@ -41,13 +41,6 @@ export function HomePage() {
       </section>
 
       <section className="chooser-panel">
-        <div className="chooser-panel__header">
-          <p className="hero__eyebrow">Choose your experience</p>
-          <h1>Open the Mini App you want to explore.</h1>
-          <p>
-            Browse the clip store or shop custom obedience task packages, all inside the same Telegram-ready experience.
-          </p>
-        </div>
         <div className="chooser-grid">
           <Link
             to="/clips"
