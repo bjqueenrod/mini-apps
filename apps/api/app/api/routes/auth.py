@@ -34,7 +34,7 @@ def auth_telegram(payload: TelegramAuthRequest, response: Response) -> TelegramA
     notify_miniapp_open(payload.start_param, user)
 
     serializer = get_session_serializer()
-    session_payload = build_session_payload(user, source=source)
+    session_payload = build_session_payload(user, source=source, start_param=payload.start_param)
     token = serializer.dumps(session_payload)
     max_age = 60 * 60 * 24 * 7
     response.set_cookie(

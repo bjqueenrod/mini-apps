@@ -1,14 +1,16 @@
-import { MouseEvent, useEffect, useRef } from 'react';
+import { MouseEvent, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { openBotDeepLink, sendBotWebAppData } from '../app/telegram';
 import { trackClipBotCtaClick, trackClipDetailView, trackClipTagSelect } from '../features/clips/analytics';
 import { ClipItem } from '../features/clips/types';
 import { formatDuration, formatPrice } from '../utils/format';
 import { PreviewPlayer } from './PreviewPlayer';
+import { PaymentSheet } from './PaymentSheet';
 
 export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: boolean }) {
   const location = useLocation();
   const lastTrackedClipIdRef = useRef('');
+  const [showPayment, setShowPayment] = useState<null | 'stream' | 'download'>(null);
   const backTarget = `/clips${location.search}`;
   const tagHref = (tag: string) => {
     const params = new URLSearchParams();
@@ -22,6 +24,13 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
     }
     const payload = ctaType === 'stream' ? `stream_${clip?.id}` : `download_${clip?.id}`;
     const isTelegramWebApp = Boolean(window.Telegram?.WebApp);
+    const productId = ctaType === 'stream' ? clip?.watchProductId : clip?.downloadProductId;
+
+    if (productId) {
+      setShowPayment(ctaType);
+      return;
+    }
+
     if (clip && isTelegramWebApp && sendBotWebAppData(payload)) {
       return;
     }
@@ -127,6 +136,16 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
                 <span>{formatPrice(clip.downloadPrice ?? clip.price)}</span>
               </a>
             </div>
+            {showPayment && clip ? (
+              <PaymentSheet
+                productId={showPayment === 'stream' ? String(clip.watchProductId) : String(clip.downloadProductId)}
+                quantity={1}
+                mode={showPayment}
+                priceLabel={formatPrice(showPayment === 'stream' ? clip.streamPrice ?? clip.price : clip.downloadPrice ?? clip.price)}
+                botFallbackUrl={showPayment === 'stream' ? clip.botStreamUrl : clip.botDownloadUrl}
+                onClose={() => setShowPayment(null)}
+              />
+            ) : null}
           </>
         )}
       </div>

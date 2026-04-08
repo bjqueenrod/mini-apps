@@ -10,6 +10,9 @@ from app.db.session import engine
 from app.schemas.clips import ClipQueryParams
 from app.services.preview_service import build_preview_assets
 from app.utils.bot_links import build_clip_download_url, build_clip_stream_url
+from app.core.config import get_settings
+
+settings = get_settings()
 from app.utils.duration import format_duration_label, parse_duration_seconds
 from app.utils.tags import parse_tags
 
@@ -163,6 +166,8 @@ def _row_to_item(row: Any, *, include_embed_url: bool = True) -> dict[str, Any]:
         "tags": tags,
         "botStreamUrl": build_clip_stream_url(clip_id),
         "botDownloadUrl": build_clip_download_url(clip_id),
+        "watchProductId": settings.clips_watch_product_id,
+        "downloadProductId": settings.clips_download_product_id,
     }
 
 

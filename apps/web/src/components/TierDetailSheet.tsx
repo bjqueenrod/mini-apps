@@ -1,4 +1,4 @@
-import { MouseEvent, useEffect, useRef } from 'react';
+import { MouseEvent, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { openBotDeepLink, sendBotWebAppData } from '../app/telegram';
 import { getTierArtwork, TierArtworkVariant } from '../features/tiers/artwork';
@@ -6,6 +6,7 @@ import { trackTierBotCtaClick, trackTierDetailView } from '../features/tiers/ana
 import { getTierDurationLabel, getTierSummary, getTierTasksLabel } from '../features/tiers/presentation';
 import { TierItem } from '../features/tiers/types';
 import { formatPrice } from '../utils/format';
+import { PaymentSheet } from './PaymentSheet';
 
 const PACKAGE_HIGHLIGHTS = [
   'Time-limited access inside Telegram; no auto-renewal',
@@ -25,8 +26,15 @@ export function TierDetailSheet({
   artworkVariant?: TierArtworkVariant;
 }) {
   const lastTrackedTierIdRef = useRef('');
+  const [showPayment, setShowPayment] = useState(false);
 
   const handleBotAction = (url?: string) => (event: MouseEvent<HTMLAnchorElement>) => {
+    if (tier?.productId) {
+      event.preventDefault();
+      trackTierBotCtaClick({ tier, source: 'detail_sheet' });
+      setShowPayment(true);
+      return;
+    }
     if (!url) {
       event.preventDefault();
       return;
@@ -151,6 +159,15 @@ export function TierDetailSheet({
                 <span>{tier.priceLabel || formatPrice(tier.price)}</span>
               </a>
             </div>
+            {showPayment && tier.productId ? (
+              <PaymentSheet
+                productId={tier.productId}
+                quantity={1}
+                priceLabel={tier.priceLabel || formatPrice(tier.price)}
+                botFallbackUrl={tier.botBuyUrl}
+                onClose={() => setShowPayment(false)}
+              />
+            ) : null}
           </>
         )}
       </div>

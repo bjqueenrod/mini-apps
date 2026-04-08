@@ -16,6 +16,8 @@ export type ClipItem = {
   tags: string[];
   botStreamUrl: string;
   botDownloadUrl: string;
+  watchProductId?: number;
+  downloadProductId?: number;
 };
 
 export type ClipListResponse = {

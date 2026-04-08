@@ -15,11 +15,12 @@ def authenticate_telegram(init_data: str) -> TelegramAuthResult:
 
 
 
-def build_session_payload(user: TelegramUser, source: str) -> dict:
+def build_session_payload(user: TelegramUser, source: str, start_param: str | None = None) -> dict:
     return {
         "telegram_user_id": user.id,
         "username": user.username,
         "first_name": user.first_name,
         "source": source,
         "issued_at": int(time.time()),
+        "start_param": (start_param or "").strip() or None,
     }

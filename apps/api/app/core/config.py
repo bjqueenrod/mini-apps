@@ -28,6 +28,8 @@ class Settings(BaseSettings):
         default='281a5ee9-db7e-41a2-bce0-97e16a7fd7b9',
         alias='BUNNY_PREVIEW_COLLECTION_ID',
     )
+    clips_watch_product_id: int = Field(default=28, alias='CLIPS_WATCH_PRODUCT_ID')
+    clips_download_product_id: int = Field(default=27, alias='CLIPS_DOWNLOAD_PRODUCT_ID')
     keyholding_api_base_url: str = Field(
         default='',
         validation_alias=AliasChoices('SLAVE_APPLICATION_API_URL', 'KEYHOLDING_API_BASE_URL'),
