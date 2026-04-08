@@ -26,13 +26,24 @@ def _headers() -> dict[str, str]:
     return headers
 
 
-def invoice_options(*, items: list[dict[str, Any]], flow_id: str | None = None) -> dict[str, Any]:
+def invoice_options(
+    *,
+    items: list[dict[str, Any]] | None = None,
+    order_id: int | None = None,
+    flow_id: str | None = None,
+) -> dict[str, Any]:
     base = _api_base_url()
     if not base:
         raise PaymentSystemError("PAYMENT_SYSTEM_API_URL is not configured")
-    payload: dict[str, Any] = {"items": items}
+    payload: dict[str, Any] = {}
+    if order_id is not None:
+        payload["order_id"] = order_id
+    if items is not None:
+        payload["items"] = items
     if flow_id:
         payload["flow_id"] = flow_id
+    if not payload.get("items") and payload.get("order_id") is None:
+        raise PaymentSystemError("order_id or items is required")
     try:
         response = httpx.post(
             f"{base}/api/invoices/options",
@@ -128,4 +139,3 @@ def get_invoice(invoice_id: str) -> dict[str, Any]:
     except httpx.HTTPError as exc:
         logger.warning("Get invoice failed: %s", exc)
         raise PaymentSystemError("unable to load invoice") from exc
-

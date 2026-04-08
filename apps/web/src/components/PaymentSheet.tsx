@@ -52,20 +52,22 @@ export function PaymentSheet({
   const [error, setError] = useState<string>('');
   const [invoiceId, setInvoiceId] = useState<string>('');
   const [paymentUrl, setPaymentUrl] = useState<string | undefined>('');
+  const [orderId, setOrderId] = useState<number | null>(null);
   const storageKey = useMemo(
     () => `paymentSheet:${productId}:${mode || 'default'}`,
     [productId, mode],
   );
 
   const saveProgress = useCallback(
-    (payload: { invoiceId: string; paymentUrl?: string; selectedMethod?: string }) => {
+    (payload: { invoiceId?: string; paymentUrl?: string; selectedMethod?: string; orderId?: number | null }) => {
       try {
         sessionStorage.setItem(
           storageKey,
           JSON.stringify({
-            invoiceId: payload.invoiceId,
+            invoiceId: payload.invoiceId || '',
             paymentUrl: payload.paymentUrl || '',
             selectedMethod: payload.selectedMethod || '',
+            orderId: payload.orderId ?? null,
           }),
         );
       } catch {
@@ -87,7 +89,10 @@ export function PaymentSheet({
     try {
       const raw = sessionStorage.getItem(storageKey);
       if (!raw) return;
-      const parsed = JSON.parse(raw) as { invoiceId?: string; paymentUrl?: string; selectedMethod?: string };
+      const parsed = JSON.parse(raw) as { invoiceId?: string; paymentUrl?: string; selectedMethod?: string; orderId?: number };
+      if (parsed?.orderId) {
+        setOrderId(parsed.orderId);
+      }
       if (parsed?.invoiceId) {
         setInvoiceId(parsed.invoiceId);
         setPaymentUrl(parsed.paymentUrl || '');
@@ -109,7 +114,10 @@ export function PaymentSheet({
     let cancelled = false;
     (async () => {
       try {
-        const data = await fetchCheckoutOptions(productId, quantity, mode, itemContext);
+        const data = await fetchCheckoutOptions(productId, quantity, mode, {
+          ...itemContext,
+          ...(orderId ? { orderId } : {}),
+        });
         if (cancelled) return;
         setMethods(data.paymentMethods || []);
         if (!selectedMethod) {
@@ -200,18 +208,22 @@ export function PaymentSheet({
     setState('submitting');
     setError('');
     try {
-      const res = await startCheckout(productId, selectedMethod, quantity, mode, itemContext);
+      const res = await startCheckout(productId, selectedMethod, quantity, mode, {
+        ...itemContext,
+        ...(orderId ? { orderId } : {}),
+      });
+      setOrderId(res.orderId);
       setInvoiceId(res.invoiceId);
       const url = res.paymentUrl || res.providerInvoiceUrl || '';
       setPaymentUrl(url);
-      saveProgress({ invoiceId: res.invoiceId, paymentUrl: url, selectedMethod });
+      saveProgress({ invoiceId: res.invoiceId, paymentUrl: url, selectedMethod, orderId: res.orderId });
       openPaymentUrl(url);
       setState('waiting');
     } catch (err) {
       setError('Unable to start checkout. Try again or pay in bot.');
       setState('error');
     }
-  }, [itemContext, mode, productId, quantity, selectedMethod, saveProgress]);
+  }, [itemContext, mode, orderId, productId, quantity, selectedMethod, saveProgress]);
 
   const paymentButton = (
     <button type="button" className="payment-sheet__primary" onClick={handleCheckout} disabled={primaryButtonDisabled}>
@@ -220,15 +232,16 @@ export function PaymentSheet({
   );
 
   const handleChangeMethod = useCallback(() => {
-    clearProgress();
     setInvoiceId('');
     setPaymentUrl('');
     setState('select');
     setError('');
-  }, [clearProgress]);
+    saveProgress({ orderId, selectedMethod });
+  }, [orderId, saveProgress]);
 
   useEffect(() => {
     if (state === 'success' || state === 'error') {
+      setOrderId(null);
       clearProgress();
     }
   }, [state, clearProgress]);

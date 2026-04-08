@@ -14,6 +14,7 @@ class CheckoutOptionsRequest(BaseModel):
     template_values: dict[str, Any] | None = Field(default=None, alias="templateValues")
     order_values: dict[str, Any] | None = Field(default=None, alias="orderValues")
     meta_data: dict[str, Any] | None = Field(default=None, alias="metaData")
+    order_id: int | None = Field(default=None, alias="orderId")
 
 
 class PaymentMethod(BaseModel):
@@ -47,6 +48,7 @@ class CheckoutRequest(BaseModel):
     template_values: dict[str, Any] | None = Field(default=None, alias="templateValues")
     order_values: dict[str, Any] | None = Field(default=None, alias="orderValues")
     meta_data: dict[str, Any] | None = Field(default=None, alias="metaData")
+    order_id: int | None = Field(default=None, alias="orderId")
 
 
 class CheckoutResponse(BaseModel):

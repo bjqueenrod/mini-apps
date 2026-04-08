@@ -74,7 +74,10 @@ def checkout_options(payload: CheckoutOptionsRequest, session: dict = Depends(ge
         item["meta_data"] = payload.meta_data
     items = [item]
     try:
-        options = payment_gateway.invoice_options(items=items, flow_id=flow_id)
+        if payload.order_id:
+            options = payment_gateway.invoice_options(order_id=int(payload.order_id), flow_id=flow_id)
+        else:
+            options = payment_gateway.invoice_options(items=items, flow_id=flow_id)
     except payment_gateway.PaymentSystemError as exc:
         logger.warning("checkout options error: %s", exc)
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="payment options unavailable") from exc
@@ -105,13 +108,17 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
     if payload.meta_data:
         item["meta_data"] = payload.meta_data
     items = [item]
+    order_id_value = int(payload.order_id) if payload.order_id else None
     try:
-        order = payment_gateway.create_order(
-            items=items,
-            chat_id=int(chat_id),
-            application_id=application_id,
-            flow_id=flow_id,
-        )
+        if order_id_value:
+            order = {"id": order_id_value}
+        else:
+            order = payment_gateway.create_order(
+                items=items,
+                chat_id=int(chat_id),
+                application_id=application_id,
+                flow_id=flow_id,
+            )
         invoice = payment_gateway.create_invoice(
             order_id=int(order.get("id")),
             payment_method=payload.payment_method,
