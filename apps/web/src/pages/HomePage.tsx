@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
 import { TelegramDevBanner } from '../components/TelegramDevBanner';
 import { setAnalyticsContext } from '../app/analytics';
@@ -7,35 +7,7 @@ import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
 import { useEffect } from 'react';
 
-function resolveStartParamTarget(startParam?: string): '/clips' | '/tasks' | '/keyholding' {
-  const normalized = startParam?.trim().toLowerCase();
-  if (!normalized) {
-    return '/clips';
-  }
-
-  if (normalized === 'keyholding' || normalized.startsWith('keyholding')) {
-    return '/keyholding';
-  }
-
-  if (normalized === 'clips' || normalized.startsWith('stream_') || normalized.startsWith('download_')) {
-    return '/clips';
-  }
-
-  if (
-    normalized === 'tasks' ||
-    normalized.startsWith('buy_') ||
-    normalized.includes('__tier_') ||
-    normalized.includes('__tierid_') ||
-    normalized.includes('__tier-id_')
-  ) {
-    return '/tasks';
-  }
-
-  return '/clips';
-}
-
 export function HomePage() {
-  const navigate = useNavigate();
   const session = useTelegramSession();
 
   useEffect(() => {
