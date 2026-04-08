@@ -61,7 +61,8 @@ export function PaymentSheet({
         setState('select');
       } catch (err) {
         if (cancelled) return;
-        setError('Payment options unavailable.');
+        const message = err instanceof Error ? err.message : 'Payment options unavailable.';
+        setError(message);
         setState('error');
       }
     })();

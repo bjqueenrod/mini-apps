@@ -13,7 +13,17 @@ export async function fetchCheckoutOptions(productId: string, quantity = 1, mode
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ productId, quantity, mode }),
   });
-  if (!response.ok) throw new Error('Unable to load payment options');
+  if (!response.ok) {
+    let message = 'Unable to load payment options';
+    try {
+      const data = await response.json();
+      if (data?.detail) message = `${message}: ${data.detail}`;
+    } catch {
+      const text = await response.text();
+      if (text) message = `${message}: ${text}`;
+    }
+    throw new Error(message);
+  }
   return response.json();
 }
 
@@ -40,4 +50,3 @@ export async function pollInvoice(invoiceId: string): Promise<InvoiceStatusRespo
   if (!response.ok) throw new Error('Unable to check payment status');
   return response.json();
 }
-
