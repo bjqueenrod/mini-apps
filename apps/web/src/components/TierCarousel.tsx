@@ -1,4 +1,4 @@
-import { MouseEvent } from 'react';
+import { MouseEvent, useState } from 'react';
 import { openBotDeepLink, sendBotWebAppData } from '../app/telegram';
 import { trackTierBotCtaClick } from '../features/tiers/analytics';
 import { getTierArtwork, getTierArtworkVariant } from '../features/tiers/artwork';
@@ -9,6 +9,7 @@ import {
 } from '../features/tiers/presentation';
 import { TierItem } from '../features/tiers/types';
 import { formatPrice } from '../utils/format';
+import { PaymentSheet } from './PaymentSheet';
 import { usePagedCarousel } from './usePagedCarousel';
 
 function priceLabel(tier: TierItem): string {
@@ -83,13 +84,20 @@ export function TierCarousel({
   const guideLabels = getTierGuideLabels(items);
   const pageCount = loading ? 3 : items.length;
   const { currentPage, scrollToPage, trackRef } = usePagedCarousel(pageCount);
+  const [paymentTier, setPaymentTier] = useState<TierItem | null>(null);
   const handleBotAction = (tier: TierItem, url?: string) => (event: MouseEvent<HTMLAnchorElement>) => {
-    if (!url) {
-      event.preventDefault();
-      return;
-    }
     event.preventDefault();
     trackTierBotCtaClick({ tier, source: 'tier_carousel' });
+
+    if (tier.productId) {
+      setPaymentTier(tier);
+      return;
+    }
+
+    if (!url) {
+      return;
+    }
+
     const payloadId = tier.productId || tier.id;
     const isTelegramWebApp = Boolean(window.Telegram?.WebApp);
     if (payloadId && isTelegramWebApp && sendBotWebAppData(`buy_${payloadId}`)) {
@@ -208,6 +216,16 @@ export function TierCarousel({
             />
           ))}
         </div>
+      ) : null}
+      {paymentTier ? (
+        <PaymentSheet
+          productId={String(paymentTier.productId)}
+          quantity={1}
+          priceLabel={paymentTier.priceLabel || formatPrice(paymentTier.price)}
+          botFallbackUrl={paymentTier.botBuyUrl}
+          itemContext={{ tierId: paymentTier.id }}
+          onClose={() => setPaymentTier(null)}
+        />
       ) : null}
     </section>
   );

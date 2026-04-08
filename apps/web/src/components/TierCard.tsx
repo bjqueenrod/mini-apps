@@ -1,4 +1,4 @@
-import { MouseEvent } from 'react';
+import { MouseEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { openBotDeepLink, sendBotWebAppData } from '../app/telegram';
 import { trackTierBotCtaClick, trackTierSelect } from '../features/tiers/analytics';
@@ -6,15 +6,22 @@ import { TierItem } from '../features/tiers/types';
 import { getTierDurationLabel, getTierSummary, getTierTasksLabel } from '../features/tiers/presentation';
 import { formatPrice } from '../utils/format';
 import { toTierPath } from '../utils/links';
+import { PaymentSheet } from './PaymentSheet';
 
 export function TierCard({ tier, guideLabel }: { tier: TierItem; guideLabel?: string }) {
+  const [showPayment, setShowPayment] = useState(false);
   const handleBotAction = (event: MouseEvent<HTMLAnchorElement>) => {
-    if (!tier.botBuyUrl) {
-      event.preventDefault();
-      return;
-    }
     event.preventDefault();
     trackTierBotCtaClick({ tier, source: 'tier_card' });
+
+    if (tier.productId) {
+      setShowPayment(true);
+      return;
+    }
+
+    if (!tier.botBuyUrl) {
+      return;
+    }
     const payloadId = tier.productId || tier.id;
     const isTelegramWebApp = Boolean(window.Telegram?.WebApp);
     if (payloadId && isTelegramWebApp && sendBotWebAppData(`buy_${payloadId}`)) {
@@ -51,6 +58,16 @@ export function TierCard({ tier, guideLabel }: { tier: TierItem; guideLabel?: st
           Choose in Bot
         </a>
       </div>
+      {showPayment ? (
+        <PaymentSheet
+          productId={String(tier.productId)}
+          quantity={1}
+          priceLabel={tier.priceLabel || formatPrice(tier.price)}
+          botFallbackUrl={tier.botBuyUrl}
+          itemContext={{ tierId: tier.id }}
+          onClose={() => setShowPayment(false)}
+        />
+      ) : null}
     </article>
   );
 }

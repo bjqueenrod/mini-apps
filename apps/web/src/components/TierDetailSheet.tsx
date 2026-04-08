@@ -115,8 +115,8 @@ export function TierDetailSheet({
                   <h2>{tier.name}</h2>
                   <p>{getTierSummary(tier)}</p>
                   <p className="detail-sheet__supporting-copy">
-                    Choose your package here, then continue in the bot for payment, setup, and delivery. One task stays
-                    active at a time, and access ends when the package duration ends.
+                    Choose your package and pay here. Setup, delivery, and proof still happen inside the Telegram bot.
+                    One task stays active at a time, and access ends when the package duration ends.
                   </p>
                 </div>
               </div>
