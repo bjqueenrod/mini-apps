@@ -52,6 +52,52 @@ export function PaymentSheet({
   const [error, setError] = useState<string>('');
   const [invoiceId, setInvoiceId] = useState<string>('');
   const [paymentUrl, setPaymentUrl] = useState<string | undefined>('');
+  const storageKey = useMemo(
+    () => `paymentSheet:${productId}:${mode || 'default'}`,
+    [productId, mode],
+  );
+
+  const saveProgress = useCallback(
+    (payload: { invoiceId: string; paymentUrl?: string; selectedMethod?: string }) => {
+      try {
+        sessionStorage.setItem(
+          storageKey,
+          JSON.stringify({
+            invoiceId: payload.invoiceId,
+            paymentUrl: payload.paymentUrl || '',
+            selectedMethod: payload.selectedMethod || '',
+          }),
+        );
+      } catch {
+        // ignore storage errors
+      }
+    },
+    [storageKey],
+  );
+
+  const clearProgress = useCallback(() => {
+    try {
+      sessionStorage.removeItem(storageKey);
+    } catch {
+      // ignore
+    }
+  }, [storageKey]);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(storageKey);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as { invoiceId?: string; paymentUrl?: string; selectedMethod?: string };
+      if (parsed?.invoiceId) {
+        setInvoiceId(parsed.invoiceId);
+        setPaymentUrl(parsed.paymentUrl || '');
+        if (parsed.selectedMethod) setSelectedMethod(parsed.selectedMethod);
+        setState('waiting');
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }, [storageKey]);
 
   const selectedMethodInfo = useMemo(
     () => methods.find((m) => m.paymentMethod === selectedMethod),
@@ -66,8 +112,10 @@ export function PaymentSheet({
         const data = await fetchCheckoutOptions(productId, quantity, mode, itemContext);
         if (cancelled) return;
         setMethods(data.paymentMethods || []);
-        setSelectedMethod((data.paymentMethods || [])[0]?.paymentMethod || '');
-        setState('select');
+        if (!selectedMethod) {
+          setSelectedMethod((data.paymentMethods || [])[0]?.paymentMethod || '');
+        }
+        setState((prev) => (prev === 'loading' ? 'select' : prev));
       } catch (err) {
         if (cancelled) return;
         const message = err instanceof Error ? err.message : 'Payment options unavailable.';
@@ -78,7 +126,7 @@ export function PaymentSheet({
     return () => {
       cancelled = true;
     };
-  }, [productId, quantity, mode]);
+  }, [productId, quantity, mode, itemContext, selectedMethod]);
 
   const selectedLabel = useMemo(
     () => selectedMethodInfo?.label || 'Pay',
@@ -154,20 +202,36 @@ export function PaymentSheet({
     try {
       const res = await startCheckout(productId, selectedMethod, quantity, mode, itemContext);
       setInvoiceId(res.invoiceId);
-      setPaymentUrl(res.paymentUrl || res.providerInvoiceUrl || '');
-      openPaymentUrl(res.paymentUrl || res.providerInvoiceUrl || '');
+      const url = res.paymentUrl || res.providerInvoiceUrl || '';
+      setPaymentUrl(url);
+      saveProgress({ invoiceId: res.invoiceId, paymentUrl: url, selectedMethod });
+      openPaymentUrl(url);
       setState('waiting');
     } catch (err) {
       setError('Unable to start checkout. Try again or pay in bot.');
       setState('error');
     }
-  }, [itemContext, mode, productId, quantity, selectedMethod]);
+  }, [itemContext, mode, productId, quantity, selectedMethod, saveProgress]);
 
   const paymentButton = (
     <button type="button" className="payment-sheet__primary" onClick={handleCheckout} disabled={primaryButtonDisabled}>
       {payButtonLabel}
     </button>
   );
+
+  const handleChangeMethod = useCallback(() => {
+    clearProgress();
+    setInvoiceId('');
+    setPaymentUrl('');
+    setState('select');
+    setError('');
+  }, [clearProgress]);
+
+  useEffect(() => {
+    if (state === 'success' || state === 'error') {
+      clearProgress();
+    }
+  }, [state, clearProgress]);
 
   const showRetry = state === 'error' && !!botFallbackUrl;
 
@@ -239,6 +303,9 @@ export function PaymentSheet({
                   Open payment link again
                 </button>
               ) : null}
+              <button type="button" className="payment-sheet__ghost" onClick={handleChangeMethod}>
+                Choose a different method
+              </button>
               {botFallbackUrl ? (
                 <button type="button" className="payment-sheet__ghost" onClick={() => openBotDeepLink(botFallbackUrl)}>
                   Pay in bot instead
