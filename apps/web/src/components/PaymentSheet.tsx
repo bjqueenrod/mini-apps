@@ -86,8 +86,15 @@ export function PaymentSheet({
   );
 
   const selectedPriceLabel = useMemo(() => {
-    if (selectedMethodInfo?.priceCents != null) {
-      return formatPrice(selectedMethodInfo.priceCents / 100);
+    if (selectedMethodInfo) {
+      const details = (selectedMethodInfo.details || {}) as Record<string, unknown>;
+      const cents =
+        selectedMethodInfo.priceCents ??
+        (typeof details.fansly_price_usd_cents === 'number' ? (details.fansly_price_usd_cents as number) : undefined) ??
+        (typeof details.price_cents === 'number' ? (details.price_cents as number) : undefined);
+      if (cents != null) {
+        return formatPrice(cents / 100);
+      }
     }
     return priceLabel;
   }, [selectedMethodInfo, priceLabel]);
