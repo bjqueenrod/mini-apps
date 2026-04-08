@@ -38,7 +38,11 @@ export function HomePage() {
     <AppShell>
       {!session.isTelegram && <TelegramDevBanner />}
       <section className="hero">
-        <img className="hero__banner" src="/header.png?v=20260401a" alt="Mistress BJQueen Mini Apps" />
+        <img
+          className="hero__banner"
+          src="/header-telegram.jpeg?v=20260409a"
+          alt="Mistress BJQueen Telegram Mini-app banner"
+        />
       </section>
 
       <section className="chooser-panel">
