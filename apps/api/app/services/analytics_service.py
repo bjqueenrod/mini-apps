@@ -51,6 +51,14 @@ def forward_analytics_event(event: MiniAppAnalyticsEventRequest, session: dict) 
             timeout=settings.cms_tracking_timeout_seconds,
         )
         response.raise_for_status()
+        logger.debug(
+            "Forwarded mini-app analytics event=%s telegram_user_id=%s screen=%s action_key=%s flow_id=%s",
+            event.event_name,
+            telegram_user_id,
+            event.screen,
+            event.action_key,
+            event.flow_id,
+        )
         return True
     except httpx.HTTPError as exc:
         logger.warning(
