@@ -57,7 +57,9 @@ export function KeyholdingTierCarousel({
                     ? 'Daily discipline'
                     : index === 2
                       ? 'Full enforcement'
-                      : undefined);
+                      : index === 3
+                        ? 'Total submission'
+                        : undefined);
               return (
                 <article
                   key={tier.id || index}
