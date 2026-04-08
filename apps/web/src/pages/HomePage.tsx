@@ -41,6 +41,14 @@ export function HomePage() {
       </section>
 
       <section className="chooser-panel">
+        <div className="chooser-panel__header">
+          <h1>Control, clips, and custom access in one place.</h1>
+          <p>
+            Browse previews, unlock full clips, buy custom obedience task packages, or apply for structured chastity
+            keyholding. Everything runs through Telegram for a smooth, private buying flow.
+          </p>
+          <p>Choose your path below.</p>
+        </div>
         <div className="chooser-grid">
           <Link
             to="/keyholding"
