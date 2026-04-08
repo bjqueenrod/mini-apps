@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
 import { TelegramDevBanner } from '../components/TelegramDevBanner';
 import { setAnalyticsContext } from '../app/analytics';
@@ -8,11 +8,22 @@ import { useTelegramSession } from '../features/auth/hooks';
 import { useEffect } from 'react';
 
 export function HomePage() {
+  const navigate = useNavigate();
   const session = useTelegramSession();
 
   useEffect(() => {
     applyTelegramTheme();
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const startapp = (params.get('startapp') || '').trim().toLowerCase();
+    const target =
+      startapp === 'clips' || startapp === 'tasks' || startapp === 'keyholding' ? `/${startapp}` : null;
+    if (target) {
+      navigate(target, { replace: true });
+    }
+  }, [navigate]);
 
   useEffect(() => {
     setAnalyticsContext({
