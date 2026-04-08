@@ -1443,7 +1443,7 @@ button {
 }
 
 .top-sellers__pill {
-  border-radius: 999px;
+  border-radius: 14px;
   padding: 10px 14px;
   background: rgba(176, 106, 214, 0.12);
   border: 1px solid rgba(176, 106, 214, 0.2);
