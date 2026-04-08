@@ -355,7 +355,11 @@ export function BrowsePage() {
     <AppShell>
       {!session.isTelegram && <TelegramDevBanner />}
       <section className="hero">
-        <img className="hero__banner" src="/header.png?v=20260327a" alt="Mistress BJQueen Clip Store" />
+        <img
+          className="hero__banner"
+          src="/header-clipstore.jpeg?v=20260409a"
+          alt="Mistress BJQueen Clip Store banner"
+        />
       </section>
 
       {(newClipsQuery.isLoading || newClipsQuery.data?.items?.length) ? (
