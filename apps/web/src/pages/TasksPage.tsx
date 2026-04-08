@@ -382,11 +382,6 @@ export function TasksPage() {
             alt="Mistress BJQueen Custom Obedience Tasks banner"
           />
           <div className="hero__banner-mask" aria-hidden="true" />
-          <div className="hero__banner-copy">
-            <span className="hero__banner-kicker">Mistress BJQueen&apos;s</span>
-            <strong>Custom Obedience</strong>
-            <span>Time-limited obedience packages in Telegram</span>
-          </div>
         </div>
       </section>
 
