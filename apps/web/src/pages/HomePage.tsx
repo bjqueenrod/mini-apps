@@ -34,6 +34,11 @@ export function HomePage() {
     });
   }, [session.error, session.isTelegram, session.ready, session.startParam]);
 
+  const handleCardClick = (actionKey: string) => () => {
+    trackInteraction({ actionKey, screen: 'home' });
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'auto' }), 0);
+  };
+
   return (
     <AppShell>
       {!session.isTelegram && <TelegramDevBanner />}
@@ -50,7 +55,7 @@ export function HomePage() {
           <Link
             to="/keyholding"
             className="chooser-card chooser-card--tasks"
-            onClick={() => trackInteraction({ actionKey: 'chooser_keyholding', screen: 'home' })}
+            onClick={handleCardClick('chooser_keyholding')}
           >
             <span className="chooser-card__eyebrow">🔒 KEYHOLDING</span>
             <strong>Give up control of your cock.</strong>
@@ -63,7 +68,7 @@ export function HomePage() {
           <Link
             to="/tasks"
             className="chooser-card chooser-card--tasks"
-            onClick={() => trackInteraction({ actionKey: 'chooser_tasks', screen: 'home' })}
+            onClick={handleCardClick('chooser_tasks')}
           >
             <span className="chooser-card__eyebrow">📝 CUSTOM TASKS</span>
             <strong>Get tasks built for you.</strong>
@@ -76,7 +81,7 @@ export function HomePage() {
           <Link
             to="/clips"
             className="chooser-card chooser-card--clips"
-            onClick={() => trackInteraction({ actionKey: 'chooser_clips', screen: 'home' })}
+            onClick={handleCardClick('chooser_clips')}
           >
             <span className="chooser-card__eyebrow">🎬 CLIP STORE</span>
             <strong>Browse. Preview. Unlock.</strong>
