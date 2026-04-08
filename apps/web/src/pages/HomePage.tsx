@@ -56,7 +56,7 @@ export function HomePage() {
             onClick={() => trackInteraction({ actionKey: 'chooser_keyholding', screen: 'home' })}
           >
             <span className="chooser-card__eyebrow">🔒 KEYHOLDING</span>
-            <strong>Give up control of your lock.</strong>
+            <strong>Give up control of your cock.</strong>
             <p>
               Structured chastity with real oversight. Proofed check-ins, enforced rules, and defined consequences.
               Apply, get reviewed, and enter controlled keyholding.
