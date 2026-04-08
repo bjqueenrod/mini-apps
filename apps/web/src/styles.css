@@ -1405,6 +1405,49 @@ button {
   line-height: 1.32;
 }
 
+.top-sellers__fact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.top-sellers__fact {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(176, 106, 214, 0.2);
+  background: rgba(176, 106, 214, 0.08);
+}
+
+.top-sellers__fact-label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+
+.top-sellers__section-label {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
+}
+
+.top-sellers__pill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.top-sellers__pill {
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(176, 106, 214, 0.12);
+  border: 1px solid rgba(176, 106, 214, 0.2);
+  color: var(--text);
+  font-size: 0.82rem;
+  line-height: 1.32;
+}
+
 .top-sellers__body {
   display: flex;
   flex: 1;

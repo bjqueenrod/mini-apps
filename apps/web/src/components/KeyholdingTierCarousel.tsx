@@ -70,26 +70,32 @@ export function KeyholdingTierCarousel({
                     <h3>{tier.name}</h3>
                     {tier.desc ? <p className="top-sellers__descriptor">{tier.desc}</p> : null}
                     {controlLabel ? <p className="top-sellers__badge-inline">{controlLabel}</p> : null}
-                    {tier.duration ? (
-                      <p>
-                        <strong>Duration:</strong> {tier.duration}
-                      </p>
-                    ) : null}
-                    {tier.idealFor ? (
-                      <p>
-                        <strong>Ideal for:</strong> {tier.idealFor}
-                      </p>
-                    ) : null}
+                    {(tier.duration || tier.idealFor) && (
+                      <div className="top-sellers__fact-grid">
+                        {tier.duration ? (
+                          <div className="top-sellers__fact">
+                            <span className="top-sellers__fact-label">Duration</span>
+                            <strong>{tier.duration}</strong>
+                          </div>
+                        ) : null}
+                        {tier.idealFor ? (
+                          <div className="top-sellers__fact">
+                            <span className="top-sellers__fact-label">Ideal for</span>
+                            <strong>{tier.idealFor}</strong>
+                          </div>
+                        ) : null}
+                      </div>
+                    )}
                     {includes.length ? (
                       <div>
-                        <p>
-                          <strong>What&apos;s included:</strong>
-                        </p>
-                        <ul>
+                        <p className="top-sellers__section-label">What you get</p>
+                        <div className="top-sellers__pill-grid">
                           {includes.map((item) => (
-                            <li key={item}>{item}</li>
+                            <span key={item} className="top-sellers__pill">
+                              {item}
+                            </span>
                           ))}
-                        </ul>
+                        </div>
                       </div>
                     ) : null}
                     <p>
