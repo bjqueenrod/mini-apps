@@ -34,6 +34,7 @@ export function PaymentSheet({
   botFallbackUrl,
   onClose,
   onSuccess,
+  itemContext,
 }: {
   productId: string;
   quantity?: number;
@@ -42,6 +43,7 @@ export function PaymentSheet({
   botFallbackUrl?: string;
   onClose: () => void;
   onSuccess?: () => void;
+  itemContext?: Record<string, unknown>;
 }) {
   const [state, setState] = useState<SheetState>('loading');
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
@@ -54,7 +56,7 @@ export function PaymentSheet({
     let cancelled = false;
     (async () => {
       try {
-        const data = await fetchCheckoutOptions(productId, quantity, mode);
+        const data = await fetchCheckoutOptions(productId, quantity, mode, itemContext);
         if (cancelled) return;
         setMethods(data.paymentMethods || []);
         setSelectedMethod((data.paymentMethods || [])[0]?.paymentMethod || '');
@@ -118,7 +120,7 @@ export function PaymentSheet({
     setState('submitting');
     setError('');
     try {
-      const res = await startCheckout(productId, selectedMethod, quantity, mode);
+      const res = await startCheckout(productId, selectedMethod, quantity, mode, itemContext);
       setInvoiceId(res.invoiceId);
       setPaymentUrl(res.paymentUrl || res.providerInvoiceUrl || '');
       openPaymentUrl(res.paymentUrl || res.providerInvoiceUrl || '');

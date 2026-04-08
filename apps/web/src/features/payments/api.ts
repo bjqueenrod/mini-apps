@@ -6,12 +6,17 @@ import {
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
-export async function fetchCheckoutOptions(productId: string, quantity = 1, mode?: string): Promise<CheckoutOptionsResponse> {
+export async function fetchCheckoutOptions(
+  productId: string,
+  quantity = 1,
+  mode?: string,
+  extras?: Record<string, unknown>,
+): Promise<CheckoutOptionsResponse> {
   const response = await fetch(`${API_BASE}/payments/checkout-options`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ productId, quantity, mode }),
+    body: JSON.stringify({ productId, quantity, mode, ...extras }),
   });
   if (!response.ok) {
     let message = 'Unable to load payment options';
@@ -32,12 +37,13 @@ export async function startCheckout(
   paymentMethod: string,
   quantity = 1,
   mode?: string,
+  extras?: Record<string, unknown>,
 ): Promise<CheckoutResponse> {
   const response = await fetch(`${API_BASE}/payments/checkout`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ productId, paymentMethod, quantity, mode }),
+    body: JSON.stringify({ productId, paymentMethod, quantity, mode, ...extras }),
   });
   if (!response.ok) throw new Error('Unable to start checkout');
   return response.json();

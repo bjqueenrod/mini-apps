@@ -9,6 +9,11 @@ class CheckoutOptionsRequest(BaseModel):
     product_id: str = Field(alias="productId")
     quantity: int = 1
     mode: str | None = None
+    unit_price_cents: int | None = Field(default=None, alias="unitPriceCents")
+    clip_id: str | None = Field(default=None, alias="clipId")
+    template_values: dict[str, Any] | None = Field(default=None, alias="templateValues")
+    order_values: dict[str, Any] | None = Field(default=None, alias="orderValues")
+    meta_data: dict[str, Any] | None = Field(default=None, alias="metaData")
 
 
 class PaymentMethod(BaseModel):
@@ -37,6 +42,11 @@ class CheckoutRequest(BaseModel):
     payment_method: str = Field(alias="paymentMethod")
     quantity: int = 1
     mode: str | None = None
+    unit_price_cents: int | None = Field(default=None, alias="unitPriceCents")
+    clip_id: str | None = Field(default=None, alias="clipId")
+    template_values: dict[str, Any] | None = Field(default=None, alias="templateValues")
+    order_values: dict[str, Any] | None = Field(default=None, alias="orderValues")
+    meta_data: dict[str, Any] | None = Field(default=None, alias="metaData")
 
 
 class CheckoutResponse(BaseModel):
@@ -59,4 +69,3 @@ class InvoiceStatusResponse(BaseModel):
 
     class Config:
         populate_by_name = True
-

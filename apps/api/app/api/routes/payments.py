@@ -61,7 +61,18 @@ def _normalize_status(value: str | None) -> str:
 @router.post("/payments/checkout-options", response_model=CheckoutOptionsResponse)
 def checkout_options(payload: CheckoutOptionsRequest, session: dict = Depends(get_session)) -> CheckoutOptionsResponse:
     flow_id = session.get("start_param") or session.get("flow_id")
-    items = [{"product_id": payload.product_id, "quantity": max(1, payload.quantity)}]
+    item: dict[str, Any] = {"product_id": payload.product_id, "quantity": max(1, payload.quantity)}
+    if payload.unit_price_cents is not None:
+        item["unit_price_cents"] = int(payload.unit_price_cents)
+    if payload.clip_id:
+        item["clip_id"] = payload.clip_id
+    if payload.template_values:
+        item["template_values"] = payload.template_values
+    if payload.order_values:
+        item["order_values"] = payload.order_values
+    if payload.meta_data:
+        item["meta_data"] = payload.meta_data
+    items = [item]
     try:
         options = payment_gateway.invoice_options(items=items, flow_id=flow_id)
     except payment_gateway.PaymentSystemError as exc:
@@ -82,7 +93,18 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
     if not chat_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
 
-    items = [{"product_id": payload.product_id, "quantity": max(1, payload.quantity)}]
+    item: dict[str, Any] = {"product_id": payload.product_id, "quantity": max(1, payload.quantity)}
+    if payload.unit_price_cents is not None:
+        item["unit_price_cents"] = int(payload.unit_price_cents)
+    if payload.clip_id:
+        item["clip_id"] = payload.clip_id
+    if payload.template_values:
+        item["template_values"] = payload.template_values
+    if payload.order_values:
+        item["order_values"] = payload.order_values
+    if payload.meta_data:
+        item["meta_data"] = payload.meta_data
+    items = [item]
     try:
         order = payment_gateway.create_order(
             items=items,

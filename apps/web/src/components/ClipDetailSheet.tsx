@@ -143,6 +143,12 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
                 mode={showPayment}
                 priceLabel={formatPrice(showPayment === 'stream' ? clip.streamPrice ?? clip.price : clip.downloadPrice ?? clip.price)}
                 botFallbackUrl={showPayment === 'stream' ? clip.botStreamUrl : clip.botDownloadUrl}
+                itemContext={{
+                  unitPriceCents: Math.round(
+                    100 * (showPayment === 'stream' ? clip.streamPrice ?? clip.price ?? 0 : clip.downloadPrice ?? clip.price ?? 0),
+                  ),
+                  clipId: clip.id,
+                }}
                 onClose={() => setShowPayment(null)}
               />
             ) : null}
