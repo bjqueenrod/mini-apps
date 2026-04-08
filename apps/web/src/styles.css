@@ -1248,8 +1248,12 @@ button {
   align-items: stretch;
   gap: 12px;
   overflow-x: auto;
+  overflow-y: visible;
   padding-bottom: 4px;
   scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: none;
   scrollbar-width: none;
 }
 
