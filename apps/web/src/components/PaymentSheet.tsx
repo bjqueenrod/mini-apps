@@ -227,19 +227,24 @@ export function PaymentSheet({
         ) : null}
 
         {state === 'waiting' ? (
-          <div className="payment-sheet__body">
-            <div className="payment-sheet__spinner">Waiting for payment…</div>
-            <p>Checkout opened in your browser. Complete payment and we’ll update here.</p>
-            {paymentUrl ? (
-              <button type="button" className="payment-sheet__primary" onClick={() => openPaymentUrl(paymentUrl)}>
-                Open payment link again
-              </button>
-            ) : null}
-            {botFallbackUrl ? (
-              <button type="button" className="payment-sheet__ghost" onClick={() => openBotDeepLink(botFallbackUrl)}>
-                Pay in bot instead
-              </button>
-            ) : null}
+          <div className="payment-sheet__body payment-sheet__body--center">
+            <div className="payment-sheet__spinner payment-sheet__spinner--center">
+              <div className="payment-sheet__spinner-wheel" aria-hidden />
+              <span>Waiting for payment…</span>
+            </div>
+            <p className="payment-sheet__muted-text">Checkout opened in your browser. Complete payment and we’ll update here.</p>
+            <div className="payment-sheet__actions">
+              {paymentUrl ? (
+                <button type="button" className="payment-sheet__primary" onClick={() => openPaymentUrl(paymentUrl)}>
+                  Open payment link again
+                </button>
+              ) : null}
+              {botFallbackUrl ? (
+                <button type="button" className="payment-sheet__ghost" onClick={() => openBotDeepLink(botFallbackUrl)}>
+                  Pay in bot instead
+                </button>
+              ) : null}
+            </div>
           </div>
         ) : null}
 

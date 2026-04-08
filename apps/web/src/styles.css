@@ -2350,6 +2350,11 @@ button {
   gap: 12px;
 }
 
+.payment-sheet__body--center {
+  align-items: center;
+  text-align: center;
+}
+
 .payment-sheet__body--shimmer {
   gap: 16px;
 }
@@ -2394,6 +2399,31 @@ button {
   justify-content: flex-start;
   gap: 8px;
   color: var(--muted, #c6bdd6);
+}
+
+.payment-sheet__spinner--center {
+  justify-content: center;
+}
+
+.payment-sheet__spinner-wheel {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid rgba(176, 106, 214, 0.35);
+  border-top-color: var(--accent, #d07bff);
+  animation: results-spin 0.85s linear infinite;
+}
+
+.payment-sheet__muted-text {
+  color: var(--muted, #c6bdd6);
+}
+
+.payment-sheet__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  align-items: center;
 }
 
 .payment-sheet__shimmer-dot {
