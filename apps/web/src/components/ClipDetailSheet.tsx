@@ -118,21 +118,21 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
               <a
                 href={clip.botStreamUrl}
                 target="_blank"
-                rel="noreferrer"
-                className="detail-sheet__action detail-sheet__action--stream"
-                onClick={handleBotAction(clip.botStreamUrl, 'stream')}
-              >
-                <strong>🎬 Stream in Bot</strong>
+              rel="noreferrer"
+              className="detail-sheet__action detail-sheet__action--stream"
+              onClick={handleBotAction(clip.botStreamUrl, 'stream')}
+            >
+                <strong>🎬 Stream Now</strong>
                 <span>{formatPrice(clip.streamPrice ?? clip.price)}</span>
               </a>
               <a
                 href={clip.botDownloadUrl}
                 target="_blank"
-                rel="noreferrer"
-                className="detail-sheet__action detail-sheet__action--download"
-                onClick={handleBotAction(clip.botDownloadUrl, 'download')}
-              >
-                <strong>📥 Download in Bot</strong>
+              rel="noreferrer"
+              className="detail-sheet__action detail-sheet__action--download"
+              onClick={handleBotAction(clip.botDownloadUrl, 'download')}
+            >
+                <strong>📥 Download Now</strong>
                 <span>{formatPrice(clip.downloadPrice ?? clip.price)}</span>
               </a>
             </div>
