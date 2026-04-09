@@ -513,7 +513,7 @@ export function TasksPage() {
             <h2>Choose the package that fits your pace</h2>
             <p className="tasks-panel__body-copy">
               Each package determines how long I can give you tasks for and the maximum number of tasks you can receive
-              each day. Payment, setup, delivery, and proof review all happen inside the Telegram bot.
+              each day. Setup, task delivery, and proof review all happen inside Telegram.
             </p>
           </div>
         </div>
