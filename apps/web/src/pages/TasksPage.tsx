@@ -435,34 +435,6 @@ export function TasksPage() {
         </div>
       </section>
 
-      <section className="tasks-manifesto">
-        <div className="tasks-manifesto__intro">
-          <p className="hero__eyebrow">Why Custom Feels Different</p>
-          <h2>Guided, accountable, and written around you</h2>
-          <p className="tasks-panel__body-copy">
-            You are not buying a generic chatbot or a fixed list of scripts. You are buying a time-limited, structured
-            flow where tasks are selected to match your setup and kept accountable with proof reviewed by Mistress
-            BJQueen.
-          </p>
-        </div>
-        <div className="tasks-manifesto__quote">
-          <strong>Personalised, paced, and worth paying for because it stays focused on you.</strong>
-        </div>
-        <div className="tasks-manifesto__grid" aria-label="Why custom feels different">
-          {WHY_CUSTOM_POINTS.map((point) => (
-            <article key={point.title} className="tasks-manifesto__item">
-              <span className="tasks-benefit__icon">
-                <TaskIcon name={point.icon} />
-              </span>
-              <div>
-                <strong>{point.title}</strong>
-                <p>{point.detail}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <section className="tasks-panel tasks-panel--steps">
         <div className="tasks-panel__header">
           <p className="hero__eyebrow">How It Works</p>
