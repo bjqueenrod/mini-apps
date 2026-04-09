@@ -636,12 +636,7 @@ export function TasksPage() {
       </section>
 
       <div className="sticky-mobile-cta">
-        <div className="sticky-mobile-cta__content">
-          <span>Custom Obedience Tasks</span>
-          <a className="tasks-button tasks-button--primary sticky-mobile-cta__button" href="#packages">
-            Choose Package
-          </a>
-        </div>
+        <div className="sticky-mobile-cta__content" />
       </div>
     </AppShell>
   );
