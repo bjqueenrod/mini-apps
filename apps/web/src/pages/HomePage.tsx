@@ -88,11 +88,15 @@ export function HomePage() {
             className="chooser-card chooser-card--clips"
             onClick={handleCardClick('chooser_clips')}
           >
-            <span className="chooser-card__eyebrow">🎬 CLIP STORE</span>
+            <span className="chooser-card__eyebrow">🎬 FEMDOM CLIP STORE</span>
             <strong>Browse. Preview. Unlock.</strong>
             <p>
-              Search the archive, watch previews, and unlock full clips instantly. Stream or download in seconds, no
-              waiting, no friction.
+              Search my femdom clip archive, watch previews, and unlock full clips in seconds. Stream instantly or
+              download and keep them.
+            </p>
+            <p>
+              Use hashtag search to find exactly what you want, preview before you buy, and unlock full access when
+              you’re ready.
             </p>
             <span className="chooser-card__cta">Enter Clip Store</span>
           </Link>
