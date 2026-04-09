@@ -1109,8 +1109,8 @@ button {
 }
 
 .top-sellers--tiers .top-sellers__media {
-  height: clamp(140px, 40vw, 180px);
-  padding-top: 10px;
+  height: clamp(180px, 38vw, 240px);
+  padding: 12px 0 8px;
 }
 
 .top-sellers--tiers .top-sellers__body--tier {
