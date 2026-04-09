@@ -64,6 +64,8 @@ def _normalize_status(value: str | None) -> str:
 def checkout_options(payload: CheckoutOptionsRequest, session: dict = Depends(get_session)) -> CheckoutOptionsResponse:
     flow_id = session.get("start_param") or session.get("flow_id")
     item: dict[str, Any] = {"product_id": payload.product_id, "quantity": max(1, payload.quantity)}
+    if payload.mode:
+        item["mode"] = payload.mode
     if payload.unit_price_cents is not None:
         item["unit_price_cents"] = int(payload.unit_price_cents)
     if payload.clip_id:
@@ -99,6 +101,8 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
 
     item: dict[str, Any] = {"product_id": payload.product_id, "quantity": max(1, payload.quantity)}
+    if payload.mode:
+        item["mode"] = payload.mode
     if payload.unit_price_cents is not None:
         item["unit_price_cents"] = int(payload.unit_price_cents)
     if payload.clip_id:
@@ -120,6 +124,7 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
                 chat_id=int(chat_id),
                 application_id=application_id,
                 flow_id=flow_id,
+                clip_mode=payload.mode,
             )
         invoice = payment_gateway.create_invoice(
             order_id=int(order.get("id")),

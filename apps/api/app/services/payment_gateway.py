@@ -64,10 +64,40 @@ def create_order(
     chat_id: int | None = None,
     application_id: str | None = None,
     flow_id: str | None = None,
+    clip_mode: str | None = None,
 ) -> dict[str, Any]:
     base = _api_base_url()
     if not base:
         raise PaymentSystemError("PAYMENT_SYSTEM_API_URL is not configured")
+    # Clip-specific order endpoint (required by payment-system for clip sales)
+    clip_id = None
+    if len(items) == 1:
+        clip_id = items[0].get("clip_id") or items[0].get("clipId")
+
+    if clip_id and clip_mode:
+        payload: dict[str, Any] = {
+            "mode": clip_mode,
+            "chat_id": chat_id,
+            "application_id": application_id,
+            "flow_id": flow_id,
+        }
+        try:
+            response = httpx.post(
+                f"{base}/api/clips/{clip_id}/order",
+                json=payload,
+                headers=_headers(),
+                timeout=settings.payment_system_timeout_seconds,
+            )
+            response.raise_for_status()
+            data = response.json()
+            item = data.get("item") if isinstance(data, dict) else None
+            if not isinstance(item, dict):
+                raise PaymentSystemError("clip order payload missing")
+            return item
+        except httpx.HTTPError as exc:
+            logger.warning("Create clip order failed: %s", exc)
+            raise PaymentSystemError("unable to create clip order") from exc
+
     payload: dict[str, Any] = {
         "items": items,
         "chat_id": chat_id,
