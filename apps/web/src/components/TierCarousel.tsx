@@ -192,7 +192,6 @@ export function TierCarousel({
                       aria-label={`Continue to payment for ${tier.name}`}
                     >
                       <strong>Continue to Payment</strong>
-                      <span>{priceLabel(tier)}</span>
                     </a>
                   </div>
                 </article>
