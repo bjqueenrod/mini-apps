@@ -57,7 +57,7 @@ export function HomePage() {
             className="chooser-card chooser-card--tasks"
             onClick={handleCardClick('chooser_keyholding')}
           >
-            <span className="chooser-card__eyebrow">🔒 KEYHOLDING</span>
+            <span className="chooser-card__eyebrow">🔒 CHASTITY KEYHOLDING</span>
             <strong>Give up ownership of your cock.</strong>
             <p>
               Choose your tier, submit your application, and let me control access to your cock with check-ins, proof,
@@ -71,7 +71,7 @@ export function HomePage() {
             className="chooser-card chooser-card--tasks"
             onClick={handleCardClick('chooser_tasks')}
           >
-            <span className="chooser-card__eyebrow">📝 CUSTOM TASKS</span>
+            <span className="chooser-card__eyebrow">📝 CUSTOM OBEDIENCE TASKS</span>
             <strong>Be put to work for me.</strong>
             <p>
               Choose your package and intensity, then receive obedience tasks built around your selected fetish
