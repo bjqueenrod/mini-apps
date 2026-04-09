@@ -140,7 +140,7 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
               <PaymentSheet
                 productId={showPayment === 'stream' ? String(clip.watchProductId) : String(clip.downloadProductId)}
                 quantity={1}
-                mode={showPayment}
+                mode={showPayment === 'stream' ? 'watch' : 'download'}
                 priceLabel={formatPrice(showPayment === 'stream' ? clip.streamPrice ?? clip.price : clip.downloadPrice ?? clip.price)}
                 botFallbackUrl={showPayment === 'stream' ? clip.botStreamUrl : clip.botDownloadUrl}
                 itemContext={{
