@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export function PreviewPlayer({
   embedUrl,
@@ -12,7 +12,8 @@ export function PreviewPlayer({
   title: string;
 }) {
   const [active, setActive] = useState(false);
-  const backgroundUrl = thumbnailUrl || previewImageUrl;
+  const posterUrl = useMemo(() => thumbnailUrl || undefined, [thumbnailUrl]);
+  const animatedPosterUrl = useMemo(() => previewImageUrl || thumbnailUrl, [previewImageUrl, thumbnailUrl]);
 
   if (embedUrl) {
     return (
@@ -34,7 +35,7 @@ export function PreviewPlayer({
         ) : (
           <div
             className="preview-player__poster"
-            style={{ backgroundImage: backgroundUrl ? `url(${backgroundUrl})` : undefined }}
+            style={{ backgroundImage: posterUrl ? `url(${posterUrl})` : undefined }}
             aria-label={title}
           >
             <span className="preview-player__hint">Hover to play</span>
@@ -45,8 +46,15 @@ export function PreviewPlayer({
   }
 
   return (
-    <div className="preview-player preview-player--fallback" style={{ backgroundImage: backgroundUrl ? `url(${backgroundUrl})` : undefined }}>
-      <span>No public preview available yet.</span>
+    <div
+      className="preview-player preview-player--fallback"
+      style={{ backgroundImage: active ? (animatedPosterUrl ? `url(${animatedPosterUrl})` : undefined) : posterUrl ? `url(${posterUrl})` : undefined }}
+      onPointerEnter={() => setActive(true)}
+      onPointerLeave={() => setActive(false)}
+      onFocus={() => setActive(true)}
+      onBlur={() => setActive(false)}
+    >
+      <span>{active ? 'Loading preview...' : 'No public preview available yet.'}</span>
     </div>
   );
 }
