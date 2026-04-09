@@ -4,7 +4,7 @@ import { PaymentMethod } from '../features/payments/types';
 import { formatPrice } from '../utils/format';
 import { openBotDeepLink } from '../app/telegram';
 
-type SheetState = 'loading' | 'select' | 'submitting' | 'waiting' | 'success' | 'error';
+type SheetState = 'loading' | 'select' | 'confirm' | 'submitting' | 'waiting' | 'success' | 'error';
 
 function openPaymentUrl(url?: string | null) {
   if (!url) return false;
@@ -110,6 +110,8 @@ export function PaymentSheet({
   );
   const selectedInstructions = selectedMethodInfo?.instructions?.trim();
   const selectedTributeCode = selectedMethodInfo?.tributeCode?.trim();
+  const requiresCode = Boolean(selectedMethodInfo?.requiresCode);
+  const hasInstructions = Boolean(selectedInstructions || selectedTributeCode || requiresCode);
   const isLoading = state === 'loading' || state === 'submitting';
 
   useEffect(() => {
@@ -158,11 +160,12 @@ export function PaymentSheet({
   }, [selectedMethodInfo, priceLabel]);
 
   const payButtonLabel = useMemo(() => {
+    if (state === 'confirm') return 'Open payment';
     if (selectedPriceLabel) {
       return `Pay ${selectedPriceLabel}`;
     }
     return `Pay with ${selectedLabel}`;
-  }, [selectedPriceLabel, selectedLabel]);
+  }, [selectedPriceLabel, selectedLabel, state]);
 
   const paymentNotes = selectedInstructions || selectedTributeCode ? (
     <div className="payment-sheet__note" role="note">
@@ -244,8 +247,16 @@ export function PaymentSheet({
     }
   }, [itemContext, mode, orderId, productId, quantity, selectedMethod, saveProgress]);
 
+  const handlePrimaryClick = useCallback(() => {
+    if (state === 'select' && hasInstructions) {
+      setState('confirm');
+      return;
+    }
+    void handleCheckout();
+  }, [state, hasInstructions, handleCheckout]);
+
   const paymentButton = (
-    <button type="button" className="payment-sheet__primary" onClick={handleCheckout} disabled={primaryButtonDisabled}>
+    <button type="button" className="payment-sheet__primary" onClick={handlePrimaryClick} disabled={primaryButtonDisabled}>
       {payButtonLabel}
     </button>
   );
@@ -320,6 +331,21 @@ export function PaymentSheet({
                 Pay in bot instead
               </button>
             ) : null}
+          </div>
+        ) : null}
+
+        {state === 'confirm' ? (
+          <div className="payment-sheet__body">
+            <p>Please follow these instructions before opening the payment link.</p>
+            {paymentNotes}
+            <div className="payment-sheet__actions">
+              <button type="button" className="payment-sheet__primary" onClick={handleCheckout} disabled={primaryButtonDisabled}>
+                Open payment
+              </button>
+              <button type="button" className="payment-sheet__ghost" onClick={() => setState('select')}>
+                Choose a different method
+              </button>
+            </div>
           </div>
         ) : null}
 
