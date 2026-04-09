@@ -67,7 +67,7 @@ const HOW_IT_WORKS_STEPS = [
   {
     title: 'Complete your setup',
     detail:
-      'Fill in categories, sex toys/props, limits, timezone, send times, chastity status, and whether to auto-send or request.',
+      'Select your fetish categories, intensity, available sex toys/props, timezone, send times, chastity status and whether to auto-send or request.',
     icon: 'sliders',
   },
   {
