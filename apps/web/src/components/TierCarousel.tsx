@@ -168,8 +168,6 @@ export function TierCarousel({
                         <span />
                       )}
                     </div>
-                    <h3>{tier.name}</h3>
-                    <p className="top-sellers__descriptor">{descriptor}</p>
                     <div className="top-sellers__meta-grid">
                       <div className="top-sellers__meta-item">
                         <span className="top-sellers__meta-label">Duration</span>
@@ -184,7 +182,6 @@ export function TierCarousel({
                       <span className="top-sellers__meta-label">Price</span>
                       <strong>{priceLabel(tier)}</strong>
                     </div>
-                    {valueSummary ? <p className="top-sellers__value-copy">{valueSummary}</p> : null}
                     <a
                       href={tier.botBuyUrl || '#'}
                       className="top-sellers__cta"
