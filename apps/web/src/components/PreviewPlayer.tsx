@@ -35,12 +35,8 @@ export function PreviewPlayer({
     <div
       className="preview-player preview-player--fallback"
       style={{ backgroundImage: posterUrl ? `url(${posterUrl})` : undefined }}
-      onPointerEnter={() => animatedPosterUrl && setActive(true)}
-      onPointerLeave={() => setActive(false)}
-      onFocus={() => animatedPosterUrl && setActive(true)}
-      onBlur={() => setActive(false)}
     >
-      <span>{animatedPosterUrl && active ? 'Loading preview...' : 'No public preview available yet.'}</span>
+      <span>{animatedPosterUrl ? 'Preview available on request.' : 'No public preview available yet.'}</span>
     </div>
   );
 }
