@@ -1371,7 +1371,9 @@ button {
 }
 
 .top-sellers__media--tier img {
+  object-fit: contain;
   object-position: center center;
+  padding: 8px;
 }
 
 .top-sellers__media-fallback {
