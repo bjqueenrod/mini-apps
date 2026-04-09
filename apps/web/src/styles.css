@@ -1076,7 +1076,7 @@ button {
 }
 
 .top-sellers--tiers .top-sellers__track {
-  grid-auto-columns: 92%;
+  grid-auto-columns: 100%;
   gap: 16px;
   padding: 8px 2px 4px;
 }
