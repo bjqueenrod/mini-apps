@@ -129,6 +129,7 @@ def create_invoice(
     chat_id: int | None = None,
     application_id: str | None = None,
     flow_id: str | None = None,
+    code: str | None = None,
 ) -> dict[str, Any]:
     base = _api_base_url()
     if not base:
@@ -140,6 +141,8 @@ def create_invoice(
         "application_id": application_id,
         "flow_id": flow_id,
     }
+    if code:
+        payload["code"] = code
     try:
         response = httpx.post(
             f"{base}/api/invoices",

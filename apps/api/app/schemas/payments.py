@@ -59,6 +59,8 @@ class CheckoutResponse(BaseModel):
     payment_url: str | None = Field(default=None, alias="paymentUrl")
     provider_invoice_url: str | None = Field(default=None, alias="providerInvoiceUrl")
     payment_method: str = Field(alias="paymentMethod")
+    payment_code: str | None = Field(default=None, alias="paymentCode")
+    instructions: str | None = None
     totals: dict[str, Any] | None = None
 
     class Config:

@@ -115,6 +115,7 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
         item["meta_data"] = payload.meta_data
     items = [item]
     order_id_value = int(payload.order_id) if payload.order_id else None
+    selected_method: dict[str, Any] | None = None
     try:
         if order_id_value:
             order = {"id": order_id_value}
@@ -126,12 +127,33 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
                 flow_id=flow_id,
                 clip_mode=payload.mode,
             )
+        options = payment_gateway.invoice_options(order_id=int(order.get("id")), flow_id=flow_id)
+        methods = options.get("payment_methods") if isinstance(options, dict) else None
+        if isinstance(methods, list):
+            for method in methods:
+                if not isinstance(method, dict):
+                    continue
+                slug = (method.get("payment_method") or "").strip().lower()
+                if slug == payload.payment_method:
+                    if slug in {"paypal", "throne"}:
+                        method["requires_code"] = True
+                    elif slug == "crypto":
+                        method["requires_code"] = False
+                    selected_method = method
+                    break
+        code_value = str(selected_method.get("code") or "").strip() if selected_method else ""
+        requires_code = (
+            bool(selected_method.get("requires_code")) if isinstance(selected_method, dict) else False
+        )
+        if requires_code and not code_value:
+            raise payment_gateway.PaymentSystemError("missing payment code for selected method")
         invoice = payment_gateway.create_invoice(
             order_id=int(order.get("id")),
             payment_method=payload.payment_method,
             chat_id=int(chat_id),
             application_id=application_id,
             flow_id=flow_id,
+            code=code_value or None,
         )
     except payment_gateway.PaymentSystemError as exc:
         logger.warning("checkout error: %s", exc)
@@ -145,12 +167,19 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
     if not invoice_id_value and isinstance(invoice, dict):
         invoice_id_value = invoice.get("invoice_id") or invoice.get("invoiceId") or invoice.get("id")
 
+    instruction_templates = selected_method.get("instruction_templates") if isinstance(selected_method, dict) else {}
+    checkout_instructions = None
+    if isinstance(instruction_templates, dict):
+        checkout_instructions = str(instruction_templates.get("checkout_default") or "").strip() or None
+
     return CheckoutResponse(
         orderId=int(order.get("id")),
         invoiceId=str(invoice_id_value or ""),
         paymentUrl=invoice_url,
         providerInvoiceUrl=provider_url,
         paymentMethod=payload.payment_method,
+        paymentCode=code_value or None,
+        instructions=checkout_instructions,
         totals=None,
     )
 

@@ -21,6 +21,8 @@ export type CheckoutResponse = {
   paymentUrl?: string | null;
   providerInvoiceUrl?: string | null;
   paymentMethod: string;
+  paymentCode?: string | null;
+  instructions?: string | null;
   totals?: Record<string, unknown> | null;
 };
 
