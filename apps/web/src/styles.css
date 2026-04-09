@@ -2247,6 +2247,25 @@ button {
   border: 0;
 }
 
+.preview-player__poster {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+
+.preview-player__hint {
+  background: rgba(0, 0, 0, 0.55);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  letter-spacing: 0.01em;
+}
+
 @media (min-width: 720px) {
   .hero__banner-copy {
     right: 28px;
