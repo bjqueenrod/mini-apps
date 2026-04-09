@@ -1248,14 +1248,14 @@ button {
   padding-bottom: 4px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  touch-action: pan-x pan-y;
+  overscroll-behavior: auto;
+  touch-action: pan-x;
   scrollbar-width: none;
 }
 
 .top-sellers,
 .top-sellers--tiers {
-  overscroll-behavior-y: contain;
+  overscroll-behavior-y: auto;
 }
 
 .top-sellers__track::-webkit-scrollbar {
