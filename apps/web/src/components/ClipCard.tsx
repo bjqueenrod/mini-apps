@@ -19,18 +19,17 @@ export function ClipCard({
   const location = useLocation();
   const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const selectedTag = searchParams.get('tags')?.split(',')[0] ?? undefined;
-  const mediaCandidates = useMemo(
-    () => [clip.thumbnailUrl, clip.previewWebpUrl].filter(Boolean) as string[],
-    [clip.previewWebpUrl, clip.thumbnailUrl],
-  );
-  const [mediaIndex, setMediaIndex] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+  const [fallbackTriggered, setFallbackTriggered] = useState(false);
   const displayTags = useMemo(() => pickPrimaryTags(clip.tags, selectedTag), [clip.tags, selectedTag]);
 
   useEffect(() => {
-    setMediaIndex(0);
-  }, [mediaCandidates]);
+    setFallbackTriggered(false);
+  }, [clip.thumbnailUrl, clip.previewWebpUrl]);
 
-  const mediaUrl = mediaCandidates[mediaIndex];
+  const stillUrl = clip.thumbnailUrl;
+  const animatedUrl = clip.previewWebpUrl;
+  const mediaUrl = fallbackTriggered ? undefined : (isHovering ? animatedUrl || stillUrl : stillUrl);
 
   return (
     <Link
@@ -45,6 +44,10 @@ export function ClipCard({
           tags: (searchParams.get('tags') ?? '').split(',').filter(Boolean),
         })
       }
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+      onFocus={() => setIsHovering(true)}
+      onBlur={() => setIsHovering(false)}
     >
       <div className="clip-card__media" style={!mediaUrl ? { backgroundImage: safeBackground() } : undefined}>
         {mediaUrl ? (
@@ -53,11 +56,7 @@ export function ClipCard({
             alt={clip.title}
             loading="lazy"
             onError={() => {
-              if (mediaIndex < mediaCandidates.length - 1) {
-                setMediaIndex((current) => current + 1);
-              } else {
-                setMediaIndex(mediaCandidates.length);
-              }
+              setFallbackTriggered(true);
             }}
           />
         ) : (
