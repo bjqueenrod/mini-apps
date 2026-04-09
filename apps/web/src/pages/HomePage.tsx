@@ -58,10 +58,11 @@ export function HomePage() {
             onClick={handleCardClick('chooser_keyholding')}
           >
             <span className="chooser-card__eyebrow">🔒 KEYHOLDING</span>
-            <strong>KEYHOLDING</strong>
+            <strong>Give up ownership of your cock.</strong>
             <p>
-              Give up ownership of your cock. Choose your tier, submit your application, and let me control access with
-              oversight, check-ins with proof, obedience tasks, enforced rules, and clear consequences.
+              Choose your tier, submit your application, and let me control access to your cock with check-ins, proof,
+              obedience tasks, enforced rules, and clear consequences. A structured, hands-on keyholding service with
+              clear expectations.
             </p>
             <span className="chooser-card__cta">Apply for Keyholding</span>
           </Link>
