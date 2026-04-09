@@ -58,10 +58,10 @@ export function HomePage() {
             onClick={handleCardClick('chooser_keyholding')}
           >
             <span className="chooser-card__eyebrow">🔒 KEYHOLDING</span>
-            <strong>Give up control of your cock.</strong>
+            <strong>KEYHOLDING</strong>
             <p>
-              Structured chastity with real oversight. Proofed check-ins, enforced rules, and defined consequences.
-              Apply, get reviewed, and enter controlled keyholding.
+              Give up ownership of your cock. Choose your tier, submit your application, and let me control access with
+              oversight, check-ins with proof, obedience tasks, enforced rules, and clear consequences.
             </p>
             <span className="chooser-card__cta">Apply for Keyholding</span>
           </Link>
