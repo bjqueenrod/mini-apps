@@ -2110,6 +2110,9 @@ button {
   bottom: 0;
   background: linear-gradient(180deg, rgba(24,19,30,0.42), rgba(24,19,30,0.98));
   padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .detail-sheet__actions--single {
@@ -2117,12 +2120,19 @@ button {
 }
 
 .detail-sheet__action {
-  flex: 1;
   display: grid;
   gap: 4px;
+  justify-items: center;
   padding: 14px 16px;
   border-radius: 18px;
   border: 1px solid transparent;
+}
+
+.detail-sheet__action-stack {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  text-align: center;
 }
 
 .detail-sheet__action--stream {

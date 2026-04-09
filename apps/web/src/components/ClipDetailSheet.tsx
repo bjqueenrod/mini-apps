@@ -122,13 +122,11 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
                 className="detail-sheet__action detail-sheet__action--stream"
                 onClick={handleBotAction(clip.botStreamUrl, 'stream')}
               >
-                <strong>
-                  🎬
-                  <br />
-                  Stream Now
-                  <br />
-                  {formatPrice(clip.streamPrice ?? clip.price)}
-                </strong>
+                <div className="detail-sheet__action-stack">
+                  <span aria-hidden="true">🎬</span>
+                  <strong>Stream Now</strong>
+                  <span>{formatPrice(clip.streamPrice ?? clip.price)}</span>
+                </div>
               </a>
               <a
                 href={clip.botDownloadUrl}
@@ -137,13 +135,11 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
                 className="detail-sheet__action detail-sheet__action--download"
                 onClick={handleBotAction(clip.botDownloadUrl, 'download')}
               >
-                <strong>
-                  📥
-                  <br />
-                  Download Now
-                  <br />
-                  {formatPrice(clip.downloadPrice ?? clip.price)}
-                </strong>
+                <div className="detail-sheet__action-stack">
+                  <span aria-hidden="true">📥</span>
+                  <strong>Download Now</strong>
+                  <span>{formatPrice(clip.downloadPrice ?? clip.price)}</span>
+                </div>
               </a>
             </div>
             {showPayment && clip ? (
