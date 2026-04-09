@@ -1262,8 +1262,8 @@ button {
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
-  overscroll-behavior-y: contain;
-  touch-action: pan-x;
+  overscroll-behavior-y: auto;
+  touch-action: pan-x pan-y;
   scrollbar-width: none;
 }
 
