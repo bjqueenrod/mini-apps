@@ -84,6 +84,59 @@ button {
   box-shadow: var(--shadow-card);
 }
 
+.currency-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.currency-banner__row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.currency-banner__label {
+  font-weight: 600;
+  color: #f3e9ff;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.currency-banner__hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.currency-banner__toggle {
+  display: inline-flex;
+  gap: 6px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(176, 106, 214, 0.25);
+}
+
+.currency-pill {
+  border: none;
+  background: transparent;
+  color: #f3e9ff;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, box-shadow 120ms ease;
+}
+
+.currency-pill.is-active {
+  background: linear-gradient(135deg, rgba(176, 106, 214, 0.5), rgba(107, 142, 240, 0.5));
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
 .error-state {
   color: var(--danger);
 }

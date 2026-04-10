@@ -8,6 +8,7 @@ import { ClipDetailSheet } from '../components/ClipDetailSheet';
 import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
 import { TelegramDevBanner } from '../components/TelegramDevBanner';
+import { CurrencyToggleBanner } from '../components/CurrencyToggleBanner';
 import { TopSellersCarousel } from '../components/TopSellersCarousel';
 import { setAnalyticsContext } from '../app/analytics';
 import { applyTelegramTheme } from '../app/telegram';
@@ -353,7 +354,12 @@ export function BrowsePage() {
 
   return (
     <AppShell>
-      {!session.isTelegram && <TelegramDevBanner />}
+      {!session.isTelegram && (
+        <>
+          <TelegramDevBanner />
+          <CurrencyToggleBanner />
+        </>
+      )}
       <section className="hero">
         <img
           className="hero__banner"

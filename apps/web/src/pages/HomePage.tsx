@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
 import { TelegramDevBanner } from '../components/TelegramDevBanner';
+import { CurrencyToggleBanner } from '../components/CurrencyToggleBanner';
 import { setAnalyticsContext } from '../app/analytics';
 import { trackInteraction } from '../app/analytics';
 import { applyTelegramTheme } from '../app/telegram';
@@ -41,7 +42,12 @@ export function HomePage() {
 
   return (
     <AppShell>
-      {!session.isTelegram && <TelegramDevBanner />}
+      {!session.isTelegram && (
+        <>
+          <TelegramDevBanner />
+          <CurrencyToggleBanner />
+        </>
+      )}
       <section className="hero">
         <img
           className="hero__banner"
