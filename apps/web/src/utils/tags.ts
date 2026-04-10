@@ -1,10 +1,12 @@
 export const FEATURED_TAGS = [
-  '#chastity',
-  '#ruined_orgasm',
-  '#edging',
-  '#tease_denial',
-  '#bondage',
-  '#milking_table',
+  'chastity',
+  'ruined_orgasm',
+  'edging',
+  'tease_denial',
+  'bondage',
+  'milking_table',
+  'cuckold',
+  'oral',
 ];
 
 export function normalizeTag(tag: string): string {
