@@ -107,7 +107,7 @@ export function KeyholdingTierCarousel({
                       <span className="top-sellers__meta-label">Price</span>
                       <strong>{priceLabel}</strong>
                       {tier.pricePerWeekPricing || tier.pricePerWeek || tier.pricePerWeekPence != null || tier.pricePerWeekValue != null ? (
-                        <span className="top-sellers__price-subtext">or {pricePerWeekLabel} per week</span>
+                        <span className="top-sellers__price-subtext">{pricePerWeekLabel} per week</span>
                       ) : null}
                     </div>
                     {onApply ? (
