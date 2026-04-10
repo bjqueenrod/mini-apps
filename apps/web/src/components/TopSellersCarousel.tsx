@@ -62,11 +62,17 @@ export function TopSellersCarousel({
               const streamPriceLabel = resolvePriceLabel({
                 currency,
                 pricings: [clip.streamPricing, clip.watchPricing, clip.pricing],
+                fallbackAmountPenceCandidates: [clip.streamPricePence, clip.watchPricePence, clip.pricePence],
+                fallbackAmountCandidates: [clip.streamPrice, clip.price],
+                fallbackLabelCandidates: [clip.streamPriceLabel, clip.watchPriceLabel, clip.priceLabel],
                 defaultLabel: 'Price on request',
               });
               const downloadPriceLabel = resolvePriceLabel({
                 currency,
                 pricings: [clip.downloadPricing, clip.pricing],
+                fallbackAmountPenceCandidates: [clip.downloadPricePence, clip.pricePence],
+                fallbackAmountCandidates: [clip.downloadPrice, clip.price],
+                fallbackLabelCandidates: [clip.downloadPriceLabel, clip.priceLabel],
                 defaultLabel: 'Price on request',
               });
               return (

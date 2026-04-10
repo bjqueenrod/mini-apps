@@ -17,6 +17,9 @@ function priceLabel(tier: TierItem, currency: CurrencyCode): string {
   return resolvePriceLabel({
     currency,
     pricings: [tier.pricing],
+    fallbackAmountPenceCandidates: [tier.pricePence],
+    fallbackAmountCandidates: [tier.price],
+    fallbackLabelCandidates: [tier.priceLabel],
     defaultLabel: 'Price on request',
   });
 }

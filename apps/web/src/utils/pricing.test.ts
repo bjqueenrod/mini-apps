@@ -23,6 +23,22 @@ describe('resolvePriceLabel', () => {
     expect(label).toBe('£12.99');
   });
 
+  it('derives usd pricing from gbp amount and fx rate when usd is missing', () => {
+    const label = resolvePriceLabel({
+      currency: 'USD',
+      pricings: [{ gbp: { amount_pence: 1299 }, fx: { rate: 1.25 } }],
+    });
+    expect(label).toBe('$16.24');
+  });
+
+  it('falls back to the provided numeric amount when pricing is absent', () => {
+    const label = resolvePriceLabel({
+      currency: 'USD',
+      fallbackAmountPence: 1299,
+    });
+    expect(label).toBe('$12.99');
+  });
+
   it('returns default label when pricing object is absent', () => {
     const label = resolvePriceLabel({
       currency: 'GBP',
@@ -42,5 +58,13 @@ describe('resolvePriceLabel', () => {
       pricings: [{ usd: { amount_pence: 1525 }, gbp: { amount_pence: 1200 } }],
     });
     expect(amount).toBe(1525);
+  });
+
+  it('derives pricing amount pence for usd from gbp fx snapshot', () => {
+    const amount = resolvePriceAmountPenceOptional({
+      currency: 'USD',
+      pricings: [{ gbp: { amount_pence: 1200 }, fx: { rate: 1.25 } }],
+    });
+    expect(amount).toBe(1500);
   });
 });

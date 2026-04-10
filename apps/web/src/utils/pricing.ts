@@ -21,6 +21,12 @@ export type PricingEnvelope = {
 type ResolvePriceLabelOptions = {
   currency?: CurrencyCode;
   pricings?: Array<PricingEnvelope | null | undefined>;
+  fallbackAmountPence?: unknown;
+  fallbackAmountPenceCandidates?: unknown[];
+  fallbackAmount?: unknown;
+  fallbackAmountCandidates?: unknown[];
+  fallbackLabel?: unknown;
+  fallbackLabelCandidates?: unknown[];
   defaultLabel?: string;
 };
 
@@ -46,6 +52,14 @@ function asPence(value: unknown): number | undefined {
   return Math.round(amount);
 }
 
+function pricingFxRate(pricing: PricingEnvelope | null | undefined): number | undefined {
+  const fx = pricing?.fx;
+  if (!fx || typeof fx !== 'object') return undefined;
+  const rate = asNumber(fx.rate);
+  if (rate == null || rate <= 0) return undefined;
+  return rate;
+}
+
 function pricingFormatted(
   pricing: PricingEnvelope | null | undefined,
   currency: CurrencyCode,
@@ -64,6 +78,29 @@ function pricingAmountPence(
   return asPence(bucket.amount_pence ?? bucket.amountPence);
 }
 
+function derivedPricingAmountPence(
+  pricing: PricingEnvelope | null | undefined,
+  currency: CurrencyCode,
+): number | undefined {
+  const directAmount = pricingAmountPence(pricing, currency);
+  if (directAmount != null) return directAmount;
+
+  const rate = pricingFxRate(pricing);
+  if (rate == null) return undefined;
+
+  const gbpAmount = pricingAmountPence(pricing, 'GBP');
+  if (currency === 'USD' && gbpAmount != null) {
+    return Math.round(gbpAmount * rate);
+  }
+
+  const usdAmount = pricingAmountPence(pricing, 'USD');
+  if (currency === 'GBP' && usdAmount != null) {
+    return Math.round(usdAmount / rate);
+  }
+
+  return undefined;
+}
+
 function firstFormatted(
   pricings: Array<PricingEnvelope | null | undefined> | undefined,
   currency: CurrencyCode,
@@ -80,8 +117,32 @@ function firstPricingPence(
   currency: CurrencyCode,
 ): number | undefined {
   for (const pricing of pricings || []) {
-    const value = pricingAmountPence(pricing, currency);
+    const value = derivedPricingAmountPence(pricing, currency);
     if (value != null) return value;
+  }
+  return undefined;
+}
+
+function firstText(values: unknown[]): string | undefined {
+  for (const value of values) {
+    const text = asText(value);
+    if (text) return text;
+  }
+  return undefined;
+}
+
+function firstPence(values: unknown[]): number | undefined {
+  for (const value of values) {
+    const amount = asPence(value);
+    if (amount != null) return amount;
+  }
+  return undefined;
+}
+
+function firstAmount(values: unknown[]): number | undefined {
+  for (const value of values) {
+    const amount = asNumber(value);
+    if (amount != null) return amount;
   }
   return undefined;
 }
@@ -94,6 +155,18 @@ export function resolvePriceLabel(options: ResolvePriceLabelOptions): string {
 
   const pricingPence = firstPricingPence(options.pricings, currency);
   if (pricingPence != null) return formatPrice(pricingPence / 100, currency);
+
+  const fallbackPence = firstPence([
+    options.fallbackAmountPence,
+    ...(options.fallbackAmountPenceCandidates || []),
+  ]);
+  if (fallbackPence != null) return formatPrice(fallbackPence / 100, currency);
+
+  const fallbackAmount = firstAmount([options.fallbackAmount, ...(options.fallbackAmountCandidates || [])]);
+  if (fallbackAmount != null) return formatPrice(fallbackAmount, currency);
+
+  const fallbackLabel = firstText([options.fallbackLabel, ...(options.fallbackLabelCandidates || [])]);
+  if (fallbackLabel) return fallbackLabel;
 
   return options.defaultLabel !== undefined ? options.defaultLabel : 'Price on request';
 }

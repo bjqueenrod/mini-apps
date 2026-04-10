@@ -41,11 +41,17 @@ export function KeyholdingTierCarousel({
               const priceLabel = resolvePriceLabel({
                 currency,
                 pricings: [tier.pricing, tier.paymentProductPricing],
+                fallbackAmountPenceCandidates: [tier.pricePence, tier.paymentProductPricePence],
+                fallbackAmountCandidates: [tier.priceValue, tier.price],
+                fallbackLabelCandidates: [tier.priceLabel],
                 defaultLabel: 'Price on request',
               });
               const pricePerWeekLabel = resolvePriceLabel({
                 currency,
                 pricings: [tier.pricePerWeekPricing],
+                fallbackAmountPenceCandidates: [tier.pricePerWeekPence],
+                fallbackAmountCandidates: [tier.pricePerWeekValue, tier.pricePerWeek],
+                fallbackLabelCandidates: [tier.pricePerWeek],
                 defaultLabel: 'Price on request',
               });
               const controlLabel =
@@ -100,7 +106,7 @@ export function KeyholdingTierCarousel({
                     <div className="top-sellers__price-block top-sellers__price-block--keyholding">
                       <span className="top-sellers__meta-label">Price</span>
                       <strong>{priceLabel}</strong>
-                      {tier.pricePerWeekPricing ? (
+                      {tier.pricePerWeekPricing || tier.pricePerWeek || tier.pricePerWeekPence != null || tier.pricePerWeekValue != null ? (
                         <span className="top-sellers__price-subtext">or {pricePerWeekLabel} per week</span>
                       ) : null}
                     </div>
