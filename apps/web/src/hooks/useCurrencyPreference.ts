@@ -7,8 +7,23 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 
 function readCurrency(): CurrencyCode {
   if (typeof window === 'undefined') return 'GBP';
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  return stored === 'USD' ? 'USD' : 'GBP';
+
+  const params = new URLSearchParams(window.location.search);
+  const queryCurrency = params.get('currency') || params.get('curr') || params.get('c');
+
+  const startParam = params.get('tgWebAppStartParam') || params.get('startapp') || '';
+  const fromStartParam = /currency[:=]?([A-Za-z]{3})/i.exec(startParam)?.[1];
+
+  const pick = (value?: string | null): CurrencyCode | undefined => {
+    const upper = value?.trim().toUpperCase();
+    return upper === 'USD' ? 'USD' : upper === 'GBP' ? 'GBP' : undefined;
+  };
+
+  const fromUrl = pick(queryCurrency);
+  const fromStart = pick(fromStartParam);
+  const stored = pick(window.localStorage.getItem(STORAGE_KEY));
+
+  return fromUrl || fromStart || stored || 'GBP';
 }
 
 export function useCurrencyPreference(): [CurrencyCode, (next: CurrencyCode) => void] {
