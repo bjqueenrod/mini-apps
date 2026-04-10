@@ -32,6 +32,20 @@ def _request_url(path: str) -> str | None:
     return f'{api_url}{path}'
 
 
+def _extract_item(payload: Any) -> dict[str, Any] | None:
+    if not isinstance(payload, dict):
+        return None
+
+    item = payload.get('item')
+    if isinstance(item, dict):
+        return _normalize_record(item)
+
+    if any(key in payload for key in ('pricing', 'price_pence', 'pricePence', 'price_label', 'priceLabel')):
+        return _normalize_record(payload)
+
+    return None
+
+
 def list_payment_products(active_only: bool = False) -> list[dict[str, Any]]:
     request_url = _request_url('/api/payment-products')
     if request_url is None:
@@ -81,7 +95,28 @@ def get_payment_product(product_id: int | str) -> dict[str, Any] | None:
         logger.warning('Unable to load payment product %s from payment system: %s', product_id_int, exc)
         return None
 
-    item = payload.get('item')
-    if not isinstance(item, dict):
+    return _extract_item(payload)
+
+
+def get_clip_pricing(clip_id: str) -> dict[str, Any] | None:
+    clip_id = str(clip_id).strip()
+    if not clip_id:
         return None
-    return _normalize_record(item)
+
+    request_url = _request_url(f'/api/clips/{clip_id}/pricing')
+    if request_url is None:
+        return None
+
+    try:
+        response = httpx.get(
+            request_url,
+            headers=_request_headers(),
+            timeout=settings.payment_system_timeout_seconds,
+        )
+        response.raise_for_status()
+        payload = response.json()
+    except (httpx.HTTPError, ValueError) as exc:
+        logger.warning('Unable to load clip pricing %s from payment system: %s', clip_id, exc)
+        return None
+
+    return _extract_item(payload)

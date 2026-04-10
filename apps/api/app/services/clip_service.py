@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.db.clip_mapping import DEFAULT_SHORT_DESCRIPTION_LENGTH, get_clip_mapping
 from app.db.session import engine
 from app.schemas.clips import ClipQueryParams
-from app.services.payment_product_service import get_payment_product, list_payment_products
+from app.services.payment_product_service import get_clip_pricing, list_payment_products
 from app.services.preview_service import build_preview_assets
 from app.services.pricing_service import coerce_pence, fx_snapshot_from_pricing, pricing_from_gbp_pence
 from app.utils.bot_links import build_clip_download_url, build_clip_stream_url
@@ -47,6 +47,14 @@ def _text(value: Any) -> str | None:
     return text or None
 
 
+def _first_value(data: dict[str, Any], *names: str) -> Any:
+    for name in names:
+        value = data.get(name)
+        if value is not None and value != '':
+            return value
+    return None
+
+
 def _price_from_pence(value: Any) -> float | None:
     pence = coerce_pence(value)
     if pence is None or pence <= 0:
@@ -54,42 +62,43 @@ def _price_from_pence(value: Any) -> float | None:
     return round(pence / 100.0, 2)
 
 
-def _payment_product_key(data: dict[str, Any]) -> str | None:
-    for key in ("payment_product_id", "product_id", "productId"):
-        value = data.get(key)
-        if value in (None, ""):
-            continue
-        text = str(value).strip()
-        if text:
-            return text
-    return None
-
-
-def _payment_product_map(product_ids: set[str]) -> dict[str, dict[str, Any]]:
-    if not product_ids:
+def _clip_pricing_map(clip_ids: set[str]) -> dict[str, dict[str, Any]]:
+    if not clip_ids:
         return {}
 
-    products = list_payment_products(active_only=False)
-    mapped = {str(item.get("id")): item for item in products if isinstance(item, dict) and item.get("id") is not None}
-    missing = [product_id for product_id in product_ids if product_id not in mapped]
-    for product_id in missing:
-        item = get_payment_product(product_id)
-        if item is not None and item.get("id") is not None:
-            mapped[str(item.get("id"))] = item
-    return mapped
+    pricing_by_id: dict[str, dict[str, Any]] = {}
+    for clip_id in clip_ids:
+        pricing = get_clip_pricing(clip_id)
+        if isinstance(pricing, dict):
+            pricing_by_id[clip_id.upper()] = pricing
+    return pricing_by_id
 
 
-def _payment_product_pricing(
-    product: dict[str, Any] | None,
+def _resolve_pricing(
+    source: dict[str, Any] | None,
     *,
+    pricing_keys: tuple[str, ...],
+    amount_keys: tuple[str, ...],
+    label_keys: tuple[str, ...],
     fallback_pence: Any = None,
     fallback_label: str | None = None,
+    fx_snapshot: dict[str, Any] | None = None,
 ) -> tuple[float | None, int | None, str | None, dict[str, Any] | None]:
-    if not isinstance(product, dict):
-        return None, coerce_pence(fallback_pence), fallback_label, None
+    if not isinstance(source, dict):
+        fallback_amount_pence = coerce_pence(fallback_pence)
+        if fallback_amount_pence is None:
+            return None, None, fallback_label, None
+        pricing = pricing_from_gbp_pence(fallback_amount_pence, fx_snapshot=fx_snapshot or _fx_snapshot())
+        return _price_from_pence(fallback_amount_pence), fallback_amount_pence, fallback_label, pricing
 
-    pricing = product.get("pricing") if isinstance(product.get("pricing"), dict) else None
-    price_pence = coerce_pence(product.get("price_pence") or product.get("pricePence"))
+    pricing = None
+    for key in pricing_keys:
+        value = source.get(key)
+        if isinstance(value, dict):
+            pricing = value
+            break
+
+    price_pence = coerce_pence(_first_value(source, *amount_keys))
     if price_pence is None and isinstance(pricing, dict):
         gbp_bucket = pricing.get("gbp") if isinstance(pricing.get("gbp"), dict) else {}
         price_pence = coerce_pence(gbp_bucket.get("amount_pence") or gbp_bucket.get("amountPence"))
@@ -97,10 +106,10 @@ def _payment_product_pricing(
         price_pence = coerce_pence(fallback_pence)
 
     if pricing is None and price_pence is not None:
-        pricing = pricing_from_gbp_pence(price_pence, fx_snapshot=_fx_snapshot())
+        pricing = pricing_from_gbp_pence(price_pence, fx_snapshot=fx_snapshot or _fx_snapshot())
 
     price = _price_from_pence(price_pence)
-    price_label = _text(product.get("price_label") or product.get("priceLabel"))
+    price_label = _text(_first_value(source, *label_keys))
     if not price_label and isinstance(pricing, dict):
         gbp_bucket = pricing.get("gbp") if isinstance(pricing.get("gbp"), dict) else {}
         price_label = _text(gbp_bucket.get("formatted"))
@@ -217,6 +226,7 @@ def _row_to_item(
     *,
     include_embed_url: bool = True,
     fx_snapshot: dict[str, Any] | None = None,
+    clip_pricing: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     data = dict(row._mapping)
     clip_id = str(data.get("clip_id") or data.get("id") or "")
@@ -229,12 +239,53 @@ def _row_to_item(
     base_pence = coerce_pence(data.get("price_pence"))
     watch_pence = coerce_pence(data.get("watch_price_pence")) or base_pence
     download_pence = coerce_pence(data.get("download_price_pence")) or base_pence
-    base_price = _price_from_pence(base_pence)
-    stream_price = _price_from_pence(watch_pence) or base_price
-    download_price = _price_from_pence(download_pence) or base_price
-    pricing = pricing_from_gbp_pence(base_pence, fx_snapshot=fx_snapshot)
-    watch_pricing = pricing_from_gbp_pence(watch_pence, fx_snapshot=fx_snapshot)
-    download_pricing = pricing_from_gbp_pence(download_pence, fx_snapshot=fx_snapshot)
+    payment_pricing = clip_pricing if isinstance(clip_pricing, dict) else None
+    base_price, base_price_pence, base_price_label, pricing = _resolve_pricing(
+        payment_pricing,
+        pricing_keys=("pricing",),
+        amount_keys=("price_pence", "pricePence"),
+        label_keys=("price_label", "priceLabel"),
+        fallback_pence=base_pence,
+        fallback_label=None,
+        fx_snapshot=fx_snapshot,
+    )
+    stream_price, stream_price_pence, stream_price_label, watch_pricing = _resolve_pricing(
+        payment_pricing,
+        pricing_keys=("streamPricing", "watchPricing"),
+        amount_keys=("stream_price_pence", "streamPricePence", "watch_price_pence", "watchPricePence"),
+        label_keys=("stream_price_label", "streamPriceLabel", "watch_price_label", "watchPriceLabel"),
+        fallback_pence=watch_pence,
+        fallback_label=None,
+        fx_snapshot=fx_snapshot,
+    )
+    download_price, download_price_pence, download_price_label, download_pricing = _resolve_pricing(
+        payment_pricing,
+        pricing_keys=("downloadPricing",),
+        amount_keys=("download_price_pence", "downloadPricePence"),
+        label_keys=("download_price_label", "downloadPriceLabel"),
+        fallback_pence=download_pence,
+        fallback_label=None,
+        fx_snapshot=fx_snapshot,
+    )
+
+    if base_price is None:
+        base_price = _price_from_pence(base_pence)
+    if base_price_pence is None:
+        base_price_pence = base_pence
+    if base_price_label is None and isinstance(payment_pricing, dict):
+        base_price_label = _text(payment_pricing.get("priceLabel") or payment_pricing.get("price_label"))
+    if stream_price is None:
+        stream_price = _price_from_pence(watch_pence) or base_price
+    if stream_price_pence is None:
+        stream_price_pence = watch_pence
+    if stream_price_label is None and isinstance(payment_pricing, dict):
+        stream_price_label = _text(payment_pricing.get("streamPriceLabel") or payment_pricing.get("watchPriceLabel"))
+    if download_price is None:
+        download_price = _price_from_pence(download_pence) or base_price
+    if download_price_pence is None:
+        download_price_pence = download_pence
+    if download_price_label is None and isinstance(payment_pricing, dict):
+        download_price_label = _text(payment_pricing.get("downloadPriceLabel"))
     return {
         "id": clip_id,
         "title": str(data.get("title") or clip_id),
@@ -281,7 +332,17 @@ def search_clips(db: Session, params: ClipQueryParams) -> dict[str, Any]:
     total = int(db.execute(count_query).scalar_one())
     rows = db.execute(query).all()
     fx_snapshot = _fx_snapshot()
-    items = [_row_to_item(row, include_embed_url=False, fx_snapshot=fx_snapshot) for row in rows]
+    clip_ids = {str(row._mapping.get("clip_id") or row._mapping.get("id") or "").upper() for row in rows}
+    clip_pricing_by_id = _clip_pricing_map({clip_id for clip_id in clip_ids if clip_id})
+    items = [
+        _row_to_item(
+            row,
+            include_embed_url=False,
+            fx_snapshot=fx_snapshot,
+            clip_pricing=clip_pricing_by_id.get(str(row._mapping.get("clip_id") or row._mapping.get("id") or "").upper()),
+        )
+        for row in rows
+    ]
 
     categories: list[str] = []
     category_col = mapping.get("category")
@@ -335,7 +396,8 @@ def get_clip_detail(db: Session, clip_id: str) -> dict[str, Any] | None:
     row = db.execute(stmt).first()
     if row is None:
         return None
-    item = _row_to_item(row, fx_snapshot=_fx_snapshot())
+    clip_id = str(row._mapping.get("clip_id") or row._mapping.get("id") or "").upper()
+    item = _row_to_item(row, fx_snapshot=_fx_snapshot(), clip_pricing=get_clip_pricing(clip_id))
     return item
 
 
@@ -359,76 +421,22 @@ def get_top_seller_clips(db: Session) -> dict[str, Any]:
         stmt = stmt.where(active_col == 1)
 
     rows = db.execute(stmt).all()
-    payment_product_ids: set[str] = {str(settings.clips_watch_product_id), str(settings.clips_download_product_id)}
-    row_data_by_id: dict[str, dict[str, Any]] = {}
     row_by_id: dict[str, Any] = {}
+    clip_ids: set[str] = set()
     for row in rows:
         data = dict(row._mapping)
         clip_id = str(data.get("clip_id") or data.get("id") or "").upper()
         if not clip_id:
             continue
-        row_data_by_id[clip_id] = data
         row_by_id[clip_id] = row
-        payment_product_id = _payment_product_key(data)
-        if payment_product_id:
-            payment_product_ids.add(payment_product_id)
-
-    payment_products_by_id = _payment_product_map(payment_product_ids)
+        clip_ids.add(clip_id)
+    clip_pricing_by_id = _clip_pricing_map(clip_ids)
     item_map: dict[str, dict[str, Any]] = {}
     for clip_id in TOP_SELLER_CLIP_IDS:
-        row_data = row_data_by_id.get(clip_id)
-        if not row_data:
-            continue
         row = row_by_id.get(clip_id)
         if row is None:
             continue
-        item = _row_to_item(row, include_embed_url=False, fx_snapshot=_fx_snapshot())
-        clip_product = payment_products_by_id.get(_payment_product_key(row_data) or "")
-        price, price_pence, price_label, pricing = _payment_product_pricing(
-            clip_product,
-            fallback_pence=row_data.get("price_pence"),
-            fallback_label=item.get("priceLabel"),
-        )
-        if price is not None:
-            item["price"] = price
-        if price_pence is not None:
-            item["pricePence"] = price_pence
-        if price_label:
-            item["priceLabel"] = price_label
-        if pricing is not None:
-            item["pricing"] = pricing
-
-        watch_product = payment_products_by_id.get(str(settings.clips_watch_product_id))
-        stream_price, stream_price_pence, stream_price_label, stream_pricing = _payment_product_pricing(
-            watch_product,
-            fallback_pence=row_data.get("watch_price_pence") or row_data.get("price_pence"),
-            fallback_label=item.get("priceLabel"),
-        )
-        if stream_price is not None:
-            item["streamPrice"] = stream_price
-        if stream_price_pence is not None:
-            item["streamPricePence"] = stream_price_pence
-        if stream_price_label:
-            item["streamPriceLabel"] = stream_price_label
-        if stream_pricing is not None:
-            item["streamPricing"] = stream_pricing
-            item["watchPricing"] = stream_pricing
-
-        download_product = payment_products_by_id.get(str(settings.clips_download_product_id))
-        download_price, download_price_pence, download_price_label, download_pricing = _payment_product_pricing(
-            download_product,
-            fallback_pence=row_data.get("download_price_pence") or row_data.get("price_pence"),
-            fallback_label=item.get("priceLabel"),
-        )
-        if download_price is not None:
-            item["downloadPrice"] = download_price
-        if download_price_pence is not None:
-            item["downloadPricePence"] = download_price_pence
-        if download_price_label:
-            item["downloadPriceLabel"] = download_price_label
-        if download_pricing is not None:
-            item["downloadPricing"] = download_pricing
-
+        item = _row_to_item(row, include_embed_url=False, fx_snapshot=_fx_snapshot(), clip_pricing=clip_pricing_by_id.get(clip_id))
         item_map[clip_id] = item
     items = [item_map[clip_id] for clip_id in TOP_SELLER_CLIP_IDS if clip_id in item_map]
     return {
@@ -463,7 +471,17 @@ def get_new_clips(db: Session, *, limit: int = 10) -> dict[str, Any]:
 
     rows = db.execute(stmt).all()
     fx_snapshot = _fx_snapshot()
-    items = [_row_to_item(row, include_embed_url=False, fx_snapshot=fx_snapshot) for row in rows]
+    clip_ids = {str(row._mapping.get("clip_id") or row._mapping.get("id") or "").upper() for row in rows}
+    clip_pricing_by_id = _clip_pricing_map({clip_id for clip_id in clip_ids if clip_id})
+    items = [
+        _row_to_item(
+            row,
+            include_embed_url=False,
+            fx_snapshot=fx_snapshot,
+            clip_pricing=clip_pricing_by_id.get(str(row._mapping.get("clip_id") or row._mapping.get("id") or "").upper()),
+        )
+        for row in rows
+    ]
     return {
         "items": items,
         "page": 1,

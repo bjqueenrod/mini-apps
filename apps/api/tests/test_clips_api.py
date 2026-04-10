@@ -13,41 +13,61 @@ def test_top_sellers_returns_ordered_selection(client, monkeypatch) -> None:
     assert payload["hasMore"] is False
 
 
-def test_top_sellers_uses_payment_product_pricing(client, monkeypatch) -> None:
+def test_clips_use_payment_system_pricing(client, monkeypatch) -> None:
+    pricing_map = {
+        "BJQ0001": {
+            "pricing": {
+                "gbp": {"amount_pence": 1599, "formatted": "£15.99"},
+                "usd": {"amount_pence": 1999, "formatted": "$19.99"},
+            },
+            "streamPricing": {
+                "gbp": {"amount_pence": 1599, "formatted": "£15.99"},
+                "usd": {"amount_pence": 1999, "formatted": "$19.99"},
+            },
+            "downloadPricing": {
+                "gbp": {"amount_pence": 1099, "formatted": "£10.99"},
+                "usd": {"amount_pence": 1399, "formatted": "$13.99"},
+            },
+        },
+        "BJQ0002": {
+            "pricing": {
+                "gbp": {"amount_pence": 1199, "formatted": "£11.99"},
+                "usd": {"amount_pence": 1499, "formatted": "$14.99"},
+            },
+            "streamPricing": {
+                "gbp": {"amount_pence": 1199, "formatted": "£11.99"},
+                "usd": {"amount_pence": 1499, "formatted": "$14.99"},
+            },
+            "downloadPricing": {
+                "gbp": {"amount_pence": 899, "formatted": "£8.99"},
+                "usd": {"amount_pence": 1099, "formatted": "$10.99"},
+            },
+        },
+    }
+    monkeypatch.setattr(
+        "app.services.clip_service.get_clip_pricing",
+        lambda clip_id: pricing_map.get(str(clip_id).upper()),
+    )
+
+    search_response = client.get("/api/clips", params={"q": "countdown"})
+    assert search_response.status_code == 200
+    search_payload = search_response.json()
+    assert search_payload["items"][0]["pricing"]["gbp"]["formatted"] == "£11.99"
+
+    new_response = client.get("/api/clips/new")
+    assert new_response.status_code == 200
+    new_payload = new_response.json()
+    assert new_payload["items"][0]["pricing"]["gbp"]["formatted"] == "£11.99"
+
     monkeypatch.setattr(
         "app.services.clip_service.TOP_SELLER_CLIP_IDS",
         ("BJQ0002", "BJQ0001"),
     )
-    monkeypatch.setattr(
-        "app.services.clip_service.list_payment_products",
-        lambda active_only=False: [
-            {
-                "id": 28,
-                "active": True,
-                "pricing": {
-                    "gbp": {"amount_pence": 1599, "formatted": "£15.99"},
-                    "usd": {"amount_pence": 1999, "formatted": "$19.99"},
-                },
-            },
-            {
-                "id": 27,
-                "active": True,
-                "pricing": {
-                    "gbp": {"amount_pence": 1099, "formatted": "£10.99"},
-                    "usd": {"amount_pence": 1399, "formatted": "$13.99"},
-                },
-            },
-        ],
-    )
-    monkeypatch.setattr("app.services.clip_service.get_payment_product", lambda product_id: None)
-
-    response = client.get("/api/clips/top-sellers")
-    assert response.status_code == 200
-    payload = response.json()
-    assert payload["items"][0]["streamPrice"] == 15.99
-    assert payload["items"][0]["downloadPrice"] == 10.99
-    assert payload["items"][0]["streamPricing"]["gbp"]["formatted"] == "£15.99"
-    assert payload["items"][0]["downloadPricing"]["gbp"]["formatted"] == "£10.99"
+    top_response = client.get("/api/clips/top-sellers")
+    assert top_response.status_code == 200
+    top_payload = top_response.json()
+    assert top_payload["items"][0]["pricing"]["gbp"]["formatted"] == "£11.99"
+    assert top_payload["items"][1]["downloadPricing"]["gbp"]["formatted"] == "£10.99"
 
 
 
@@ -121,6 +141,39 @@ def test_clip_detail_returns_bot_links_and_hides_paid_urls(client) -> None:
     response = client.get("/api/clips/BJQ0001")
     assert response.status_code == 200
     item = response.json()
+    assert item["botStreamUrl"].endswith("stream_BJQ0001")
+    assert item["botDownloadUrl"].endswith("download_BJQ0001")
+    assert "bunny_stream_video_id" not in item
+    assert item["previewEmbedUrl"].endswith("preview-1")
+
+
+def test_clip_detail_uses_payment_system_pricing(client, monkeypatch) -> None:
+    monkeypatch.setattr(
+        "app.services.clip_service.get_clip_pricing",
+        lambda clip_id: {
+            "pricing": {
+                "gbp": {"amount_pence": 1599, "formatted": "£15.99"},
+                "usd": {"amount_pence": 1999, "formatted": "$19.99"},
+            },
+            "streamPricing": {
+                "gbp": {"amount_pence": 1599, "formatted": "£15.99"},
+                "usd": {"amount_pence": 1999, "formatted": "$19.99"},
+            },
+            "downloadPricing": {
+                "gbp": {"amount_pence": 1099, "formatted": "£10.99"},
+                "usd": {"amount_pence": 1399, "formatted": "$13.99"},
+            },
+        }
+        if str(clip_id).upper() == "BJQ0001"
+        else None,
+    )
+
+    response = client.get("/api/clips/BJQ0001")
+    assert response.status_code == 200
+    item = response.json()
+    assert item["pricing"]["gbp"]["formatted"] == "£15.99"
+    assert item["streamPricing"]["gbp"]["formatted"] == "£15.99"
+    assert item["downloadPricing"]["gbp"]["formatted"] == "£10.99"
     assert item["botStreamUrl"].endswith("stream_BJQ0001")
     assert item["botDownloadUrl"].endswith("download_BJQ0001")
     assert "bunny_stream_video_id" not in item
