@@ -1,33 +1,7 @@
-import { useEffect, useState } from 'react';
-
-type Currency = 'GBP' | 'USD';
-
-const STORAGE_KEY = 'currencyPreference';
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
-
-function readCurrency(): Currency {
-  if (typeof window === 'undefined') return 'GBP';
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  if (stored === 'USD') return 'USD';
-  return 'GBP';
-}
-
-function persistCurrency(next: Currency) {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, next);
-    document.cookie = `currency=${next}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
-  } catch {
-    // ignore persistence errors
-  }
-}
+import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
 
 export function CurrencyToggleBanner() {
-  const [currency, setCurrency] = useState<Currency>(() => readCurrency());
-
-  useEffect(() => {
-    persistCurrency(currency);
-  }, [currency]);
+  const [currency, setCurrency] = useCurrencyPreference();
 
   return (
     <div className="dev-banner currency-banner">

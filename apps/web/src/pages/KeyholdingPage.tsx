@@ -9,6 +9,7 @@ import { setAnalyticsContext } from '../app/analytics';
 import { useTelegramSession } from '../features/auth/hooks';
 import { useKeyholdingOptions, useKeyholdingTiers } from '../features/keyholding/hooks';
 import { KeyholdingTierCarousel } from '../components/KeyholdingTierCarousel';
+import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
 
 function handleApplyClick() {
   window.location.href = 'https://apply.mistressbjqueen.com';
@@ -20,8 +21,9 @@ function SectionEyebrow({ children }: { children: string }) {
 
 export function KeyholdingPage() {
   const session = useTelegramSession();
-  const tiersQuery = useKeyholdingTiers();
-  const optionsQuery = useKeyholdingOptions();
+  const [currency] = useCurrencyPreference();
+  const tiersQuery = useKeyholdingTiers(currency);
+  const optionsQuery = useKeyholdingOptions(currency);
   const didInitRef = useRef(false);
 
   useEffect(() => {
@@ -178,7 +180,12 @@ export function KeyholdingPage() {
 
         {tiersQuery.isError && <ErrorState message={(tiersQuery.error as Error).message} />}
         {(tiersQuery.isLoading || (tiersQuery.data?.items?.length ?? 0) > 0) && (
-          <KeyholdingTierCarousel items={tiersQuery.data?.items ?? []} loading={tiersQuery.isLoading} onApply={handleApplyClick} />
+          <KeyholdingTierCarousel
+            items={tiersQuery.data?.items ?? []}
+            loading={tiersQuery.isLoading}
+            onApply={handleApplyClick}
+            currency={currency}
+          />
         )}
         {!tiersQuery.isLoading && tiersQuery.data && (tiersQuery.data.items?.length ?? 0) === 0 && (
           <EmptyState title="No tiers available" message="Tiers will appear here when configured." />
