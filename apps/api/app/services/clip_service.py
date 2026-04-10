@@ -242,7 +242,7 @@ def _row_to_item(
 ) -> dict[str, Any]:
     data = dict(row._mapping)
     clip_id = str(data.get("clip_id") or data.get("id") or "")
-    tags = parse_tags(data.get("keywords"), data.get("hashtags"))
+    tags = parse_tags(data.get("hashtags"))
     preview = _build_preview(data.get("bunny_stream_preview_id"), include_embed_url=include_embed_url)
     custom_thumbnail_url = (
         str(data.get("thumbnail_url") or data.get("custom_thumbnail_url") or "").strip() or None
@@ -396,7 +396,7 @@ def get_clip_hashtags(db: Session, *, limit: int = 250) -> dict[str, Any]:
     tag_counts: dict[str, int] = {}
     for row in rows:
         data = dict(row._mapping)
-        for tag in parse_tags(data.get("keywords"), data.get("hashtags")):
+        for tag in parse_tags(data.get("hashtags")):
             tag_counts[tag] = tag_counts.get(tag, 0) + 1
 
     items = [

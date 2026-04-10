@@ -5,8 +5,8 @@ from app.utils.tags import parse_tags
 
 
 
-def test_parse_tags_handles_keywords_and_hashtags() -> None:
-    assert parse_tags("a,b", "#c #d") == ["a", "b", "c", "d"]
+def test_parse_tags_handles_hashtags_only() -> None:
+    assert parse_tags("#c #d") == ["c", "d"]
 
 
 
