@@ -128,7 +128,10 @@ export function initializeAnalytics() {
 }
 
 export function setAnalyticsContext(next: AnalyticsContext) {
-  context = next;
+  context = {
+    ...next,
+    enabled: next.enabled && next.isTelegram,
+  };
   if (context.enabled) {
     flushPendingEvents();
   }
