@@ -38,7 +38,7 @@ def _first_column(*values: Any) -> Any:
 
 
 
-def _price_from_cents(value: Any) -> float | None:
+def _price_from_pence(value: Any) -> float | None:
     cents = 0 if value in (None, "") else int(value)
     if cents <= 0:
         return None
@@ -67,7 +67,7 @@ def _coalesce_text(*columns: Any):
 def _sort_expression(sort: str, mapping):
     created_at = mapping.get("created_at")
     title = mapping.get("title")
-    price = _first_column(mapping.get("price_cents"), mapping.get("download_price_cents"))
+    price = _first_column(mapping.get("price_pence"), mapping.get("download_price_pence"))
     clip_id = mapping.get("clip_id")
     options = {
         "newest": created_at.desc() if created_at is not None else clip_id.desc(),
@@ -145,9 +145,9 @@ def _row_to_item(row: Any, *, include_embed_url: bool = True) -> dict[str, Any]:
         str(data.get("thumbnail_url") or data.get("custom_thumbnail_url") or "").strip() or None
     )
     description = str(data.get("description") or "").strip() or None
-    base_price = _price_from_cents(data.get("price_cents"))
-    stream_price = _price_from_cents(data.get("watch_price_cents")) or base_price
-    download_price = _price_from_cents(data.get("download_price_cents")) or base_price
+    base_price = _price_from_pence(data.get("price_pence"))
+    stream_price = _price_from_pence(data.get("watch_price_pence")) or base_price
+    download_price = _price_from_pence(data.get("download_price_pence")) or base_price
     return {
         "id": clip_id,
         "title": str(data.get("title") or clip_id),

@@ -3,7 +3,7 @@ export type PaymentMethod = {
   paymentMethod: string;
   label: string;
   requiresCode?: boolean;
-  priceCents?: number;
+  pricePence?: number;
   instructions?: string | null;
   tributeCode?: string | null;
   details?: Record<string, unknown> | null;

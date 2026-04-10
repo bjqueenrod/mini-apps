@@ -34,7 +34,7 @@ def _normalize_methods(raw: list[dict[str, Any]] | None) -> list[PaymentMethod]:
                     requiresCode=bool(item.get("requires_code")),
                     instructions=(item.get("instructions") or None),
                     tributeCode=(item.get("tribute_code") or item.get("tributeCode") or None),
-                    priceCents=item.get("price_cents"),
+                    priceCents=item.get("price_pence"),
                     details=item.get("method_details") if isinstance(item.get("method_details"), dict) else None,
                 )
             )
@@ -66,8 +66,8 @@ def checkout_options(payload: CheckoutOptionsRequest, session: dict = Depends(ge
     item: dict[str, Any] = {"product_id": payload.product_id, "quantity": max(1, payload.quantity)}
     if payload.mode:
         item["mode"] = payload.mode
-    if payload.unit_price_cents is not None:
-        item["unit_price_cents"] = int(payload.unit_price_cents)
+    if payload.unit_price_pence is not None:
+        item["unit_price_pence"] = int(payload.unit_price_pence)
     if payload.clip_id:
         item["clip_id"] = payload.clip_id
     if payload.template_values:
@@ -103,8 +103,8 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
     item: dict[str, Any] = {"product_id": payload.product_id, "quantity": max(1, payload.quantity)}
     if payload.mode:
         item["mode"] = payload.mode
-    if payload.unit_price_cents is not None:
-        item["unit_price_cents"] = int(payload.unit_price_cents)
+    if payload.unit_price_pence is not None:
+        item["unit_price_pence"] = int(payload.unit_price_pence)
     if payload.clip_id:
         item["clip_id"] = payload.clip_id
     if payload.template_values:

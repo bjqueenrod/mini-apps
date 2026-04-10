@@ -29,9 +29,9 @@ def setup_database() -> None:
                 clip_id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
                 description TEXT,
-                price_cents INTEGER NOT NULL DEFAULT 0,
-                download_price_cents INTEGER NOT NULL DEFAULT 0,
-                watch_price_cents INTEGER NOT NULL DEFAULT 0,
+                price_pence INTEGER NOT NULL DEFAULT 0,
+                download_price_pence INTEGER NOT NULL DEFAULT 0,
+                watch_price_pence INTEGER NOT NULL DEFAULT 0,
                 keywords TEXT,
                 hashtags TEXT,
                 duration TEXT,
@@ -63,8 +63,8 @@ def setup_database() -> None:
                 tasks_per_day INTEGER,
                 price REAL,
                 price_value REAL,
-                price_cents INTEGER,
-                payment_product_price_cents INTEGER,
+                price_pence INTEGER,
+                payment_product_price_pence INTEGER,
                 payment_product_price_label TEXT,
                 badge TEXT,
                 display_order INTEGER,
@@ -77,7 +77,7 @@ def setup_database() -> None:
         conn.exec_driver_sql(
             """
             INSERT INTO clips (
-                clip_id, title, description, price_cents, download_price_cents, watch_price_cents,
+                clip_id, title, description, price_pence, download_price_pence, watch_price_pence,
                 keywords, hashtags, duration, filename, thumbnail_url, category, file_id,
                 bunny_stream_video_id, bunny_download_storage_path, bunny_stream_preview_id, active
             ) VALUES
@@ -96,8 +96,8 @@ def setup_database() -> None:
             """
             INSERT INTO premium_tiers (
                 id, name, short_description, description, desc, product_id, payment_product_id,
-                duration_days, number_of_weeks, tasks_per_day, price, price_value, price_cents,
-                payment_product_price_cents, payment_product_price_label, badge, display_order, is_active
+                duration_days, number_of_weeks, tasks_per_day, price, price_value, price_pence,
+                payment_product_price_pence, payment_product_price_label, badge, display_order, is_active
             ) VALUES
             (1, 'Initiation', 'Quick try-out. Low commitment', 'A short obedience trial to establish the tone.', NULL, 19, NULL,
              3, NULL, 1, 19.99, NULL, NULL, NULL, NULL, NULL, NULL, 1),

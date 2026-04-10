@@ -51,7 +51,7 @@ def _float(value: Any) -> float | None:
             return None
 
 
-def _price_from_cents(value: Any) -> float | None:
+def _price_from_pence(value: Any) -> float | None:
     cents = _int(value)
     if cents is None or cents <= 0:
         return None
@@ -61,7 +61,7 @@ def _price_from_cents(value: Any) -> float | None:
 def _format_price(value: float | None) -> str | None:
     if value is None:
         return None
-    return f'${value:,.2f}'
+    return f'£{value:,.2f}'
 
 
 def _duration_days(data: dict[str, Any]) -> int | None:
@@ -81,9 +81,11 @@ def _tasks_per_day(data: dict[str, Any]) -> int | None:
 def _price_parts(data: dict[str, Any]) -> tuple[float | None, str | None]:
     label = _text(_first_value(data, 'payment_product_price_label', 'price_label', 'priceLabel'))
     direct = _float(_first_value(data, 'price', 'price_value', 'priceValue'))
-    cents = _price_from_cents(_first_value(data, 'price_cents', 'payment_product_price_cents'))
+    cents = _price_from_pence(_first_value(data, 'price_pence', 'payment_product_price_pence'))
     price = direct if direct is not None else cents
     if label:
+        if label.startswith('$'):
+            label = '£' + label[1:]
         return price, label
     return price, _format_price(price)
 

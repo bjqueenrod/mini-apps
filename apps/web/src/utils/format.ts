@@ -1,6 +1,9 @@
-export function formatPrice(value?: number): string {
+export type CurrencyCode = 'GBP' | 'USD';
+
+export function formatPrice(value?: number, currency: CurrencyCode = 'GBP'): string {
   if (typeof value !== 'number') return 'Coming soon';
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+  const locale = currency === 'GBP' ? 'en-GB' : 'en-US';
+  return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(value);
 }
 
 function durationLabelToSeconds(durationLabel?: string): number | undefined {

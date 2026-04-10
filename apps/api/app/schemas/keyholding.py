@@ -35,7 +35,7 @@ class KeyholdingOptionResponse(BaseModel):
     availability_tiers: list[str] = Field(default_factory=list, alias="availabilityTiers")
     requires_lockbox_photo: bool = Field(default=False, alias="requiresLockboxPhoto")
     price_label: str | None = Field(default=None, alias="priceLabel")
-    price_cents: int | None = Field(default=None, alias="priceCents")
+    price_pence: int | None = Field(default=None, alias="priceCents")
     payment_product_id: int | None = Field(default=None, alias="paymentProductId")
     order: int | None = None
 

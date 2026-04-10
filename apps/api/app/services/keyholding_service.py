@@ -105,7 +105,7 @@ def fetch_keyholding_options() -> dict[str, Any]:
                 "availabilityTiers": item.get("availability_tiers") or item.get("availabilityTiers") or [],
                 "requiresLockboxPhoto": bool(item.get("requires_lockbox_photo") or item.get("requiresLockboxPhoto")),
                 "priceLabel": item.get("price_label") or item.get("priceLabel") or None,
-                "priceCents": item.get("price_cents") or item.get("priceCents") or None,
+                "priceCents": item.get("price_pence") or item.get("priceCents") or None,
                 "paymentProductId": item.get("payment_product_id") or item.get("paymentProductId") or None,
                 "order": item.get("order"),
             }

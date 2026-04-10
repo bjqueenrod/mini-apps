@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { pollInvoice, fetchCheckoutOptions, startCheckout } from '../features/payments/api';
 import { PaymentMethod } from '../features/payments/types';
-import { formatPrice } from '../utils/format';
+import { formatPrice, CurrencyCode } from '../utils/format';
 import { openBotDeepLink } from '../app/telegram';
 
 type SheetState = 'loading' | 'select' | 'confirm' | 'submitting' | 'waiting' | 'success' | 'error';
@@ -53,6 +53,11 @@ export function PaymentSheet({
   const [invoiceId, setInvoiceId] = useState<string>('');
   const [paymentUrl, setPaymentUrl] = useState<string | undefined>('');
   const [orderId, setOrderId] = useState<number | null>(null);
+  const [currency, setCurrency] = useState<CurrencyCode>(() => {
+    if (typeof window === 'undefined') return 'GBP';
+    const saved = window.localStorage.getItem('currencyPreference');
+    return saved === 'USD' ? 'USD' : 'GBP';
+  });
   const storageKey = useMemo(
     () => `paymentSheet:${productId}:${mode || 'default'}`,
     [productId, mode],
@@ -148,15 +153,15 @@ export function PaymentSheet({
   const selectedPriceLabel = useMemo(() => {
     if (selectedMethodInfo) {
       const details = (selectedMethodInfo.details || {}) as Record<string, unknown>;
-      const cents =
-        selectedMethodInfo.priceCents ??
-        (typeof details.price_cents === 'number' ? (details.price_cents as number) : undefined);
-      if (cents != null) {
-        return formatPrice(cents / 100);
+      const pence =
+        selectedMethodInfo.pricePence ??
+        (typeof details.price_pence === 'number' ? (details.price_pence as number) : undefined);
+      if (pence != null) {
+        return formatPrice(pence / 100, currency);
       }
     }
     return priceLabel;
-  }, [selectedMethodInfo, priceLabel]);
+  }, [selectedMethodInfo, priceLabel, currency]);
 
   const payButtonLabel = useMemo(() => {
     if (state === 'confirm') {
@@ -189,6 +194,19 @@ export function PaymentSheet({
   const primaryButtonDisabled = state === 'loading' || state === 'submitting' || !selectedMethod;
 
   const retryButtonDisabled = !selectedMethod;
+
+  const toggleCurrency = useCallback(
+    (next: CurrencyCode) => {
+      setCurrency(next);
+      try {
+        window.localStorage.setItem('currencyPreference', next);
+        document.cookie = `currency=${next};path=/;max-age=${60 * 60 * 24 * 90}`;
+      } catch {
+        // ignore storage errors
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     if (state !== 'waiting' || !invoiceId) return undefined;
@@ -288,6 +306,22 @@ export function PaymentSheet({
           <h3>Complete Payment</h3>
           <button type="button" className="payment-sheet__close" onClick={onClose} aria-label="Close">
             ×
+          </button>
+        </div>
+        <div className="payment-sheet__currency-toggle" role="group" aria-label="Currency">
+          <button
+            type="button"
+            className={currency === 'GBP' ? 'active' : ''}
+            onClick={() => toggleCurrency('GBP')}
+          >
+            £ GBP
+          </button>
+          <button
+            type="button"
+            className={currency === 'USD' ? 'active' : ''}
+            onClick={() => toggleCurrency('USD')}
+          >
+            $ USD
           </button>
         </div>
 

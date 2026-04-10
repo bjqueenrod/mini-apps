@@ -9,7 +9,7 @@ class CheckoutOptionsRequest(BaseModel):
     product_id: str = Field(alias="productId")
     quantity: int = 1
     mode: str | None = None
-    unit_price_cents: int | None = Field(default=None, alias="unitPriceCents")
+    unit_price_pence: int | None = Field(default=None, alias="unitPriceCents")
     clip_id: str | None = Field(default=None, alias="clipId")
     template_values: dict[str, Any] | None = Field(default=None, alias="templateValues")
     order_values: dict[str, Any] | None = Field(default=None, alias="orderValues")
@@ -24,7 +24,7 @@ class PaymentMethod(BaseModel):
     requires_code: bool = Field(default=False, alias="requiresCode")
     instructions: str | None = None
     tribute_code: str | None = Field(default=None, alias="tributeCode")
-    price_cents: int | None = Field(default=None, alias="priceCents")
+    price_pence: int | None = Field(default=None, alias="priceCents")
     details: dict[str, Any] | None = None
 
     class Config:
@@ -45,7 +45,7 @@ class CheckoutRequest(BaseModel):
     payment_method: str = Field(alias="paymentMethod")
     quantity: int = 1
     mode: str | None = None
-    unit_price_cents: int | None = Field(default=None, alias="unitPriceCents")
+    unit_price_pence: int | None = Field(default=None, alias="unitPriceCents")
     clip_id: str | None = Field(default=None, alias="clipId")
     template_values: dict[str, Any] | None = Field(default=None, alias="templateValues")
     order_values: dict[str, Any] | None = Field(default=None, alias="orderValues")
