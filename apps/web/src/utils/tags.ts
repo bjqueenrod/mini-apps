@@ -1,14 +1,10 @@
 export const FEATURED_TAGS = [
-  'chastity',
-  'ruinedorgasm',
-  'milking',
-  'bondage',
-  'cuckold',
-  'joi',
-  'strapon',
-  'blowjob',
-  'magicwand',
-  'compilation',
+  '#chastity',
+  '#ruined_orgasm',
+  '#edging',
+  '#tease_denial',
+  '#bondage',
+  '#milking_table',
 ];
 
 export function normalizeTag(tag: string): string {
@@ -74,11 +70,12 @@ export function pickPrimaryTags(tags: string[], selectedTag?: string): string[] 
   };
 
   if (normalizedSelectedTag) {
-    addTag(tags.find((tag) => tag.trim().toLowerCase() === normalizedSelectedTag));
+    addTag(tags.find((tag) => normalizeTag(tag) === normalizedSelectedTag));
   }
 
   for (const featuredTag of FEATURED_TAGS) {
-    addTag(tags.find((tag) => tag.trim().toLowerCase() === featuredTag));
+    const normalizedFeaturedTag = normalizeTag(featuredTag);
+    addTag(tags.find((tag) => normalizeTag(tag) === normalizedFeaturedTag));
   }
 
   for (const tag of tags) {

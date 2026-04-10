@@ -22,7 +22,7 @@ import { useClipDetail, useClipHashtags, useClipSearch, useNewClips, useTopSelle
 import { readQueryState, toSearchParams } from '../features/clips/queryState';
 import { ClipItem } from '../features/clips/types';
 import { pushRecentSearch } from '../utils/storage';
-import { composeSearchText, extractHashtagTokens, FEATURED_TAGS, setHashtagToken, stripHashtagTokens } from '../utils/tags';
+import { composeSearchText, extractHashtagTokens, FEATURED_TAGS, normalizeTag, setHashtagToken, stripHashtagTokens } from '../utils/tags';
 import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
 
 export function BrowsePage() {
@@ -49,16 +49,16 @@ export function BrowsePage() {
   const newClipsQuery = useNewClips(currency);
   const topSellersQuery = useTopSellers(currency);
   const clipDetailQuery = useClipDetail(clipId, currency);
-  const featuredTagSet = useMemo(() => new Set(FEATURED_TAGS.map((tag) => tag.toLowerCase())), []);
+  const featuredTagSet = useMemo(() => new Set(FEATURED_TAGS.map((tag) => normalizeTag(tag))), []);
   const searchTokens = useMemo(() => extractHashtagTokens(searchValue), [searchValue]);
   const lastSecondaryContextRef = useRef('');
   const [secondaryTagOptions, setSecondaryTagOptions] = useState<string[]>([]);
   const selectedFeaturedTag = useMemo(
-    () => searchTokens.find((tag) => featuredTagSet.has(tag.toLowerCase())) ?? '',
+    () => searchTokens.find((tag) => featuredTagSet.has(normalizeTag(tag))) ?? '',
     [featuredTagSet, searchTokens],
   );
   const selectedSecondaryTag = useMemo(
-    () => searchTokens.find((tag) => !featuredTagSet.has(tag.toLowerCase())) ?? '',
+    () => searchTokens.find((tag) => !featuredTagSet.has(normalizeTag(tag))) ?? '',
     [featuredTagSet, searchTokens],
   );
   const trackedListViewKeysRef = useRef(new Set<string>());
@@ -72,7 +72,7 @@ export function BrowsePage() {
       const seenInClip = new Set<string>();
       for (const rawTag of item.tags) {
         const tag = rawTag.trim();
-        const normalized = tag.toLowerCase();
+        const normalized = normalizeTag(tag);
         if (!tag || featuredTagSet.has(normalized) || excluded.has(normalized) || seenInClip.has(normalized)) {
           continue;
         }
@@ -92,7 +92,7 @@ export function BrowsePage() {
       .map((entry) => entry.tag);
   }, [featuredTagSet, visibleClips]);
   const secondaryTagContextKey = useMemo(
-    () => `${stripHashtagTokens(searchValue).toLowerCase()}::${selectedFeaturedTag.toLowerCase()}`,
+    () => `${stripHashtagTokens(searchValue).toLowerCase()}::${normalizeTag(selectedFeaturedTag)}`,
     [searchValue, selectedFeaturedTag],
   );
   const queryIdentity = useMemo(
