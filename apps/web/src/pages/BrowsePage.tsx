@@ -24,6 +24,7 @@ import { readQueryState, toSearchParams } from '../features/clips/queryState';
 import { ClipItem } from '../features/clips/types';
 import { pushRecentSearch } from '../utils/storage';
 import { composeSearchText, extractHashtagTokens, FEATURED_TAGS, setHashtagToken, stripHashtagTokens } from '../utils/tags';
+import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
 
 export function BrowsePage() {
   const location = useLocation();
@@ -31,6 +32,7 @@ export function BrowsePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { clipId } = useParams();
   const session = useTelegramSession();
+  const [currency] = useCurrencyPreference();
   const [searchValue, setSearchValue] = useState(() => {
     const initialQueryState = readQueryState(searchParams);
     return composeSearchText(initialQueryState.q, initialQueryState.tags);
@@ -41,13 +43,13 @@ export function BrowsePage() {
   const [isSearchPinned, setIsSearchPinned] = useState(false);
   const [filtersExpanded, setFiltersExpanded] = useState(true);
   const [visibleClips, setVisibleClips] = useState<ClipItem[]>([]);
-  const queryState = useMemo(() => readQueryState(searchParams), [searchParams]);
+  const queryState = useMemo(() => ({ ...readQueryState(searchParams), currency }), [searchParams, currency]);
   const activeQueryState = useMemo(() => ({ ...queryState, page }), [page, queryState]);
   const clipsQuery = useClipSearch(activeQueryState);
   const clipHashtagsQuery = useClipHashtags();
-  const newClipsQuery = useNewClips();
-  const topSellersQuery = useTopSellers();
-  const clipDetailQuery = useClipDetail(clipId);
+  const newClipsQuery = useNewClips(currency);
+  const topSellersQuery = useTopSellers(currency);
+  const clipDetailQuery = useClipDetail(clipId, currency);
   const featuredTagSet = useMemo(() => new Set(FEATURED_TAGS.map((tag) => tag.toLowerCase())), []);
   const searchTokens = useMemo(() => extractHashtagTokens(searchValue), [searchValue]);
   const lastSecondaryContextRef = useRef('');
@@ -374,10 +376,16 @@ export function BrowsePage() {
           title="🆕 New Clips"
           loading={newClipsQuery.isLoading}
           listType="new_clips"
+          currency={currency}
         />
       ) : null}
       {(topSellersQuery.isLoading || topSellersQuery.data?.items?.length) ? (
-        <TopSellersCarousel items={topSellersQuery.data?.items ?? []} loading={topSellersQuery.isLoading} listType="top_sellers" />
+        <TopSellersCarousel
+          items={topSellersQuery.data?.items ?? []}
+          loading={topSellersQuery.isLoading}
+          listType="top_sellers"
+          currency={currency}
+        />
       ) : null}
 
       <div ref={searchPanelSentinelRef} className="search-panel__sentinel" aria-hidden="true" />
@@ -433,7 +441,7 @@ export function BrowsePage() {
           <span>Loading clips...</span>
         </div>
       )}
-      {!showResultsLoading && visibleClips.length > 0 && <ClipGrid items={visibleClips} />}
+      {!showResultsLoading && visibleClips.length > 0 && <ClipGrid items={visibleClips} currency={currency} />}
       {clipsQuery.data && !clipsQuery.isLoading && !clipsQuery.isFetching && visibleClips.length === 0 && <EmptyState />}
 
       {clipsQuery.data?.hasMore && (
@@ -453,6 +461,7 @@ export function BrowsePage() {
         <ClipDetailSheet
           clip={clipDetailQuery.data}
           loading={clipDetailQuery.isLoading}
+          currency={currency}
         />
       )}
     </AppShell>

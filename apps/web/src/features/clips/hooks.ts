@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { CurrencyCode } from '../../utils/format';
 import { fetchClip, fetchClipHashtags, fetchClips, fetchNewClips, fetchTopSellers } from './api';
 import { ClipQueryState } from './types';
 
@@ -12,25 +13,25 @@ export function useClipSearch(queryState: ClipQueryState) {
   });
 }
 
-export function useClipDetail(clipId?: string) {
+export function useClipDetail(clipId?: string, currency: CurrencyCode = 'GBP') {
   return useQuery({
-    queryKey: ['clip', clipId],
-    queryFn: () => fetchClip(clipId!),
+    queryKey: ['clip', clipId, currency],
+    queryFn: () => fetchClip(clipId!, currency),
     enabled: Boolean(clipId),
   });
 }
 
-export function useTopSellers() {
+export function useTopSellers(currency: CurrencyCode = 'GBP') {
   return useQuery({
-    queryKey: ['clips', 'top-sellers'],
-    queryFn: fetchTopSellers,
+    queryKey: ['clips', 'top-sellers', currency],
+    queryFn: () => fetchTopSellers(currency),
   });
 }
 
-export function useNewClips() {
+export function useNewClips(currency: CurrencyCode = 'GBP') {
   return useQuery({
-    queryKey: ['clips', 'new'],
-    queryFn: fetchNewClips,
+    queryKey: ['clips', 'new', currency],
+    queryFn: () => fetchNewClips(currency),
   });
 }
 

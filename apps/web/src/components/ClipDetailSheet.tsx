@@ -3,11 +3,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { openBotDeepLink, sendBotWebAppData } from '../app/telegram';
 import { trackClipBotCtaClick, trackClipDetailView, trackClipTagSelect } from '../features/clips/analytics';
 import { ClipItem } from '../features/clips/types';
-import { formatDuration, formatPrice } from '../utils/format';
+import { CurrencyCode, formatDuration, formatPrice } from '../utils/format';
 import { PreviewPlayer } from './PreviewPlayer';
 import { PaymentSheet } from './PaymentSheet';
 
-export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: boolean }) {
+export function ClipDetailSheet({ clip, loading, currency = 'GBP' }: { clip?: ClipItem; loading?: boolean; currency?: CurrencyCode }) {
   const location = useLocation();
   const lastTrackedClipIdRef = useRef('');
   const [showPayment, setShowPayment] = useState<null | 'stream' | 'download'>(null);
@@ -97,8 +97,8 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
             <div className="detail-sheet__body">
               <div className="detail-sheet__eyebrow">
                 <span>{clip.category || 'Library'}</span>
-                <span>{formatDuration(clip.durationLabel, clip.durationSeconds)}</span>
-              </div>
+                  <span>{formatDuration(clip.durationLabel, clip.durationSeconds)}</span>
+                </div>
               <h2>{clip.title}</h2>
               <p>{clip.description || clip.shortDescription}</p>
               <div className="detail-sheet__tags">
@@ -125,7 +125,7 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
                 <div className="detail-sheet__action-stack">
                   <span aria-hidden="true">🎬</span>
                   <strong>Stream Now</strong>
-                  <span>{formatPrice(clip.streamPrice ?? clip.price)}</span>
+                  <span>{formatPrice(clip.streamPrice ?? clip.price, currency)}</span>
                 </div>
               </a>
               <a
@@ -138,7 +138,7 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
                 <div className="detail-sheet__action-stack">
                   <span aria-hidden="true">📥</span>
                   <strong>Download Now</strong>
-                  <span>{formatPrice(clip.downloadPrice ?? clip.price)}</span>
+                  <span>{formatPrice(clip.downloadPrice ?? clip.price, currency)}</span>
                 </div>
               </a>
             </div>
@@ -147,7 +147,7 @@ export function ClipDetailSheet({ clip, loading }: { clip?: ClipItem; loading?: 
                 productId={showPayment === 'stream' ? String(clip.watchProductId) : String(clip.downloadProductId)}
                 quantity={1}
                 mode={showPayment === 'stream' ? 'watch' : 'download'}
-                priceLabel={formatPrice(showPayment === 'stream' ? clip.streamPrice ?? clip.price : clip.downloadPrice ?? clip.price)}
+                priceLabel={formatPrice(showPayment === 'stream' ? clip.streamPrice ?? clip.price : clip.downloadPrice ?? clip.price, currency)}
                 botFallbackUrl={showPayment === 'stream' ? clip.botStreamUrl : clip.botDownloadUrl}
                 itemContext={{
                   unitPriceCents: Math.round(

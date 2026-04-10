@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { trackClipSelect } from '../features/clips/analytics';
 import { ClipItem } from '../features/clips/types';
-import { formatDuration, formatPrice } from '../utils/format';
+import { CurrencyCode, formatDuration, formatPrice } from '../utils/format';
 import { toClipPath } from '../utils/links';
 import { usePagedCarousel } from './usePagedCarousel';
 
@@ -15,11 +15,13 @@ export function TopSellersCarousel({
   title = '⭐ Top Sellers',
   loading = false,
   listType = 'top_sellers',
+  currency = 'GBP',
 }: {
   items: ClipItem[];
   title?: string;
   loading?: boolean;
   listType?: 'new_clips' | 'top_sellers';
+  currency?: CurrencyCode;
 }) {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -86,9 +88,9 @@ export function TopSellersCarousel({
                     <h3>{clip.title}</h3>
                     <p>{clip.shortDescription || clip.description || 'Preview this clip in Telegram.'}</p>
                     <div className="top-sellers__prices">
-                      <span>{`🎬 ${formatPrice(clip.streamPrice ?? clip.price)}`}</span>
+                      <span>{`🎬 ${formatPrice(clip.streamPrice ?? clip.price, currency)}`}</span>
                       <span className="top-sellers__price-separator">•</span>
-                      <span>{`📥 ${formatPrice(clip.downloadPrice ?? clip.price)}`}</span>
+                      <span>{`📥 ${formatPrice(clip.downloadPrice ?? clip.price, currency)}`}</span>
                     </div>
                   </div>
                 </Link>

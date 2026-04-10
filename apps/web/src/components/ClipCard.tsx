@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { trackClipSelect } from '../features/clips/analytics';
 import { ClipItem } from '../features/clips/types';
-import { formatDuration, formatPrice } from '../utils/format';
+import { CurrencyCode, formatDuration, formatPrice } from '../utils/format';
 import { pickPrimaryTags } from '../utils/tags';
 import { safeBackground } from '../utils/theme';
 import { toClipPath } from '../utils/links';
@@ -16,10 +16,12 @@ export function ClipCard({
   clip,
   position,
   sourceList,
+  currency = 'GBP',
 }: {
   clip: ClipItem;
   position: number;
   sourceList: 'search_results' | 'new_clips' | 'top_sellers';
+  currency?: CurrencyCode;
 }) {
   const location = useLocation();
   const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
@@ -64,9 +66,9 @@ export function ClipCard({
         <p>{clip.description || clip.shortDescription || 'Preview this clip in Telegram.'}</p>
         <div className="clip-card__footer">
           <div className="clip-card__prices">
-            <span>{`🎬 ${formatPrice(clip.streamPrice ?? clip.price)}`}</span>
+            <span>{`🎬 ${formatPrice(clip.streamPrice ?? clip.price, currency)}`}</span>
             <span className="clip-card__price-separator">•</span>
-            <span>{`📥 ${formatPrice(clip.downloadPrice ?? clip.price)}`}</span>
+            <span>{`📥 ${formatPrice(clip.downloadPrice ?? clip.price, currency)}`}</span>
           </div>
           <span className="clip-card__tags">{displayTags.map((tag) => `#${tag}`).join(' ')}</span>
         </div>

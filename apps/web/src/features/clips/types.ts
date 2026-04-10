@@ -44,4 +44,5 @@ export type ClipQueryState = {
   tags: string[];
   sort: string;
   page: number;
+  currency?: 'GBP' | 'USD';
 };

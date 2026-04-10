@@ -10,6 +10,7 @@ function buildQuery(state: ClipQueryState): string {
   if (state.sort) params.set('sort', state.sort);
   params.set('page', String(Math.max(1, state.page)));
   params.set('limit', '20');
+  if (state.currency) params.set('currency', state.currency);
   return params.toString();
 }
 
@@ -19,20 +20,23 @@ export async function fetchClips(state: ClipQueryState): Promise<ClipListRespons
   return response.json();
 }
 
-export async function fetchClip(id: string): Promise<ClipItem> {
-  const response = await fetch(`${API_BASE}/clips/${encodeURIComponent(id)}`, { credentials: 'include' });
+export async function fetchClip(id: string, currency?: string): Promise<ClipItem> {
+  const query = currency ? `?currency=${encodeURIComponent(currency)}` : '';
+  const response = await fetch(`${API_BASE}/clips/${encodeURIComponent(id)}${query}`, { credentials: 'include' });
   if (!response.ok) throw new Error('Unable to load clip details.');
   return response.json();
 }
 
-export async function fetchTopSellers(): Promise<ClipListResponse> {
-  const response = await fetch(`${API_BASE}/clips/top-sellers`, { credentials: 'include' });
+export async function fetchTopSellers(currency?: string): Promise<ClipListResponse> {
+  const query = currency ? `?currency=${encodeURIComponent(currency)}` : '';
+  const response = await fetch(`${API_BASE}/clips/top-sellers${query}`, { credentials: 'include' });
   if (!response.ok) throw new Error('Unable to load top sellers.');
   return response.json();
 }
 
-export async function fetchNewClips(): Promise<ClipListResponse> {
-  const response = await fetch(`${API_BASE}/clips/new`, { credentials: 'include' });
+export async function fetchNewClips(currency?: string): Promise<ClipListResponse> {
+  const query = currency ? `?currency=${encodeURIComponent(currency)}` : '';
+  const response = await fetch(`${API_BASE}/clips/new${query}`, { credentials: 'include' });
   if (!response.ok) throw new Error('Unable to load new clips.');
   return response.json();
 }
