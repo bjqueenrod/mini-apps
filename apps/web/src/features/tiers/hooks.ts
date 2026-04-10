@@ -1,16 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
+import { CurrencyCode } from '../../utils/format';
 import { fetchFeaturedTiers, fetchTier, fetchTiers } from './api';
 
-export function useTiers() {
+export function useTiers(currency: CurrencyCode = 'GBP') {
   return useQuery({
-    queryKey: ['tiers'],
+    queryKey: ['tiers', currency],
     queryFn: fetchTiers,
   });
 }
 
-export function useFeaturedTiers() {
+export function useFeaturedTiers(currency: CurrencyCode = 'GBP') {
   return useQuery({
-    queryKey: ['tiers', 'featured'],
+    queryKey: ['tiers', 'featured', currency],
     queryFn: fetchFeaturedTiers,
   });
 }

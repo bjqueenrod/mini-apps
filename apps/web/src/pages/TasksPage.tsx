@@ -10,6 +10,7 @@ import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
 import { trackMiniAppOpenAttributed } from '../features/clips/analytics';
 import { useTiers } from '../features/tiers/hooks';
+import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
 
 type TaskIconName =
   | 'wand'
@@ -346,7 +347,8 @@ function TaskIcon({ name }: { name: TaskIconName }) {
 
 export function TasksPage() {
   const session = useTelegramSession();
-  const tiersQuery = useTiers();
+  const [currency] = useCurrencyPreference();
+  const tiersQuery = useTiers(currency);
   const didTrackOpenRef = useRef(false);
 
   useEffect(() => {
@@ -499,7 +501,7 @@ export function TasksPage() {
 
         {tiersQuery.isError && <ErrorState message={(tiersQuery.error as Error).message} />}
         {(tiersQuery.isLoading || (tiersQuery.data && tiersQuery.data.items.length > 0)) && (
-          <TierCarousel items={tiersQuery.data?.items ?? []} loading={tiersQuery.isLoading} />
+          <TierCarousel items={tiersQuery.data?.items ?? []} loading={tiersQuery.isLoading} currency={currency} />
         )}
         {!tiersQuery.isLoading && tiersQuery.data && tiersQuery.data.items.length === 0 && (
           <EmptyState

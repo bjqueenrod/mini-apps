@@ -8,12 +8,13 @@ import {
   getTierTasksLabel,
 } from '../features/tiers/presentation';
 import { TierItem } from '../features/tiers/types';
-import { formatPrice } from '../utils/format';
+import { CurrencyCode, formatPrice } from '../utils/format';
 import { PaymentSheet } from './PaymentSheet';
 import { usePagedCarousel } from './usePagedCarousel';
 
-function priceLabel(tier: TierItem): string {
-  return tier.priceLabel || formatPrice(tier.price);
+function priceLabel(tier: TierItem, currency: CurrencyCode): string {
+  const base = typeof tier.price === 'number' ? formatPrice(tier.price, currency) : undefined;
+  return (typeof tier.priceLabel === 'string' && tier.priceLabel.trim()) ? tier.priceLabel : base || 'Price on request';
 }
 
 function displayBadgeLabel(badgeLabel?: string): string | undefined {
@@ -68,10 +69,12 @@ export function TierCarousel({
   items,
   title,
   loading = false,
+  currency = 'GBP',
 }: {
   items: TierItem[];
   title?: string;
   loading?: boolean;
+  currency?: CurrencyCode;
 }) {
   if (!items.length && !loading) {
     return null;
@@ -180,7 +183,7 @@ export function TierCarousel({
                     </div>
                     <div className="top-sellers__price-block">
                       <span className="top-sellers__meta-label">Price</span>
-                      <strong>{priceLabel(tier)}</strong>
+                      <strong>{priceLabel(tier, currency)}</strong>
                     </div>
                     <a
                       href={tier.botBuyUrl || '#'}
@@ -213,7 +216,7 @@ export function TierCarousel({
         <PaymentSheet
           productId={String(paymentTier.productId)}
           quantity={1}
-          priceLabel={paymentTier.priceLabel || formatPrice(paymentTier.price)}
+          priceLabel={priceLabel(paymentTier, currency)}
           botFallbackUrl={paymentTier.botBuyUrl}
           itemContext={{ tierId: paymentTier.id }}
           onClose={() => setPaymentTier(null)}
