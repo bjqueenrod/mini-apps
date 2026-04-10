@@ -253,8 +253,14 @@ def _row_to_item(
     download_pence = coerce_pence(data.get("download_price_pence")) or base_pence
     payment_pricing = clip_pricing if isinstance(clip_pricing, dict) else None
     base_pricing_source = _pricing_bucket(payment_pricing, "pricing")
-    stream_pricing_source = _pricing_bucket(payment_pricing, "streamPricing", "watchPricing") or base_pricing_source
-    download_pricing_source = _pricing_bucket(payment_pricing, "downloadPricing") or base_pricing_source
+    stream_pricing_source = _pricing_bucket(
+        payment_pricing,
+        "streamPricing",
+        "stream_pricing",
+        "watchPricing",
+        "watch_pricing",
+    ) or base_pricing_source
+    download_pricing_source = _pricing_bucket(payment_pricing, "downloadPricing", "download_pricing") or base_pricing_source
     base_price, base_price_pence, base_price_label, pricing = _resolve_pricing(
         base_pricing_source,
         pricing_keys=(),

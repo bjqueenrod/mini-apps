@@ -20,11 +20,11 @@ def test_clips_use_payment_system_pricing(client, monkeypatch) -> None:
                 "gbp": {"amount_pence": 1599, "formatted": "£15.99"},
                 "usd": {"amount_pence": 1999, "formatted": "$19.99"},
             },
-            "streamPricing": {
+            "stream_pricing": {
                 "gbp": {"amount_pence": 1599, "formatted": "£15.99"},
                 "usd": {"amount_pence": 1999, "formatted": "$19.99"},
             },
-            "downloadPricing": {
+            "download_pricing": {
                 "gbp": {"amount_pence": 1099, "formatted": "£10.99"},
                 "usd": {"amount_pence": 1399, "formatted": "$13.99"},
             },
@@ -34,11 +34,11 @@ def test_clips_use_payment_system_pricing(client, monkeypatch) -> None:
                 "gbp": {"amount_pence": 1199, "formatted": "£11.99"},
                 "usd": {"amount_pence": 1499, "formatted": "$14.99"},
             },
-            "streamPricing": {
+            "stream_pricing": {
                 "gbp": {"amount_pence": 1199, "formatted": "£11.99"},
                 "usd": {"amount_pence": 1499, "formatted": "$14.99"},
             },
-            "downloadPricing": {
+            "download_pricing": {
                 "gbp": {"amount_pence": 899, "formatted": "£8.99"},
                 "usd": {"amount_pence": 1099, "formatted": "$10.99"},
             },
@@ -155,11 +155,11 @@ def test_clip_detail_uses_payment_system_pricing(client, monkeypatch) -> None:
                 "gbp": {"amount_pence": 1599, "formatted": "£15.99"},
                 "usd": {"amount_pence": 1999, "formatted": "$19.99"},
             },
-            "streamPricing": {
+            "stream_pricing": {
                 "gbp": {"amount_pence": 1599, "formatted": "£15.99"},
                 "usd": {"amount_pence": 1999, "formatted": "$19.99"},
             },
-            "downloadPricing": {
+            "download_pricing": {
                 "gbp": {"amount_pence": 1099, "formatted": "£10.99"},
                 "usd": {"amount_pence": 1399, "formatted": "$13.99"},
             },
