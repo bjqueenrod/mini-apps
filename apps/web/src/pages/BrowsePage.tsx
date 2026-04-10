@@ -32,9 +32,9 @@ export function BrowsePage() {
   const { clipId } = useParams();
   const session = useTelegramSession();
   const [currency] = useCurrencyPreference();
+  const urlQueryState = useMemo(() => readQueryState(searchParams), [searchParams]);
   const [searchValue, setSearchValue] = useState(() => {
-    const initialQueryState = readQueryState(searchParams);
-    return composeSearchText(initialQueryState.q, initialQueryState.tags);
+    return composeSearchText(urlQueryState.q, urlQueryState.tags);
   });
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const searchPanelSentinelRef = useRef<HTMLDivElement | null>(null);
@@ -42,8 +42,20 @@ export function BrowsePage() {
   const [isSearchPinned, setIsSearchPinned] = useState(false);
   const [filtersExpanded, setFiltersExpanded] = useState(true);
   const [visibleClips, setVisibleClips] = useState<ClipItem[]>([]);
-  const queryState = useMemo(() => ({ ...readQueryState(searchParams), currency }), [searchParams, currency]);
-  const activeQueryState = useMemo(() => ({ ...queryState, page }), [page, queryState]);
+  const searchText = useMemo(() => stripHashtagTokens(searchValue), [searchValue]);
+  const searchTags = useMemo(() => extractHashtagTokens(searchValue), [searchValue]);
+  const queryState = useMemo(
+    () => ({
+      q: searchText,
+      category: urlQueryState.category,
+      tags: searchTags,
+      sort: urlQueryState.sort,
+      page,
+      currency,
+    }),
+    [currency, page, searchTags, searchText, urlQueryState.category, urlQueryState.sort],
+  );
+  const activeQueryState = queryState;
   const clipsQuery = useClipSearch(activeQueryState);
   const clipHashtagsQuery = useClipHashtags();
   const newClipsQuery = useNewClips(currency);
@@ -130,10 +142,6 @@ export function BrowsePage() {
   }, [queryIdentity]);
 
   useEffect(() => {
-    setSearchValue(composeSearchText(queryState.q, queryState.tags));
-  }, [queryState.q, queryState.tags]);
-
-  useEffect(() => {
     const normalize = (value: string) => value.trim().toLowerCase();
     const dedupe = (items: string[]) => {
       const deduped: string[] = [];
@@ -176,9 +184,8 @@ export function BrowsePage() {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       const next = {
-        ...queryState,
+        ...urlQueryState,
         q: stripHashtagTokens(searchValue),
-        tags: extractHashtagTokens(searchValue),
         page: 1,
       };
       setPage(1);
@@ -188,7 +195,7 @@ export function BrowsePage() {
       }
     }, 250);
     return () => window.clearTimeout(timer);
-  }, [searchValue]);
+  }, [searchValue, setSearchParams, urlQueryState]);
 
   useEffect(() => {
     if (!clipsQuery.data || clipsQuery.data.page !== page) {

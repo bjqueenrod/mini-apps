@@ -17,7 +17,6 @@ export function toSearchParams(state: ClipQueryState): URLSearchParamsInit {
   const params: Record<string, string> = {};
   if (state.q) params.q = state.q;
   if (state.category) params.category = state.category;
-  if (state.tags.length) params.tags = state.tags.join(',');
   if (state.sort && state.sort !== DEFAULT_SORT) params.sort = state.sort;
   if (state.page > 1) params.page = String(state.page);
   return params;
