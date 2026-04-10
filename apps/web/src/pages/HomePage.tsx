@@ -48,14 +48,6 @@ export function HomePage() {
           <CurrencyToggleBanner />
         </>
       )}
-      <section className="hero">
-        <img
-          className="hero__banner"
-          src="/header-telegram.jpeg?v=20260409a"
-          alt="Mistress BJQueen Telegram Mini-app banner"
-        />
-      </section>
-
       <section className="chooser-panel">
         <div className="chooser-grid">
           <Link
