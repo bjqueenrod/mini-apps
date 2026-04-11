@@ -258,6 +258,26 @@ def test_checkout_retries_when_code_conflicts(client, monkeypatch) -> None:
     assert captured_codes == ["MBJQ-KEY-RETRY1", "MBJQ-KEY-RETRY2"]
 
 
+def test_invoice_status_does_not_require_session_cookie(client, monkeypatch) -> None:
+    from app.services import payment_gateway
+
+    monkeypatch.setattr(
+        payment_gateway,
+        "get_invoice",
+        lambda invoice_id: {
+            "status": "pending",
+            "invoice_url": f"https://example.com/{invoice_id}",
+            "provider_invoice_url": f"https://provider.example/{invoice_id}",
+        },
+    )
+
+    response = client.get("/api/payments/invoices/inv_123")
+
+    assert response.status_code == 200
+    assert response.json()["invoiceId"] == "inv_123"
+    assert response.json()["status"] == "pending"
+
+
 def test_invoice_status_surfaces_not_found_detail(client, monkeypatch) -> None:
     from app.services import payment_gateway
 
