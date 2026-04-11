@@ -10,7 +10,13 @@ from app.core.telegram import TelegramUser
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
-TRACKED_START_PARAM_PATTERN = re.compile(r"^(l_[0-9a-z]+)(?:__[A-Za-z0-9_-]{1,64})?$")
+TRACKED_START_PARAM_PATTERN = re.compile(
+    r"^(?:"
+    r"l_[0-9a-z]+(?:__[A-Za-z0-9_-]{1,64})?"
+    r"|"
+    r"clips(?:_[A-Za-z0-9_-]{1,64})?__l_[0-9a-z]+(?:__[A-Za-z0-9_-]{1,64})?"
+    r")$"
+)
 
 
 def is_tracked_start_param(start_param: str | None) -> bool:
