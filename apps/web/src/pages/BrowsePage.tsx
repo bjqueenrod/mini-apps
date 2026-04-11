@@ -38,6 +38,7 @@ export function BrowsePage() {
   });
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const searchPanelSentinelRef = useRef<HTMLDivElement | null>(null);
+  const searchPanelRef = useRef<HTMLElement | null>(null);
   const [page, setPage] = useState(1);
   const [isSearchPinned, setIsSearchPinned] = useState(false);
   const [filtersExpanded, setFiltersExpanded] = useState(true);
@@ -335,18 +336,20 @@ export function BrowsePage() {
       return;
     }
 
-    const timer = window.setTimeout(() => {
-      const sentinel = searchPanelSentinelRef.current;
-      const targetTop = sentinel
-        ? Math.max(0, sentinel.getBoundingClientRect().top + window.scrollY + 12)
-        : 0;
+    let frameTwo = 0;
+    const frameOne = window.requestAnimationFrame(() => {
       setIsSearchPinned(true);
       setFiltersExpanded(false);
-      window.scrollTo({ top: targetTop, behavior: 'auto' });
-      navigate(`${location.pathname}${location.search}`, { replace: true });
-    }, 0);
+      frameTwo = window.requestAnimationFrame(() => {
+        searchPanelRef.current?.scrollIntoView({ block: 'start', behavior: 'auto' });
+        navigate(`${location.pathname}${location.search}`, { replace: true });
+      });
+    });
 
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.cancelAnimationFrame(frameOne);
+      window.cancelAnimationFrame(frameTwo);
+    };
   }, [clipId, location.pathname, location.search, location.state, navigate]);
 
   const replaceRowTag = (current: string, selectedTag: string, nextTag: string) => {
@@ -404,6 +407,7 @@ export function BrowsePage() {
 
       <div ref={searchPanelSentinelRef} className="search-panel__sentinel" aria-hidden="true" />
       <section
+        ref={searchPanelRef}
         className={`search-panel${isSearchPinned ? ' search-panel--pinned' : ''}${isSearchPinned && !filtersExpanded ? ' search-panel--collapsed' : ''}`}
       >
         <section className="toolbar">
