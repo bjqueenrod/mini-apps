@@ -26,6 +26,10 @@ def _normalize_methods(raw: list[dict[str, Any]] | None) -> list[PaymentMethod]:
     methods: list[PaymentMethod] = []
     for item in raw or []:
         try:
+            instruction_templates = item.get("instruction_templates")
+            checkout_default = None
+            if isinstance(instruction_templates, dict):
+                checkout_default = str(instruction_templates.get("checkout_default") or "").strip() or None
             methods.append(
                 PaymentMethod(
                     id=item.get("id"),
@@ -34,6 +38,7 @@ def _normalize_methods(raw: list[dict[str, Any]] | None) -> list[PaymentMethod]:
                     requiresCode=bool(item.get("requires_code")),
                     instructions=(item.get("instructions") or None),
                     tributeCode=(item.get("tribute_code") or item.get("tributeCode") or None),
+                    instructionTemplates={"checkoutDefault": checkout_default} if checkout_default else None,
                     priceCents=item.get("price_pence"),
                     details=item.get("method_details") if isinstance(item.get("method_details"), dict) else None,
                     pricing=item.get("pricing") if isinstance(item.get("pricing"), dict) else None,

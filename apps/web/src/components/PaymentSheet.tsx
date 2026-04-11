@@ -110,7 +110,9 @@ export function PaymentSheet({
     () => methods.find((m) => m.paymentMethod === selectedMethod),
     [methods, selectedMethod],
   );
-  const selectedInstructions = selectedMethodInfo?.instructions?.trim();
+  const selectedInstructions =
+    selectedMethodInfo?.instructionTemplates?.checkoutDefault?.trim() ||
+    selectedMethodInfo?.instructions?.trim();
   const selectedTributeCode = selectedMethodInfo?.tributeCode?.trim();
   const requiresCode = Boolean(selectedMethodInfo?.requiresCode);
   const hasInstructions = Boolean(selectedInstructions || selectedTributeCode || requiresCode);

@@ -8,6 +8,9 @@ export type PaymentMethod = {
   pricePence?: number;
   instructions?: string | null;
   tributeCode?: string | null;
+  instructionTemplates?: {
+    checkoutDefault?: string | null;
+  } | null;
   details?: Record<string, unknown> | null;
   pricing?: PricingEnvelope | null;
 };
