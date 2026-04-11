@@ -15,12 +15,7 @@ export function CurrencyToggleBanner({ onBackClick, showBackButton = false }: Cu
           <button type="button" className="currency-banner__back" onClick={onBackClick} aria-label="Back to Home">
             ← Back
           </button>
-        ) : (
-          <div>
-            <div className="currency-banner__label">Currency selector</div>
-            <div className="currency-banner__hint">Choose the price display you want to use in the mini app.</div>
-          </div>
-        )}
+        ) : null}
         <div className="currency-banner__toggle" role="group" aria-label="Choose currency">
           <button
             type="button"
