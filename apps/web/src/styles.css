@@ -2654,12 +2654,21 @@ button {
 }
 
 .payment-sheet__note-code {
-  display: inline-block;
-  padding: 6px 10px;
-  border-radius: 10px;
-  background: #1f1828;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(39, 31, 48, 0.96), rgba(30, 23, 39, 0.96));
   border: 1px solid var(--line, #2c2335);
+  color: var(--text, #f3edf7);
+  font-family: 'SFMono-Regular', 'Consolas', 'Menlo', monospace;
+  font-size: 1rem;
+  font-weight: 700;
   letter-spacing: 0.04em;
+  text-align: center;
 }
 
 .payment-sheet__note-copied {
