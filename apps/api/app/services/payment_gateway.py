@@ -174,6 +174,8 @@ def create_invoice(
     order_id: int,
     payment_method: str,
     chat_id: int | None = None,
+    username: str | None = None,
+    first_name: str | None = None,
     application_id: str | None = None,
     flow_id: str | None = None,
     code: str | None = None,
@@ -185,6 +187,8 @@ def create_invoice(
         "order_id": order_id,
         "payment_method": payment_method,
         "chat_id": chat_id,
+        "username": username,
+        "first_name": first_name,
         "application_id": application_id,
         "flow_id": flow_id,
     }
