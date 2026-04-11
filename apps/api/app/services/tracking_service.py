@@ -25,6 +25,34 @@ def is_tracked_start_param(start_param: str | None) -> bool:
     return bool(TRACKED_START_PARAM_PATTERN.fullmatch(normalized))
 
 
+def resolve_effective_start_param(
+    signed_start_param: str | None,
+    client_start_param: str | None,
+) -> str | None:
+    """Pick the start_param used for sessions and CMS open tracking.
+
+    Signed initData is authoritative when it carries a full tracked value. Some Telegram
+    clients omit or shorten start_param in initData while the same launch still sends
+    the full value via tgWebAppStartParam on the client — prefer the client copy when
+    the signed value is present but not a tracked deep link and the client value is.
+    """
+    signed = (signed_start_param or "").strip() or None
+    client = (client_start_param or "").strip() or None
+    if not signed:
+        return client
+    if not client:
+        return signed
+    if signed == client:
+        return signed
+    signed_tracked = is_tracked_start_param(signed)
+    client_tracked = is_tracked_start_param(client)
+    if client_tracked and not signed_tracked:
+        return client
+    if signed_tracked and not client_tracked:
+        return signed
+    return signed
+
+
 def notify_miniapp_open(start_param: str | None, user: TelegramUser) -> bool:
     normalized_start_param = (start_param or "").strip()
     cms_api_url = settings.normalized_cms_api_url

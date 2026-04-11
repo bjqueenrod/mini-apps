@@ -34,6 +34,23 @@ function normalizeStartParam(value?: string | null): string | undefined {
   return normalized ? normalized : undefined;
 }
 
+/** Telegram may surface the same launch param in several places; some parsers truncate. Prefer the longest non-empty candidate. */
+function coalesceStartParamCandidates(...candidates: (string | undefined)[]): string | undefined {
+  const seen = new Set<string>();
+  let best: string | undefined;
+  for (const raw of candidates) {
+    const normalized = normalizeStartParam(raw);
+    if (!normalized || seen.has(normalized)) {
+      continue;
+    }
+    seen.add(normalized);
+    if (!best || normalized.length > best.length) {
+      best = normalized;
+    }
+  }
+  return best;
+}
+
 /** initData is an application/x-www-form-urlencoded payload; start_param may exist here when launch-param parsing fails. */
 function startParamFromInitDataQuery(initData: string | undefined | null): string | undefined {
   const raw = initData?.trim();
@@ -77,13 +94,13 @@ export function getTelegramContext(): TelegramContext {
     return {
       isTelegram: true,
       initData: initDataStr || undefined,
-      startParam: normalizeStartParam(
-        launch.tgWebAppStartParam ||
-          startParamFromInitDataQuery(initDataStr) ||
-          queryParams.get('tgWebAppStartParam') ||
-          queryParams.get('startapp') ||
-          startParamFromLocationHash() ||
-          webApp?.initDataUnsafe?.start_param,
+      startParam: coalesceStartParamCandidates(
+        launch.tgWebAppStartParam,
+        startParamFromInitDataQuery(initDataStr),
+        queryParams.get('tgWebAppStartParam'),
+        queryParams.get('startapp'),
+        startParamFromLocationHash(),
+        webApp?.initDataUnsafe?.start_param,
       ),
       user: user ? { id: user.id, username: user.username, firstName: user.firstName } : undefined,
       close: () => webApp?.close?.(),
@@ -93,12 +110,12 @@ export function getTelegramContext(): TelegramContext {
     return {
       isTelegram: Boolean(webApp),
       initData: webApp?.initData,
-      startParam: normalizeStartParam(
-        startParamFromInitDataQuery(webApp?.initData) ||
-          queryParams.get('tgWebAppStartParam') ||
-          queryParams.get('startapp') ||
-          startParamFromLocationHash() ||
-          webApp?.initDataUnsafe?.start_param,
+      startParam: coalesceStartParamCandidates(
+        startParamFromInitDataQuery(webApp?.initData),
+        queryParams.get('tgWebAppStartParam'),
+        queryParams.get('startapp'),
+        startParamFromLocationHash(),
+        webApp?.initDataUnsafe?.start_param,
       ),
       user: unsafe ? { id: unsafe.id, username: unsafe.username, firstName: unsafe.first_name } : undefined,
       close: () => webApp?.close?.(),

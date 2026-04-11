@@ -11,7 +11,7 @@ from app.core.security import get_session_serializer
 from app.core.telegram import TelegramUser, TelegramInitDataError
 from app.schemas.auth import AuthUserResponse, TelegramAuthRequest, TelegramAuthResponse
 from app.services.auth_service import authenticate_telegram, build_session_payload
-from app.services.tracking_service import notify_miniapp_open
+from app.services.tracking_service import notify_miniapp_open, resolve_effective_start_param
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 settings = get_settings()
@@ -29,7 +29,7 @@ def auth_telegram(payload: TelegramAuthRequest, response: Response) -> TelegramA
         user = result.user
         # Prefer start_param from signed initData (Telegram supplies it for startapp launches); the
         # client-sent field can be missing when launch params are not exposed to JS reliably.
-        effective_start_param = (result.start_param or payload.start_param or "").strip() or None
+        effective_start_param = resolve_effective_start_param(result.start_param, payload.start_param)
     elif settings.is_dev and payload.dev_user:
         source = "development"
         user = TelegramUser(id=payload.dev_user.id, username=payload.dev_user.username, first_name=payload.dev_user.first_name)

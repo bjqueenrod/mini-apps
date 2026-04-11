@@ -117,6 +117,26 @@ def test_auth_telegram_start_param_from_init_data_when_body_omits_start_param(cl
     assert calls == [("clips_BJQ0169__l_e", 123)]
 
 
+def test_auth_telegram_uses_client_tracked_start_param_when_signed_is_untracked(client, monkeypatch) -> None:
+    calls: list[tuple[str | None, int]] = []
+
+    def _capture(start_param: str | None, user) -> None:
+        calls.append((start_param, user.id))
+
+    monkeypatch.setattr("app.api.routes.auth.notify_miniapp_open", _capture)
+
+    response = client.post(
+        "/api/auth/telegram",
+        json={
+            "initData": _build_init_data("test-token", start_param="clips"),
+            "startParam": "clips_BJQ0169__l_e",
+        },
+    )
+
+    assert response.status_code == 200
+    assert calls == [("clips_BJQ0169__l_e", 123)]
+
+
 def test_auth_telegram_prefers_init_data_start_param_over_body(client, monkeypatch) -> None:
     calls: list[tuple[str | None, int]] = []
 
