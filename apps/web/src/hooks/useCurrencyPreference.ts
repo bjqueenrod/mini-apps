@@ -119,21 +119,7 @@ export function useCurrencyPreference(
 
     const syncPreference = async () => {
       const telegramLookupId = getTelegramCurrencyUserId(telegramUserId);
-      console.info(
-        'Currency sync start',
-        JSON.stringify({
-          isTelegram: isTelegramWebView(),
-          telegramUserId: telegramLookupId,
-        }),
-      );
       const remoteCurrency = await fetchTelegramCurrencyPreference(telegramLookupId);
-      console.info(
-        'Currency sync result',
-        JSON.stringify({
-          telegramUserId: telegramLookupId,
-          remoteCurrency,
-        }),
-      );
       if (!cancelled && !hasLocalOverrideRef.current && remoteCurrency) {
         applyCurrency(remoteCurrency, { persist: false, broadcast: true });
       }
