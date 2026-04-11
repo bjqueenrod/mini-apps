@@ -121,6 +121,35 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
     items = [item]
     order_id_value = int(payload.order_id) if payload.order_id else None
     selected_method: dict[str, Any] | None = None
+
+    def _select_payment_method(options: dict[str, Any] | None) -> tuple[dict[str, Any] | None, str, bool]:
+        selected: dict[str, Any] | None = None
+        methods = options.get("payment_methods") if isinstance(options, dict) else None
+        if isinstance(methods, list):
+            for method in methods:
+                if not isinstance(method, dict):
+                    continue
+                slug = (method.get("payment_method") or "").strip().lower()
+                if slug == payload.payment_method:
+                    if slug in {"paypal", "throne"}:
+                        method["requires_code"] = True
+                    elif slug == "crypto":
+                        method["requires_code"] = False
+                    selected = method
+                    break
+        code = (
+            str(
+                selected.get("code")
+                or selected.get("tribute_code")
+                or selected.get("tributeCode")
+                or ""
+            ).strip()
+            if selected
+            else ""
+        )
+        requires_code = bool(selected.get("requires_code")) if isinstance(selected, dict) else False
+        return selected, code, requires_code
+
     try:
         if order_id_value:
             order = {"id": order_id_value}
@@ -133,34 +162,14 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
                 clip_mode=payload.mode,
             )
         options = payment_gateway.invoice_options(order_id=int(order.get("id")), flow_id=flow_id)
-        methods = options.get("payment_methods") if isinstance(options, dict) else None
-        if isinstance(methods, list):
-            for method in methods:
-                if not isinstance(method, dict):
-                    continue
-                slug = (method.get("payment_method") or "").strip().lower()
-                if slug == payload.payment_method:
-                    if slug in {"paypal", "throne"}:
-                        method["requires_code"] = True
-                    elif slug == "crypto":
-                        method["requires_code"] = False
-                    selected_method = method
-                    break
-        code_value = (
-            str(
-                selected_method.get("code")
-                or selected_method.get("tribute_code")
-                or selected_method.get("tributeCode")
-                or ""
-            ).strip()
-            if selected_method
-            else ""
-        )
-        requires_code = (
-            bool(selected_method.get("requires_code")) if isinstance(selected_method, dict) else False
-        )
+        selected_method, code_value, requires_code = _select_payment_method(options)
         if requires_code and not code_value:
             raise payment_gateway.PaymentSystemError("missing payment code for selected method")
+    except payment_gateway.PaymentSystemError as exc:
+        logger.warning("checkout error: %s", exc)
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc) or "checkout unavailable") from exc
+
+    try:
         invoice = payment_gateway.create_invoice(
             order_id=int(order.get("id")),
             payment_method=payload.payment_method,
@@ -170,8 +179,30 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
             code=code_value or None,
         )
     except payment_gateway.PaymentSystemError as exc:
-        logger.warning("checkout error: %s", exc)
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="checkout unavailable") from exc
+        error_text = str(exc).strip().lower()
+        if "payment code conflict" in error_text or "payment_code_conflict" in error_text:
+            try:
+                retry_options = payment_gateway.invoice_options(order_id=int(order.get("id")), flow_id=flow_id)
+                retry_method, retry_code_value, retry_requires_code = _select_payment_method(retry_options)
+                if retry_method:
+                    selected_method = retry_method
+                if retry_requires_code and not retry_code_value:
+                    raise payment_gateway.PaymentSystemError("missing payment code for selected method")
+                invoice = payment_gateway.create_invoice(
+                    order_id=int(order.get("id")),
+                    payment_method=payload.payment_method,
+                    chat_id=int(chat_id),
+                    application_id=application_id,
+                    flow_id=flow_id,
+                    code=retry_code_value or None,
+                )
+                code_value = retry_code_value
+            except payment_gateway.PaymentSystemError as retry_exc:
+                logger.warning("checkout retry error: %s", retry_exc)
+                raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(retry_exc) or "checkout unavailable") from retry_exc
+        else:
+            logger.warning("checkout error: %s", exc)
+            raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc) or "checkout unavailable") from exc
 
     invoice_url, provider_url = _invoice_urls(invoice)
     invoice_payload = invoice.get("invoice") if isinstance(invoice, dict) else None

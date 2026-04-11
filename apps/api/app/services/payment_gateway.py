@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 from typing import Any
 
@@ -24,6 +25,34 @@ def _headers() -> dict[str, str]:
     if settings.payment_system_api_token:
         headers["Authorization"] = f"Bearer {settings.payment_system_api_token}"
     return headers
+
+
+def _response_error_message(response: httpx.Response, fallback: str) -> str:
+    try:
+        payload = response.json()
+    except Exception:
+        payload = None
+
+    if isinstance(payload, dict):
+        for key in ("detail", "error", "message"):
+            value = payload.get(key)
+            if value:
+                return str(value)
+
+    text = (response.text or "").strip()
+    if text:
+      try:
+            parsed = json.loads(text)
+      except Exception:
+            return text
+      if isinstance(parsed, dict):
+            for key in ("detail", "error", "message"):
+                value = parsed.get(key)
+                if value:
+                    return str(value)
+      return text
+
+    return fallback
 
 
 def invoice_options(
@@ -53,6 +82,10 @@ def invoice_options(
         )
         response.raise_for_status()
         return response.json()
+    except httpx.HTTPStatusError as exc:
+        logger.warning("Invoice options request failed: %s", exc)
+        message = _response_error_message(exc.response, "unable to load payment options")
+        raise PaymentSystemError(message) from exc
     except httpx.HTTPError as exc:
         logger.warning("Invoice options request failed: %s", exc)
         raise PaymentSystemError("unable to load payment options") from exc
@@ -94,6 +127,10 @@ def create_order(
             if not isinstance(item, dict):
                 raise PaymentSystemError("clip order payload missing")
             return item
+        except httpx.HTTPStatusError as exc:
+            logger.warning("Create clip order failed: %s", exc)
+            message = _response_error_message(exc.response, "unable to create clip order")
+            raise PaymentSystemError(message) from exc
         except httpx.HTTPError as exc:
             logger.warning("Create clip order failed: %s", exc)
             raise PaymentSystemError("unable to create clip order") from exc
@@ -117,6 +154,10 @@ def create_order(
         if not isinstance(item, dict):
             raise PaymentSystemError("order payload missing")
         return item
+    except httpx.HTTPStatusError as exc:
+        logger.warning("Create order failed: %s", exc)
+        message = _response_error_message(exc.response, "unable to create order")
+        raise PaymentSystemError(message) from exc
     except httpx.HTTPError as exc:
         logger.warning("Create order failed: %s", exc)
         raise PaymentSystemError("unable to create order") from exc
@@ -152,6 +193,10 @@ def create_invoice(
         )
         response.raise_for_status()
         return response.json()
+    except httpx.HTTPStatusError as exc:
+        logger.warning("Create invoice failed: %s", exc)
+        message = _response_error_message(exc.response, "unable to create invoice")
+        raise PaymentSystemError(message) from exc
     except httpx.HTTPError as exc:
         logger.warning("Create invoice failed: %s", exc)
         raise PaymentSystemError("unable to create invoice") from exc
@@ -169,6 +214,10 @@ def get_invoice(invoice_id: str) -> dict[str, Any]:
         )
         response.raise_for_status()
         return response.json()
+    except httpx.HTTPStatusError as exc:
+        logger.warning("Get invoice failed: %s", exc)
+        message = _response_error_message(exc.response, "unable to load invoice")
+        raise PaymentSystemError(message) from exc
     except httpx.HTTPError as exc:
         logger.warning("Get invoice failed: %s", exc)
         raise PaymentSystemError("unable to load invoice") from exc

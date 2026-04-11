@@ -85,7 +85,28 @@ export async function startCheckout(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ productId, paymentMethod, quantity, mode, ...extras }),
   });
-  if (!response.ok) throw new Error('Unable to start checkout');
+  if (!response.ok) {
+    let message = 'Unable to start checkout';
+    try {
+      const text = await response.text();
+      if (text) {
+        try {
+          const data = JSON.parse(text);
+          const detail = data?.detail || data?.error;
+          if (detail) {
+            message = `${message}: ${detail}`;
+          } else {
+            message = `${message}: ${text}`;
+          }
+        } catch {
+          message = `${message}: ${text}`;
+        }
+      }
+    } catch {
+      // keep the generic message
+    }
+    throw new Error(message);
+  }
   return response.json();
 }
 
