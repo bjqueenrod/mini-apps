@@ -6,6 +6,13 @@ function parseStartPayload(payload?: string | null): URLSearchParams | null {
 
   const normalized = raw.startsWith('?') ? raw.slice(1) : raw;
 
+  const clipWithTrackingMatch = normalized.match(
+    /^clips(?:[_.-]|__|_-|-_)([A-Za-z0-9_-]{1,64})__(l_[0-9a-z]+(?:__[A-Za-z0-9_-]{1,64})?)$/i,
+  );
+  if (clipWithTrackingMatch) {
+    return new URLSearchParams(`startapp=clips&clipId=${encodeURIComponent(clipWithTrackingMatch[1] || '')}`);
+  }
+
   const clipIdMatch = normalized.match(/^clips(?:[_.-]|__|_-|-_)([A-Za-z0-9_-]{1,64})$/i);
   if (clipIdMatch) {
     return new URLSearchParams(`startapp=clips&clipId=${encodeURIComponent(clipIdMatch[1] || '')}`);
