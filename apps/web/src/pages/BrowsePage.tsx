@@ -136,6 +136,9 @@ export function BrowsePage() {
   const didTrackOpenRef = useRef(false);
   const didSeedClipHistoryRef = useRef(false);
   const pendingClipOpenRef = useRef<string>('');
+  /** After we've shown the Telegram start_param clip once, do not auto-open it again when the user returns to /clips (start_param stays set for the whole session). */
+  const startParamClipConsumedRef = useRef(false);
+  const prevClipIdForStartParamRef = useRef<string | undefined>();
   const computedSecondaryTagOptions = useMemo(() => {
     const excluded = new Set(['and', 'in', 'made', 'bar']);
     const tagCounts = new Map<string, { tag: string; count: number }>();
@@ -177,6 +180,24 @@ export function BrowsePage() {
   }, []);
 
   useEffect(() => {
+    const hint = resolveClipIdHint('', session.startParam);
+    if (clipId && hint && clipId === hint) {
+      startParamClipConsumedRef.current = true;
+    }
+  }, [clipId, session.startParam]);
+
+  useEffect(() => {
+    const prev = prevClipIdForStartParamRef.current;
+    if (prev && !clipId && navigationType !== 'REPLACE') {
+      const hint = resolveClipIdHint(location.search, session.startParam);
+      if (hint && hint === prev) {
+        startParamClipConsumedRef.current = true;
+      }
+    }
+    prevClipIdForStartParamRef.current = clipId;
+  }, [clipId, location.search, navigationType, session.startParam]);
+
+  useEffect(() => {
     if (!clipId || didSeedClipHistoryRef.current) {
       return;
     }
@@ -209,6 +230,9 @@ export function BrowsePage() {
 
   useEffect(() => {
     if (clipId) {
+      return;
+    }
+    if (startParamClipConsumedRef.current) {
       return;
     }
     const hintedClipId = resolveClipIdHint(location.search, session.startParam);
