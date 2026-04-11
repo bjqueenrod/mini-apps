@@ -6,13 +6,23 @@ import { trackInteraction } from '../app/analytics';
 import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
 import { useEffect } from 'react';
+import { resolveClipIdHint, resolveStartappHint, stripStartRoutingParams } from '../utils/startRouting';
 
 export function resolveHomeRedirectTarget(search: string, startParam?: string | null): string | null {
-  const params = new URLSearchParams(search);
-  const queryStart = (params.get('startapp') || params.get('tgWebAppStartParam') || '').trim().toLowerCase();
-  const startapp = (startParam || queryStart).trim().toLowerCase();
-  const target = startapp === 'clips' || startapp === 'tasks' || startapp === 'keyholding' ? `/${startapp}` : null;
-  return target ? `${target}${search}` : null;
+  const startapp = resolveStartappHint(search, startParam);
+  if (!startapp) {
+    return null;
+  }
+
+  const clipId = startapp === 'clips' ? resolveClipIdHint(search, startParam) : null;
+  const cleanedSearch = stripStartRoutingParams(search);
+  const suffix = cleanedSearch ? `?${cleanedSearch}` : '';
+
+  if (startapp === 'clips' && clipId) {
+    return `/clips/${encodeURIComponent(clipId)}${suffix}`;
+  }
+
+  return `/${startapp}${suffix}`;
 }
 
 export function HomePage() {

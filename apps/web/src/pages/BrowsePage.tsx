@@ -24,6 +24,7 @@ import { ClipItem } from '../features/clips/types';
 import { pushRecentSearch } from '../utils/storage';
 import { composeSearchText, extractHashtagTokens, FEATURED_TAGS, normalizeTag, setHashtagToken, stripHashtagTokens } from '../utils/tags';
 import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
+import { resolveClipIdHint, stripStartRoutingParams } from '../utils/startRouting';
 
 const CLIPS_FAQ = [
   {
@@ -171,6 +172,19 @@ export function BrowsePage() {
   useEffect(() => {
     applyTelegramTheme();
   }, []);
+
+  useEffect(() => {
+    if (clipId) {
+      return;
+    }
+    const hintedClipId = resolveClipIdHint(location.search, session.startParam);
+    if (!hintedClipId) {
+      return;
+    }
+    const cleanedSearch = stripStartRoutingParams(location.search);
+    const suffix = cleanedSearch ? `?${cleanedSearch}` : '';
+    navigate(`/clips/${encodeURIComponent(hintedClipId)}${suffix}`, { replace: true });
+  }, [clipId, location.search, navigate, session.startParam]);
 
   useEffect(() => {
     setAnalyticsContext({
