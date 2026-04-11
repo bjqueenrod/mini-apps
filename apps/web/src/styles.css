@@ -2590,6 +2590,24 @@ button {
   border-radius: 12px;
   padding: 12px 14px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.payment-sheet__primary-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.payment-sheet__primary-logo {
+  width: 18px;
+  height: 18px;
+  display: block;
+  object-fit: contain;
+  flex: none;
 }
 
 .payment-sheet__ghost {

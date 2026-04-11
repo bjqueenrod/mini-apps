@@ -182,17 +182,36 @@ export function PaymentSheet({
     () => selectedMethodInfo?.label || 'Pay',
     [selectedMethodInfo],
   );
+  const isPaypalSelected = selectedMethodInfo?.paymentMethod === 'paypal';
 
   const payButtonLabel = useMemo(() => {
+    const paypalPayLabel = selectedPriceLabel ? `Pay - ${selectedPriceLabel}` : 'Pay';
     if (state === 'confirm') {
-      return selectedPriceLabel ? `Pay ${selectedPriceLabel}` : `Pay with ${selectedLabel}`;
+      return isPaypalSelected ? paypalPayLabel : selectedPriceLabel ? `Pay ${selectedPriceLabel}` : `Pay with ${selectedLabel}`;
     }
     if (state === 'select') {
       if (hasInstructions) return 'Confirm';
-      return selectedPriceLabel ? `Pay ${selectedPriceLabel}` : `Pay with ${selectedLabel}`;
+      return isPaypalSelected ? paypalPayLabel : selectedPriceLabel ? `Pay ${selectedPriceLabel}` : `Pay with ${selectedLabel}`;
     }
     return 'Confirm';
-  }, [state, hasInstructions, selectedPriceLabel, selectedLabel]);
+  }, [state, hasInstructions, selectedPriceLabel, selectedLabel, isPaypalSelected]);
+
+  const primaryButtonContent = useMemo(() => {
+    if (!isPaypalSelected || !payButtonLabel.toLowerCase().startsWith('pay')) {
+      return payButtonLabel;
+    }
+    return (
+      <>
+        <img
+          src="/paypal-logo.png"
+          alt=""
+          aria-hidden="true"
+          className="payment-sheet__primary-logo"
+        />
+        <span>{payButtonLabel}</span>
+      </>
+    );
+  }, [isPaypalSelected, payButtonLabel]);
 
   const handleCopyTributeCode = useCallback(async () => {
     if (!selectedTributeCode) return;
@@ -331,7 +350,7 @@ export function PaymentSheet({
 
   const paymentButton = (
     <button type="button" className="payment-sheet__primary" onClick={handlePrimaryClick} disabled={primaryButtonDisabled}>
-      {payButtonLabel}
+      <span className="payment-sheet__primary-content">{primaryButtonContent}</span>
     </button>
   );
 
@@ -424,7 +443,7 @@ export function PaymentSheet({
             {paymentNotes}
             <div className="payment-sheet__actions payment-sheet__actions--confirm">
               <button type="button" className="payment-sheet__primary" onClick={handleCheckout} disabled={primaryButtonDisabled}>
-                {payButtonLabel}
+                <span className="payment-sheet__primary-content">{primaryButtonContent}</span>
               </button>
               <button type="button" className="payment-sheet__ghost" onClick={() => setState('select')}>
                 Choose a different method
