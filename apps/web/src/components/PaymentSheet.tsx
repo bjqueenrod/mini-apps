@@ -134,7 +134,8 @@ export function PaymentSheet({
   const showPaymentDetails = state !== 'select';
   const requiresCode = Boolean(selectedMethodInfo?.requiresCode);
   const hasInstructions = Boolean(selectedInstructions || selectedTributeCode || requiresCode);
-  const isLoading = state === 'loading' || state === 'submitting';
+  const isInitialLoading = state === 'loading';
+  const isSubmittingCheckout = state === 'submitting';
 
   useEffect(() => {
     let cancelled = false;
@@ -313,7 +314,7 @@ export function PaymentSheet({
       openPaymentUrl(url);
       setState('waiting');
     } catch (err) {
-      setError('Unable to start checkout. Try again or pay in bot.');
+      setError(err instanceof Error && err.message ? err.message : 'Unable to start checkout. Try again or pay in bot.');
       setState('error');
     }
   }, [itemContext, mode, orderId, productId, quantity, selectedMethod, saveProgress]);
@@ -360,7 +361,7 @@ export function PaymentSheet({
           </button>
         </div>
 
-        {isLoading ? (
+        {isInitialLoading ? (
           <div className="payment-sheet__body payment-sheet__body--shimmer">
             <div className="payment-sheet__spinner">
               <div className="payment-sheet__shimmer-dot" />
@@ -425,6 +426,16 @@ export function PaymentSheet({
                 Choose a different method
               </button>
             </div>
+          </div>
+        ) : null}
+
+        {isSubmittingCheckout ? (
+          <div className="payment-sheet__body payment-sheet__body--center">
+            <div className="payment-sheet__spinner payment-sheet__spinner--center">
+              <div className="payment-sheet__spinner-wheel" aria-hidden />
+              <span>Checking out…</span>
+            </div>
+            <p className="payment-sheet__muted-text">Opening your payment link now.</p>
           </div>
         ) : null}
 
