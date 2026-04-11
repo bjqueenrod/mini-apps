@@ -2662,6 +2662,13 @@ button {
   letter-spacing: 0.04em;
 }
 
+.payment-sheet__note-copied {
+  font-size: 0.78rem;
+  color: var(--accent-strong, #cf96ee);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
 .payment-sheet__shimmer-dot {
   width: 10px;
   height: 10px;

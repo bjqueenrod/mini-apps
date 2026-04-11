@@ -54,6 +54,7 @@ export function PaymentSheet({
   const [invoiceId, setInvoiceId] = useState<string>('');
   const [paymentUrl, setPaymentUrl] = useState<string | undefined>('');
   const [orderId, setOrderId] = useState<number | null>(null);
+  const [copiedTributeCode, setCopiedTributeCode] = useState(false);
   const [currency] = useCurrencyPreference();
   const storageKey = useMemo(
     () => `paymentSheet:${productId}:${mode || 'default'}`,
@@ -195,21 +196,28 @@ export function PaymentSheet({
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(selectedTributeCode);
-        return;
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = selectedTributeCode;
+        textarea.setAttribute('readonly', 'true');
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
       }
-      const textarea = document.createElement('textarea');
-      textarea.value = selectedTributeCode;
-      textarea.setAttribute('readonly', 'true');
-      textarea.style.position = 'fixed';
-      textarea.style.left = '-9999px';
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
+      setCopiedTributeCode(true);
     } catch {
       // ignore copy failures
     }
   }, [selectedTributeCode]);
+
+  useEffect(() => {
+    if (!copiedTributeCode) return undefined;
+    const timer = window.setTimeout(() => setCopiedTributeCode(false), 1400);
+    return () => window.clearTimeout(timer);
+  }, [copiedTributeCode, selectedTributeCode]);
 
   const renderInstructionText = useCallback((text: string) => {
     const lines = text.split(/\r?\n/);
@@ -241,6 +249,7 @@ export function PaymentSheet({
           >
             {selectedTributeCode}
           </button>
+          {copiedTributeCode ? <div className="payment-sheet__note-copied">Copied</div> : null}
         </div>
       ) : null}
     </div>
