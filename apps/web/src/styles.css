@@ -2653,9 +2653,15 @@ button {
 
 .payment-sheet__note-text {
   margin: 0;
-  line-height: 1.4;
+  display: grid;
+  gap: 8px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+.payment-sheet__instruction-line {
+  display: block;
+  line-height: 1.5;
 }
 
 .payment-sheet__note-code {

@@ -222,9 +222,8 @@ export function PaymentSheet({
   const renderInstructionText = useCallback((text: string) => {
     const lines = text.split(/\r?\n/);
     return lines.map((line, index) => (
-      <span key={`${index}:${line}`}>
+      <span key={`${index}:${line}`} className="payment-sheet__instruction-line">
         {line}
-        {index < lines.length - 1 ? <br /> : null}
       </span>
     ));
   }, []);
