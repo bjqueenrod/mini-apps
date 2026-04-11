@@ -2658,21 +2658,25 @@ button {
 }
 
 .payment-sheet__note-code {
+  appearance: none;
+  -webkit-appearance: none;
+  -webkit-text-fill-color: var(--text, #f3edf7);
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 46px;
-  padding: 12px 14px;
+  min-height: 50px;
+  padding: 13px 16px;
   border-radius: 12px;
-  background: linear-gradient(180deg, rgba(39, 31, 48, 0.96), rgba(30, 23, 39, 0.96));
-  border: 1px solid var(--line, #2c2335);
+  background: linear-gradient(180deg, rgba(52, 39, 64, 0.98), rgba(34, 25, 44, 0.98));
+  border: 1px solid rgba(193, 128, 229, 0.38);
   color: var(--text, #f3edf7);
   font-family: 'SFMono-Regular', 'Consolas', 'Menlo', monospace;
-  font-size: 1rem;
+  font-size: 1.06rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-align: center;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
 }
 
 .payment-sheet__note-copied {
