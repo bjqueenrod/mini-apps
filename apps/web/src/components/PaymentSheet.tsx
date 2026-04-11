@@ -31,6 +31,12 @@ function openPaymentUrl(url?: string | null) {
   }
 }
 
+/** Navigate the current webview to the delivery URL (stream/download after payment). */
+function navigateDeliveryUrl(url?: string | null): void {
+  if (!url) return;
+  window.location.assign(url);
+}
+
 export function PaymentSheet({
   productId,
   quantity = 1,
@@ -782,14 +788,14 @@ export function PaymentSheet({
                   I have recieved your payment to <strong>Stream: {clipTitle || 'your clip'}</strong>.
                   <br />
                   <br />
-                  Tap '🎬 Stream Now' to start watching right away or you can watch it later, i have DM&apos;d you
-                  the link aswell.
+                  Tap <strong>🎬 Stream Now</strong> to start watching right away or you can watch it later, i have
+                  DM&apos;d you the link aswell.
                 </p>
                 {successResult?.deliveryUrl ? (
                   <button
                     type="button"
-                    className="payment-sheet__primary"
-                    onClick={() => openPaymentUrl(successResult.deliveryUrl || undefined)}
+                    className="payment-sheet__primary payment-sheet__primary--delivery"
+                    onClick={() => navigateDeliveryUrl(successResult.deliveryUrl)}
                   >
                     🎬 Stream Now
                   </button>
@@ -805,14 +811,14 @@ export function PaymentSheet({
                   I have recieved your payment to <strong>Download: {clipTitle || 'your clip'}</strong>.
                   <br />
                   <br />
-                  Tap '📥 Download Now' to begin the download right away or you can download it later, i have
-                  DM&apos;d you the link aswell.
+                  Tap <strong>📥 Download Now</strong> to begin the download right away or you can download it later, i
+                  have DM&apos;d you the link aswell.
                 </p>
                 {successResult?.deliveryUrl ? (
                   <button
                     type="button"
-                    className="payment-sheet__primary"
-                    onClick={() => openPaymentUrl(successResult.deliveryUrl || undefined)}
+                    className="payment-sheet__primary payment-sheet__primary--delivery"
+                    onClick={() => navigateDeliveryUrl(successResult.deliveryUrl)}
                   >
                     📥 Download Now
                   </button>
