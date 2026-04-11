@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -8,6 +10,7 @@ from app.api.deps import get_db, get_session
 from app.schemas.preferences import CurrencyPreferenceRequest, CurrencyPreferenceResponse
 
 router = APIRouter(prefix="/preferences", tags=["preferences"])
+logger = logging.getLogger(__name__)
 
 ALLOWED_CURRENCY_CODES = {"GBP", "USD"}
 CREATE_USER_PREFERENCES_TABLE_SQL = """
@@ -79,7 +82,9 @@ def _save_currency_preference(db: Session, user_id: int, currency: str) -> str:
 @router.get("/currency", response_model=CurrencyPreferenceResponse)
 def get_currency_preference(session: dict = Depends(get_session), db: Session = Depends(get_db)) -> CurrencyPreferenceResponse:
     user_id = _require_telegram_user_id(session)
-    return CurrencyPreferenceResponse(currency=_load_currency_preference(db, user_id))
+    currency = _load_currency_preference(db, user_id)
+    logger.info("Loaded currency preference user_id=%s currency=%s", user_id, currency)
+    return CurrencyPreferenceResponse(currency=currency)
 
 
 @router.post("/currency", response_model=CurrencyPreferenceResponse)
@@ -89,4 +94,6 @@ def set_currency_preference(
     db: Session = Depends(get_db),
 ) -> CurrencyPreferenceResponse:
     user_id = _require_telegram_user_id(session)
-    return CurrencyPreferenceResponse(currency=_save_currency_preference(db, user_id, payload.currency))
+    currency = _save_currency_preference(db, user_id, payload.currency)
+    logger.info("Saved currency preference user_id=%s currency=%s", user_id, currency)
+    return CurrencyPreferenceResponse(currency=currency)
