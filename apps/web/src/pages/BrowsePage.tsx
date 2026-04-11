@@ -490,11 +490,13 @@ export function BrowsePage() {
               key={item.question}
               className="faq-card"
               open={openFaqQuestion === item.question}
-              onToggle={(event) => {
-                setOpenFaqQuestion(event.currentTarget.open ? item.question : null);
-              }}
             >
-              <summary>
+              <summary
+                onClick={(event) => {
+                  event.preventDefault();
+                  setOpenFaqQuestion((current) => (current === item.question ? null : item.question));
+                }}
+              >
                 <span className="faq-card__summary">
                   <span className="faq-card__icon" aria-hidden="true">
                     {item.icon === 'help'
