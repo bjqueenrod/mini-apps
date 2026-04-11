@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from typing import Any
 
 import httpx
@@ -73,22 +74,36 @@ def invoice_options(
         payload["flow_id"] = flow_id
     if not payload.get("items") and payload.get("order_id") is None:
         raise PaymentSystemError("order_id or items is required")
-    try:
-        response = httpx.post(
-            f"{base}/api/invoices/options",
-            json=payload,
-            headers=_headers(),
-            timeout=settings.payment_system_timeout_seconds,
-        )
-        response.raise_for_status()
-        return response.json()
-    except httpx.HTTPStatusError as exc:
-        logger.warning("Invoice options request failed: %s", exc)
-        message = _response_error_message(exc.response, "unable to load payment options")
-        raise PaymentSystemError(message) from exc
-    except httpx.HTTPError as exc:
-        logger.warning("Invoice options request failed: %s", exc)
-        raise PaymentSystemError("unable to load payment options") from exc
+    last_error: Exception | None = None
+    for attempt in range(2):
+        try:
+            response = httpx.post(
+                f"{base}/api/invoices/options",
+                json=payload,
+                headers=_headers(),
+                timeout=settings.payment_system_timeout_seconds,
+            )
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as exc:
+            status_code = getattr(exc.response, "status_code", None)
+            logger.warning("Invoice options request failed (attempt=%s status=%s): %s", attempt + 1, status_code, exc)
+            if attempt == 0 and status_code in {502, 503, 504}:
+                last_error = exc
+                time.sleep(0.25)
+                continue
+            message = _response_error_message(exc.response, "unable to load payment options")
+            raise PaymentSystemError(message) from exc
+        except httpx.HTTPError as exc:
+            logger.warning("Invoice options request failed (attempt=%s): %s", attempt + 1, exc)
+            last_error = exc
+            if attempt == 0:
+                time.sleep(0.25)
+                continue
+            raise PaymentSystemError("unable to load payment options") from exc
+    if last_error:
+        raise PaymentSystemError("unable to load payment options") from last_error
+    raise PaymentSystemError("unable to load payment options")
 
 
 def create_order(
