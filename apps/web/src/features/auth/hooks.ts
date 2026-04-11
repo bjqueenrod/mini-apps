@@ -1,18 +1,21 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { authenticate } from './api';
 import { getTelegramContext } from '../../app/telegram';
 
 export function useTelegramSession() {
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
-  const context = useMemo(() => getTelegramContext(), []);
+  const [context, setContext] = useState(() => getTelegramContext());
 
   useEffect(() => {
+    const ctx = getTelegramContext();
+    setContext(ctx);
+
     let mounted = true;
-    const fallbackUser = context.isTelegram
+    const fallbackUser = ctx.isTelegram
       ? undefined
-      : context.user ?? { id: 1, username: 'local-preview', firstName: 'Local' };
-    authenticate(context.initData, fallbackUser, context.startParam)
+      : ctx.user ?? { id: 1, username: 'local-preview', firstName: 'Local' };
+    authenticate(ctx.initData, fallbackUser, ctx.startParam)
       .catch((err: Error) => {
         if (mounted) {
           setError(err.message);
@@ -26,7 +29,7 @@ export function useTelegramSession() {
     return () => {
       mounted = false;
     };
-  }, [context.initData, context.startParam, context.user?.id]);
+  }, []);
 
   return { ...context, ready, error };
 }

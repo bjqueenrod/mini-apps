@@ -15,7 +15,38 @@ vi.mock('@tma.js/sdk', () => ({
   retrieveLaunchParams: sdk.retrieveLaunchParamsMock,
 }));
 
-import { sendBotWebAppData } from './telegram';
+import { getTelegramContext, sendBotWebAppData } from './telegram';
+
+describe('getTelegramContext', () => {
+  beforeEach(() => {
+    sdk.retrieveLaunchParamsMock.mockClear();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('reads tgWebAppStartParam from the URL hash when the SDK cannot parse launch params', () => {
+    sdk.retrieveLaunchParamsMock.mockImplementation(() => {
+      throw new Error('simulated launch parse failure');
+    });
+    vi.stubGlobal('window', {
+      location: {
+        search: '',
+        hash: '#tgWebAppStartParam=clips_BJQ0169__l_e&tgWebAppPlatform=ios',
+      },
+      Telegram: {
+        WebApp: {
+          initData: '',
+          initDataUnsafe: {},
+        },
+      },
+    });
+    const ctx = getTelegramContext();
+    expect(ctx.startParam).toBe('clips_BJQ0169__l_e');
+    expect(ctx.isTelegram).toBe(true);
+  });
+});
 
 describe('sendBotWebAppData', () => {
   beforeEach(() => {
