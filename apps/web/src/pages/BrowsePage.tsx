@@ -25,6 +25,39 @@ import { pushRecentSearch } from '../utils/storage';
 import { composeSearchText, extractHashtagTokens, FEATURED_TAGS, normalizeTag, setHashtagToken, stripHashtagTokens } from '../utils/tags';
 import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
 
+const CLIPS_FAQ = [
+  {
+    question: 'What happens after I pay for a clip?',
+    answer:
+      'Once payment is confirmed, I show the delivery link here and DM it to you as well so you can return later and watch or download it again.',
+    icon: 'help',
+  },
+  {
+    question: 'What is the difference between Stream Now and Download Now?',
+    answer:
+      'Stream Now opens the clip in the webview so you can watch immediately. Download Now opens the download flow so you can save the clip to your device.',
+    icon: 'scroll',
+  },
+  {
+    question: 'Do I need to buy inside Telegram?',
+    answer:
+      'No. You can pay in the mini-app browser, but if you are already in Telegram I can also hand you back to the bot when needed.',
+    icon: 'chat',
+  },
+  {
+    question: 'Will I get the link again later?',
+    answer:
+      'Yes. The delivery link is sent to you in DM as well, so you can come back to it later if you do not want to use it immediately.',
+    icon: 'sparkles',
+  },
+  {
+    question: 'Which payment methods are available?',
+    answer:
+      'The payment sheet shows the available methods for that clip, including any active options such as PayPal, crypto, or Throne when they are available.',
+    icon: 'package',
+  },
+] as const;
+
 export function BrowsePage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -409,6 +442,37 @@ export function BrowsePage() {
           currency={currency}
         />
       ) : null}
+
+      <section className="tasks-panel tasks-panel--faq">
+        <div className="tasks-panel__header">
+          <p className="hero__eyebrow">FAQ</p>
+          <h2>Questions before you choose a clip?</h2>
+        </div>
+        <div className="faq-list">
+          {CLIPS_FAQ.map((item) => (
+            <details key={item.question} className="faq-card">
+              <summary>
+                <span className="faq-card__summary">
+                  <span className="faq-card__icon" aria-hidden="true">
+                    {item.icon === 'help'
+                      ? '❔'
+                      : item.icon === 'scroll'
+                        ? '🎬'
+                        : item.icon === 'chat'
+                          ? '💬'
+                          : item.icon === 'sparkles'
+                            ? '✨'
+                            : '📦'}
+                  </span>
+                  <span className="faq-card__text">{item.question}</span>
+                  <span className="faq-card__chevron" aria-hidden="true" />
+                </span>
+              </summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
 
       <div ref={searchPanelSentinelRef} className="search-panel__sentinel" aria-hidden="true" />
       <section
