@@ -95,7 +95,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 8px;
 }
 
 .currency-banner__label {
@@ -113,8 +113,8 @@ button {
 
 .currency-banner__toggle {
   display: inline-flex;
-  gap: 6px;
-  padding: 2px;
+  gap: 4px;
+  padding: 1px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(176, 106, 214, 0.25);
@@ -124,10 +124,10 @@ button {
   border: none;
   background: transparent;
   color: #f3e9ff;
-  padding: 6px 12px;
+  padding: 5px 10px;
   border-radius: 999px;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   letter-spacing: 0.01em;
   cursor: pointer;
   transition: background 120ms ease, color 120ms ease, box-shadow 120ms ease;
