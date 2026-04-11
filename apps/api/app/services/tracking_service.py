@@ -10,11 +10,12 @@ from app.core.telegram import TelegramUser
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
+# Match plain l_<id> and mini-app startapp prefixes (clips_BJQ…__l_<id>, keyholding__l_<id>, …).
 TRACKED_START_PARAM_PATTERN = re.compile(
     r"^(?:"
     r"l_[0-9a-z]+(?:__[A-Za-z0-9_-]{1,64})?"
     r"|"
-    r"clips(?:_[A-Za-z0-9_-]{1,64})?__l_[0-9a-z]+(?:__[A-Za-z0-9_-]{1,64})?"
+    r"[A-Za-z0-9_]{1,64}__l_[0-9a-z]+(?:__[A-Za-z0-9_-]{1,64})?"
     r")$"
 )
 
