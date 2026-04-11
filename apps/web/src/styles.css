@@ -2364,30 +2364,27 @@ button {
 }
 
 .clips-faq__body {
-  overflow: hidden;
-  max-height: 0;
+  display: grid;
+  grid-template-rows: 0fr;
   opacity: 0;
   transform: translateY(-8px);
-  visibility: hidden;
   pointer-events: none;
   transition:
-    max-height 320ms ease,
+    grid-template-rows 320ms ease,
     opacity 220ms ease,
-    transform 220ms ease,
-    visibility 0s linear 220ms;
+    transform 220ms ease;
 }
 
 .clips-faq--open .clips-faq__body {
-  max-height: 4000px;
+  grid-template-rows: 1fr;
   opacity: 1;
   transform: translateY(0);
-  visibility: visible;
   pointer-events: auto;
-  transition:
-    max-height 360ms ease,
-    opacity 240ms ease,
-    transform 240ms ease,
-    visibility 0s;
+}
+
+.clips-faq__body-inner {
+  overflow: hidden;
+  min-height: 0;
 }
 
 .clips-faq__toggle {

@@ -485,26 +485,28 @@ export function BrowsePage() {
           </button>
         </div>
         <div className="clips-faq__body" aria-hidden={!showFaq}>
-          <div className="faq-list">
-            {CLIPS_FAQ.map((item) => (
-              <details key={item.question} className="faq-card" open={openFaqQuestion === item.question}>
-                <summary
-                  onClick={(event) => {
-                    event.preventDefault();
-                    setOpenFaqQuestion((current) => (current === item.question ? null : item.question));
-                  }}
-                >
-                  <span className="faq-card__summary">
-                    <span className="faq-card__icon" aria-hidden="true">
-                      ❔
+          <div className="clips-faq__body-inner">
+            <div className="faq-list">
+              {CLIPS_FAQ.map((item) => (
+                <details key={item.question} className="faq-card" open={openFaqQuestion === item.question}>
+                  <summary
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setOpenFaqQuestion((current) => (current === item.question ? null : item.question));
+                    }}
+                  >
+                    <span className="faq-card__summary">
+                      <span className="faq-card__icon" aria-hidden="true">
+                        ❔
+                      </span>
+                      <span className="faq-card__text">{item.question}</span>
+                      <span className="faq-card__chevron" aria-hidden="true" />
                     </span>
-                    <span className="faq-card__text">{item.question}</span>
-                    <span className="faq-card__chevron" aria-hidden="true" />
-                  </span>
-                </summary>
-                <p>{item.answer}</p>
-              </details>
-            ))}
+                  </summary>
+                  <p>{item.answer}</p>
+                </details>
+              ))}
+            </div>
           </div>
         </div>
       </section>
