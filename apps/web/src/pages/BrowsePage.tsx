@@ -85,12 +85,6 @@ const CLIPS_FAQ = [
       'No. The 60-minute window starts on the first successful redeem and doesn’t reset on later redeems.',
     icon: 'scroll',
   },
-  {
-    question: 'Is downloading restricted to a specific IP?',
-    answer:
-      'It can be optional. Download links support an optional IP bind so the signed download URL only works from that IP if configured.',
-    icon: 'toy',
-  },
 ] as const;
 
 export function BrowsePage() {
