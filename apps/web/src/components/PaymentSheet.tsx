@@ -5,6 +5,7 @@ import { PaymentMethod } from '../features/payments/types';
 import { resolvePriceLabelOptional } from '../utils/pricing';
 import { isTelegramWebView, openBotDeepLink } from '../app/telegram';
 import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
+import { trackInteraction } from '../app/analytics';
 
 type SheetState = 'loading' | 'select' | 'confirm' | 'submitting' | 'waiting' | 'success' | 'error';
 const WAITING_TIMEOUT_MS = 5 * 60 * 1000;
@@ -169,6 +170,31 @@ export function PaymentSheet({
   const hasInstructions = Boolean(selectedInstructions || selectedTributeCode || requiresCode);
   const isInitialLoading = state === 'loading';
   const isSubmittingCheckout = state === 'submitting';
+  const trackCheckoutConfirm = useCallback((source: 'confirm' | 'quick' | 'retry', freshCheckout?: boolean) => {
+    if (!selectedMethod) return;
+    trackInteraction({
+      screen: 'payment_sheet',
+      actionKey: 'payment_checkout_confirm',
+      properties: {
+        source,
+        product_id: productId,
+        payment_method: selectedMethod,
+        payment_method_label: selectedMethodInfo?.label || undefined,
+        quantity,
+        mode: mode || undefined,
+        delivery_mode: deliveryMode || undefined,
+        currency,
+        price_label: selectedPriceLabel || undefined,
+        requires_code: requiresCode,
+        has_instructions: hasInstructions,
+        has_saved_code: Boolean(selectedTributeCode),
+        order_id: orderId ?? undefined,
+        fresh_checkout: Boolean(freshCheckout),
+        clip_title: clipTitle || undefined,
+        has_bot_fallback: Boolean(botFallbackUrl),
+      },
+    });
+  }, [botFallbackUrl, clipTitle, currency, deliveryMode, hasInstructions, mode, orderId, productId, quantity, requiresCode, selectedMethod, selectedMethodInfo?.label, selectedPriceLabel, selectedTributeCode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -455,16 +481,19 @@ export function PaymentSheet({
       setError(err instanceof Error && err.message ? err.message : 'Unable to start checkout. Try again or pay in bot.');
       setState('error');
     }
-  }, [clearTimedOutCheckout, itemContext, mode, orderId, productId, quantity, saveProgress, selectedMethod, selectedTributeCode]);
+  }, [clearTimedOutCheckout, currency, itemContext, mode, orderId, productId, quantity, saveProgress, selectedMethod, selectedTributeCode]);
 
   const handlePrimaryClick = useCallback(() => {
     if (state === 'select') {
       setState(hasInstructions ? 'confirm' : 'submitting');
-      if (!hasInstructions) void handleCheckout();
+      if (!hasInstructions) {
+        trackCheckoutConfirm('quick');
+        void handleCheckout();
+      }
       return;
     }
     void handleCheckout();
-  }, [state, hasInstructions, handleCheckout]);
+  }, [state, hasInstructions, handleCheckout, trackCheckoutConfirm]);
 
   const paymentButton = (
     <button
@@ -599,7 +628,10 @@ export function PaymentSheet({
               <button
                 type="button"
                 className={`payment-sheet__primary${isWhitePayButton ? ' payment-sheet__primary--white' : ''}`}
-                onClick={() => void handleCheckout()}
+                onClick={() => {
+                  trackCheckoutConfirm('confirm');
+                  void handleCheckout();
+                }}
                 disabled={primaryButtonDisabled}
               >
                 <span className="payment-sheet__primary-content">{primaryButtonContent}</span>
@@ -729,7 +761,10 @@ export function PaymentSheet({
             <button
               type="button"
               className="payment-sheet__primary"
-              onClick={() => void handleCheckout({ freshCheckout: true })}
+              onClick={() => {
+                trackCheckoutConfirm('retry', true);
+                void handleCheckout({ freshCheckout: true });
+              }}
               disabled={retryButtonDisabled}
             >
               Retry checkout
