@@ -9,17 +9,17 @@ import { useEffect } from 'react';
 import { resolveClipIdHint, resolveStartappHint, stripStartRoutingParams } from '../utils/startRouting';
 
 export function resolveHomeRedirectTarget(search: string, startParam?: string | null): string | null {
-  const startapp = resolveStartappHint(search, startParam);
-  if (!startapp) {
-    return null;
-  }
-
-  const clipId = startapp === 'clips' ? resolveClipIdHint(search, startParam) : null;
+  const clipId = resolveClipIdHint(search, startParam);
   const cleanedSearch = stripStartRoutingParams(search);
   const suffix = cleanedSearch ? `?${cleanedSearch}` : '';
 
-  if (startapp === 'clips' && clipId) {
+  if (clipId) {
     return `/clips/${encodeURIComponent(clipId)}${suffix}`;
+  }
+
+  const startapp = resolveStartappHint(search, startParam);
+  if (!startapp) {
+    return null;
   }
 
   return `/${startapp}${suffix}`;
