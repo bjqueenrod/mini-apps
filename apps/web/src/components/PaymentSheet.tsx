@@ -431,6 +431,11 @@ export function PaymentSheet({
   );
 
   const handleChangeMethod = useCallback(() => {
+    if (state === 'waiting' && invoiceId) {
+      void cancelInvoice(invoiceId).catch(() => {
+        // best-effort cancellation; proceed to selection either way
+      });
+    }
     setInvoiceId('');
     setPaymentUrl('');
     setSavedPaymentCode('');
@@ -438,7 +443,7 @@ export function PaymentSheet({
     setState('select');
     setError('');
     saveProgress({ orderId, selectedMethod, paymentCode: '', waitingStartedAt: null });
-  }, [orderId, saveProgress]);
+  }, [invoiceId, orderId, saveProgress, selectedMethod, state]);
 
   useEffect(() => {
     if (state === 'success' || state === 'error') {
