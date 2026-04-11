@@ -2653,9 +2653,32 @@ button {
   align-items: center;
 }
 
+.payment-sheet__actions--inline {
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .payment-sheet__actions--confirm {
   margin-top: 16px;
   gap: 14px;
+}
+
+.payment-sheet__actions--inline .payment-sheet__primary,
+.payment-sheet__actions--inline .payment-sheet__ghost {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 10px 12px;
+  font-size: 0.92rem;
+}
+
+.payment-sheet__actions--inline .payment-sheet__primary {
+  white-space: nowrap;
+}
+
+.payment-sheet__actions--inline .payment-sheet__ghost {
+  white-space: nowrap;
 }
 
 .payment-sheet__note {

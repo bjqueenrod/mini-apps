@@ -497,14 +497,22 @@ export function PaymentSheet({
               <span>Waiting for payment…</span>
             </div>
             <p className="payment-sheet__muted-text">Checkout opened in your browser. Complete payment and we’ll update here.</p>
-            <div className="payment-sheet__actions">
+            <div className="payment-sheet__actions payment-sheet__actions--inline">
               {paymentUrl ? (
-                <button type="button" className="payment-sheet__primary" onClick={() => openPaymentUrl(paymentUrl)}>
-                  Open payment link again
+                <button
+                  type="button"
+                  className="payment-sheet__primary payment-sheet__primary--compact"
+                  onClick={() => openPaymentUrl(paymentUrl)}
+                >
+                  Open again
                 </button>
               ) : null}
-              <button type="button" className="payment-sheet__ghost" onClick={handleChangeMethod}>
-                Choose a different method
+              <button
+                type="button"
+                className="payment-sheet__ghost payment-sheet__ghost--compact"
+                onClick={handleChangeMethod}
+              >
+                Change method
               </button>
               {paymentNotes}
               {showBotFallbackActions ? (
