@@ -2675,7 +2675,7 @@ button {
 .payment-sheet__actions--inline .payment-sheet__ghost {
   flex: 1 1 0;
   min-width: 0;
-  padding: 10px 12px;
+  padding: 8px 10px;
   font-size: 0.92rem;
 }
 
