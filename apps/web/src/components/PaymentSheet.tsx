@@ -116,7 +116,7 @@ export function PaymentSheet({
     selectedMethodInfo?.instructionTemplates?.checkoutDefault?.trim() ||
     selectedMethodInfo?.instructions?.trim();
   const selectedTributeCode = selectedMethodInfo?.tributeCode?.trim();
-  const showTributeCode = state !== 'select';
+  const showPaymentDetails = state !== 'select';
   const requiresCode = Boolean(selectedMethodInfo?.requiresCode);
   const hasInstructions = Boolean(selectedInstructions || selectedTributeCode || requiresCode);
   const isLoading = state === 'loading' || state === 'submitting';
@@ -189,7 +189,7 @@ export function PaymentSheet({
     return 'Confirm';
   }, [state, hasInstructions, selectedPriceLabel, selectedLabel]);
 
-  const paymentNotes = selectedInstructions || selectedTributeCode ? (
+  const paymentNotes = showPaymentDetails && (selectedInstructions || selectedTributeCode) ? (
     <div className="payment-sheet__note" role="note">
       {selectedInstructions ? (
         <div className="payment-sheet__note-block">
@@ -197,7 +197,7 @@ export function PaymentSheet({
           <p className="payment-sheet__note-text">{selectedInstructions}</p>
         </div>
       ) : null}
-      {showTributeCode && selectedTributeCode ? (
+      {selectedTributeCode ? (
         <div className="payment-sheet__note-block">
           <div className="payment-sheet__note-label">Tribute code</div>
           <code className="payment-sheet__note-code">{selectedTributeCode}</code>
