@@ -27,6 +27,7 @@ class TelegramAuthResult:
     auth_date: int
     query_id: str | None
     user: TelegramUser
+    start_param: str | None = None
 
 
 
@@ -81,4 +82,16 @@ def validate_init_data(init_data: str, bot_token: str) -> TelegramAuthResult:
     except ValueError as exc:
         raise TelegramInitDataError("auth_date is invalid") from exc
 
-    return TelegramAuthResult(auth_date=auth_date, query_id=payload.get("query_id"), user=user)
+    start_raw = payload.get("start_param")
+    start_param: str | None = None
+    if start_raw is not None:
+        normalized_start = str(start_raw).strip()
+        if normalized_start:
+            start_param = normalized_start
+
+    return TelegramAuthResult(
+        auth_date=auth_date,
+        query_id=payload.get("query_id"),
+        user=user,
+        start_param=start_param,
+    )

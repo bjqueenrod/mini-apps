@@ -27,23 +27,27 @@ def auth_telegram(payload: TelegramAuthRequest, response: Response) -> TelegramA
         except TelegramInitDataError as exc:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc)) from exc
         user = result.user
+        # Prefer start_param from signed initData (Telegram supplies it for startapp launches); the
+        # client-sent field can be missing when launch params are not exposed to JS reliably.
+        effective_start_param = (result.start_param or payload.start_param or "").strip() or None
     elif settings.is_dev and payload.dev_user:
         source = "development"
         user = TelegramUser(id=payload.dev_user.id, username=payload.dev_user.username, first_name=payload.dev_user.first_name)
+        effective_start_param = (payload.start_param or "").strip() or None
     else:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="initData is required")
 
-    notify_miniapp_open(payload.start_param, user)
+    notify_miniapp_open(effective_start_param, user)
 
     serializer = get_session_serializer()
-    session_payload = build_session_payload(user, source=source, start_param=payload.start_param)
+    session_payload = build_session_payload(user, source=source, start_param=effective_start_param)
     logger.info(
         "Created auth session source=%s telegram_user_id=%s username=%s first_name=%s start_param=%s",
         source,
         session_payload["telegram_user_id"],
         session_payload.get("username"),
         session_payload.get("first_name"),
-        session_payload.get("start_param"),
+        effective_start_param,
     )
     token = serializer.dumps(session_payload)
     max_age = 60 * 60 * 24 * 7
