@@ -290,6 +290,15 @@ export function PaymentSheet({
     return () => window.clearInterval(timer);
   }, [state, waitingStartedAt]);
 
+  const clearTimedOutCheckout = useCallback(() => {
+    setInvoiceId('');
+    setPaymentUrl('');
+    setSavedPaymentCode('');
+    setWaitingStartedAt(null);
+    setOrderId(null);
+    clearProgress();
+  }, [clearProgress]);
+
   const waitingCountdownLabel = useMemo(() => {
     const minutes = Math.floor(waitingRemainingSeconds / 60);
     const seconds = waitingRemainingSeconds % 60;
@@ -362,6 +371,7 @@ export function PaymentSheet({
         } catch {
           // best-effort cancellation; still surface the timeout
         }
+        clearTimedOutCheckout();
         setError('Timed out waiting for payment.');
         setState('error');
         return;
@@ -374,19 +384,27 @@ export function PaymentSheet({
     return () => {
       if (timer) window.clearTimeout(timer);
     };
-  }, [state, invoiceId, onSuccess]);
+  }, [clearTimedOutCheckout, invoiceId, onSuccess, state]);
 
-  const handleCheckout = useCallback(async () => {
+  const handleCheckout = useCallback(async (options?: { freshCheckout?: boolean }) => {
     if (!selectedMethod) return;
+    const freshCheckout = Boolean(options?.freshCheckout);
     setState('submitting');
     setError('');
     try {
+      let effectiveOrderId = orderId;
+      let effectivePaymentCode = selectedTributeCode;
+      if (freshCheckout) {
+        clearTimedOutCheckout();
+        effectiveOrderId = null;
+        effectivePaymentCode = '';
+      }
       const waitingStartedAt = Date.now();
       const res = await startCheckout(productId, selectedMethod, quantity, mode, {
         ...itemContext,
         currency,
-        ...(selectedTributeCode ? { paymentCode: selectedTributeCode } : {}),
-        ...(orderId ? { orderId } : {}),
+        ...(effectivePaymentCode ? { paymentCode: effectivePaymentCode } : {}),
+        ...(effectiveOrderId ? { orderId: effectiveOrderId } : {}),
       });
       setOrderId(res.orderId);
       setInvoiceId(res.invoiceId);
@@ -408,7 +426,7 @@ export function PaymentSheet({
       setError(err instanceof Error && err.message ? err.message : 'Unable to start checkout. Try again or pay in bot.');
       setState('error');
     }
-  }, [itemContext, mode, orderId, productId, quantity, selectedMethod, saveProgress]);
+  }, [clearTimedOutCheckout, itemContext, mode, orderId, productId, quantity, saveProgress, selectedMethod, selectedTributeCode]);
 
   const handlePrimaryClick = useCallback(() => {
     if (state === 'select') {
@@ -531,7 +549,7 @@ export function PaymentSheet({
               <button
                 type="button"
                 className={`payment-sheet__primary${isWhitePayButton ? ' payment-sheet__primary--white' : ''}`}
-                onClick={handleCheckout}
+                onClick={() => void handleCheckout()}
                 disabled={primaryButtonDisabled}
               >
                 <span className="payment-sheet__primary-content">{primaryButtonContent}</span>
@@ -608,7 +626,12 @@ export function PaymentSheet({
         {state === 'error' ? (
           <div className="payment-sheet__body">
             <div className="payment-sheet__error">{error || 'Payment unavailable right now.'}</div>
-            <button type="button" className="payment-sheet__primary" onClick={handleCheckout} disabled={retryButtonDisabled}>
+            <button
+              type="button"
+              className="payment-sheet__primary"
+              onClick={() => void handleCheckout({ freshCheckout: true })}
+              disabled={retryButtonDisabled}
+            >
               Retry checkout
             </button>
             {showRetry ? (
