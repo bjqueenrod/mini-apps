@@ -1,9 +1,45 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { isTelegramWebView } from '../app/telegram';
 import { CurrencyCode } from '../utils/format';
 
 const STORAGE_KEY = 'currencyPreference';
 export const CURRENCY_PREFERENCE_EVENT = 'currency-preference-changed';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api';
+
+async function fetchTelegramCurrencyPreference(): Promise<CurrencyCode | null> {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    try {
+      const response = await fetch(`${API_BASE}/preferences/currency`, {
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = (await response.json()) as { currency?: CurrencyCode };
+        return data.currency === 'USD' ? 'USD' : 'GBP';
+      }
+      if (response.status === 401 || response.status === 403) {
+        await new Promise((resolve) => window.setTimeout(resolve, 200 * (attempt + 1)));
+        continue;
+      }
+      return null;
+    } catch {
+      await new Promise((resolve) => window.setTimeout(resolve, 200 * (attempt + 1)));
+    }
+  }
+  return null;
+}
+
+async function persistTelegramCurrencyPreference(currency: CurrencyCode): Promise<void> {
+  const response = await fetch(`${API_BASE}/preferences/currency`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ currency }),
+  });
+  if (!response.ok) {
+    throw new Error('Unable to persist currency preference.');
+  }
+}
 
 function readCurrency(): CurrencyCode {
   if (typeof window === 'undefined') return 'GBP';
@@ -28,6 +64,7 @@ function readCurrency(): CurrencyCode {
 
 export function useCurrencyPreference(): [CurrencyCode, (next: CurrencyCode) => void] {
   const [currency, setCurrency] = useState<CurrencyCode>(() => readCurrency());
+  const hasLocalOverrideRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -40,6 +77,24 @@ export function useCurrencyPreference(): [CurrencyCode, (next: CurrencyCode) => 
   }, [currency]);
 
   useEffect(() => {
+    if (!isTelegramWebView()) return;
+    let cancelled = false;
+
+    const syncPreference = async () => {
+      const remoteCurrency = await fetchTelegramCurrencyPreference();
+      if (!cancelled && !hasLocalOverrideRef.current && remoteCurrency) {
+        setCurrency(remoteCurrency);
+      }
+    };
+
+    void syncPreference();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     const handleChange = (event: Event) => {
       const detail = (event as CustomEvent<CurrencyCode>).detail;
       if (!detail) return;
@@ -50,6 +105,7 @@ export function useCurrencyPreference(): [CurrencyCode, (next: CurrencyCode) => 
   }, []);
 
   const setPreference = useCallback((next: CurrencyCode) => {
+    hasLocalOverrideRef.current = true;
     setCurrency(next);
     if (typeof window !== 'undefined') {
       try {
@@ -59,6 +115,11 @@ export function useCurrencyPreference(): [CurrencyCode, (next: CurrencyCode) => 
         // ignore persistence errors
       }
       window.dispatchEvent(new CustomEvent<CurrencyCode>(CURRENCY_PREFERENCE_EVENT, { detail: next }));
+    }
+    if (isTelegramWebView()) {
+      void persistTelegramCurrencyPreference(next).catch(() => {
+        // keep local preference even if the server write fails
+      });
     }
   }, []);
 
