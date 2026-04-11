@@ -465,7 +465,7 @@ export function BrowsePage() {
       <section className="tasks-panel tasks-panel--faq clips-faq">
         <div className="tasks-panel__header">
           <p className="hero__eyebrow">FAQ</p>
-          <h2>Questions before you choose a clip?</h2>
+          <h2>Questions before purchase?</h2>
         </div>
         <div className="faq-list">
           {CLIPS_FAQ.map((item) => (
