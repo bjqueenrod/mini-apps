@@ -170,11 +170,35 @@ export function PaymentSheet({
   const hasInstructions = Boolean(selectedInstructions || selectedTributeCode || requiresCode);
   const isInitialLoading = state === 'loading';
   const isSubmittingCheckout = state === 'submitting';
-  const trackCheckoutConfirm = useCallback((source: 'confirm' | 'quick' | 'retry', freshCheckout?: boolean) => {
+  const trackPaymentConfirm = useCallback(() => {
     if (!selectedMethod) return;
     trackInteraction({
       screen: 'payment_sheet',
-      actionKey: 'payment_checkout_confirm',
+      actionKey: 'payment_method_confirm',
+      properties: {
+        product_id: productId,
+        payment_method: selectedMethod,
+        payment_method_label: selectedMethodInfo?.label || undefined,
+        quantity,
+        mode: mode || undefined,
+        delivery_mode: deliveryMode || undefined,
+        currency,
+        price_label: selectedPriceLabel || undefined,
+        requires_code: requiresCode,
+        has_instructions: hasInstructions,
+        has_saved_code: Boolean(selectedTributeCode),
+        order_id: orderId ?? undefined,
+        clip_title: clipTitle || undefined,
+        has_bot_fallback: Boolean(botFallbackUrl),
+      },
+    });
+  }, [botFallbackUrl, clipTitle, currency, deliveryMode, hasInstructions, mode, orderId, productId, quantity, requiresCode, selectedMethod, selectedMethodInfo?.label, selectedPriceLabel, selectedTributeCode]);
+
+  const trackPaymentPayTap = useCallback((source: 'confirm' | 'quick' | 'retry' | 'open_again', freshCheckout?: boolean) => {
+    if (!selectedMethod) return;
+    trackInteraction({
+      screen: 'payment_sheet',
+      actionKey: 'payment_pay_tap',
       properties: {
         source,
         product_id: productId,
@@ -195,6 +219,24 @@ export function PaymentSheet({
       },
     });
   }, [botFallbackUrl, clipTitle, currency, deliveryMode, hasInstructions, mode, orderId, productId, quantity, requiresCode, selectedMethod, selectedMethodInfo?.label, selectedPriceLabel, selectedTributeCode]);
+
+  const trackTributeCodeCopyTap = useCallback(() => {
+    if (!selectedTributeCode) return;
+    trackInteraction({
+      screen: 'payment_sheet',
+      actionKey: 'payment_tribute_code_copy',
+      properties: {
+        product_id: productId,
+        payment_method: selectedMethod || undefined,
+        payment_method_label: selectedMethodInfo?.label || undefined,
+        quantity,
+        mode: mode || undefined,
+        delivery_mode: deliveryMode || undefined,
+        currency,
+        clip_title: clipTitle || undefined,
+      },
+    });
+  }, [clipTitle, currency, deliveryMode, mode, productId, quantity, selectedMethod, selectedMethodInfo?.label, selectedTributeCode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -303,6 +345,7 @@ export function PaymentSheet({
 
   const handleCopyTributeCode = useCallback(async () => {
     if (!selectedTributeCode) return;
+    trackTributeCodeCopyTap();
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(selectedTributeCode);
@@ -321,7 +364,7 @@ export function PaymentSheet({
     } catch {
       // ignore copy failures
     }
-  }, [selectedTributeCode]);
+  }, [selectedTributeCode, trackTributeCodeCopyTap]);
 
   useEffect(() => {
     if (!copiedTributeCode) return undefined;
@@ -486,14 +529,16 @@ export function PaymentSheet({
   const handlePrimaryClick = useCallback(() => {
     if (state === 'select') {
       setState(hasInstructions ? 'confirm' : 'submitting');
-      if (!hasInstructions) {
-        trackCheckoutConfirm('quick');
-        void handleCheckout();
+      if (hasInstructions) {
+        trackPaymentConfirm();
+        return;
       }
+      trackPaymentPayTap('quick');
+      void handleCheckout();
       return;
     }
     void handleCheckout();
-  }, [state, hasInstructions, handleCheckout, trackCheckoutConfirm]);
+  }, [state, hasInstructions, handleCheckout, trackPaymentConfirm, trackPaymentPayTap]);
 
   const paymentButton = (
     <button
@@ -629,7 +674,7 @@ export function PaymentSheet({
                 type="button"
                 className={`payment-sheet__primary${isWhitePayButton ? ' payment-sheet__primary--white' : ''}`}
                 onClick={() => {
-                  trackCheckoutConfirm('confirm');
+                  trackPaymentPayTap('confirm');
                   void handleCheckout();
                 }}
                 disabled={primaryButtonDisabled}
@@ -668,7 +713,10 @@ export function PaymentSheet({
                 <button
                   type="button"
                   className="payment-sheet__primary payment-sheet__primary--compact"
-                  onClick={() => openPaymentUrl(paymentUrl)}
+                  onClick={() => {
+                    trackPaymentPayTap('open_again');
+                    openPaymentUrl(paymentUrl);
+                  }}
                 >
                   Open again
                 </button>
@@ -762,7 +810,7 @@ export function PaymentSheet({
               type="button"
               className="payment-sheet__primary"
               onClick={() => {
-                trackCheckoutConfirm('retry', true);
+                trackPaymentPayTap('retry', true);
                 void handleCheckout({ freshCheckout: true });
               }}
               disabled={retryButtonDisabled}
