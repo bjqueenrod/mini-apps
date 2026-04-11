@@ -7,6 +7,13 @@ export const CURRENCY_PREFERENCE_EVENT = 'currency-preference-changed';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
+function getTelegramCurrencyUserId(telegramUserId?: number | null): number | null {
+  if (!isTelegramWebView()) {
+    return telegramUserId ?? null;
+  }
+  return window.Telegram?.WebApp?.initDataUnsafe?.user?.id ?? telegramUserId ?? null;
+}
+
 async function fetchTelegramCurrencyPreference(telegramUserId?: number | null): Promise<CurrencyCode | null> {
   for (let attempt = 0; attempt < 5; attempt += 1) {
     try {
@@ -110,7 +117,7 @@ export function useCurrencyPreference(
     let cancelled = false;
 
     const syncPreference = async () => {
-      const remoteCurrency = await fetchTelegramCurrencyPreference(telegramUserId);
+      const remoteCurrency = await fetchTelegramCurrencyPreference(getTelegramCurrencyUserId(telegramUserId));
       if (!cancelled && !hasLocalOverrideRef.current && remoteCurrency) {
         applyCurrency(remoteCurrency, { persist: false, broadcast: true });
       }
@@ -137,7 +144,7 @@ export function useCurrencyPreference(
     hasLocalOverrideRef.current = true;
     applyCurrency(next, { persist: !isTelegramWebView(), broadcast: true });
     if (isTelegramWebView()) {
-      void persistTelegramCurrencyPreference(next, telegramUserId).catch(() => {
+      void persistTelegramCurrencyPreference(next, getTelegramCurrencyUserId(telegramUserId)).catch(() => {
         // keep local preference even if the server write fails
       });
     }
