@@ -112,6 +112,7 @@ export function BrowsePage() {
   const [isSearchPinned, setIsSearchPinned] = useState(false);
   const [filtersExpanded, setFiltersExpanded] = useState(true);
   const [visibleClips, setVisibleClips] = useState<ClipItem[]>([]);
+  const [openFaqQuestion, setOpenFaqQuestion] = useState<string | null>(null);
   const pinnedSearchText = (location.state as { searchText?: string } | null)?.searchText ?? '';
   const searchText = useMemo(() => stripHashtagTokens(searchValue), [searchValue]);
   const searchTags = useMemo(() => extractHashtagTokens(searchValue), [searchValue]);
@@ -485,7 +486,14 @@ export function BrowsePage() {
         </div>
         <div className="faq-list">
           {CLIPS_FAQ.map((item) => (
-            <details key={item.question} className="faq-card">
+            <details
+              key={item.question}
+              className="faq-card"
+              open={openFaqQuestion === item.question}
+              onToggle={(event) => {
+                setOpenFaqQuestion(event.currentTarget.open ? item.question : null);
+              }}
+            >
               <summary>
                 <span className="faq-card__summary">
                   <span className="faq-card__icon" aria-hidden="true">
