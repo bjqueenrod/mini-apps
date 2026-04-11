@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useNavigationType, useParams, useSearchParams } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
 import { SearchBar } from '../components/SearchBar';
 import { FilterBar } from '../components/FilterBar';
@@ -80,6 +80,7 @@ const CLIPS_FAQ = [
 export function BrowsePage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const navigationType = useNavigationType();
   const [searchParams, setSearchParams] = useSearchParams();
   const { clipId } = useParams();
   const session = useTelegramSession();
@@ -133,6 +134,7 @@ export function BrowsePage() {
   const trackedListViewKeysRef = useRef(new Set<string>());
   const trackedSearchKeysRef = useRef(new Set<string>());
   const didTrackOpenRef = useRef(false);
+  const didSeedClipHistoryRef = useRef(false);
   const computedSecondaryTagOptions = useMemo(() => {
     const excluded = new Set(['and', 'in', 'made', 'bar']);
     const tagCounts = new Map<string, { tag: string; count: number }>();
@@ -172,6 +174,27 @@ export function BrowsePage() {
   useEffect(() => {
     applyTelegramTheme();
   }, []);
+
+  useEffect(() => {
+    if (!clipId || didSeedClipHistoryRef.current) {
+      return;
+    }
+    if (navigationType !== 'POP') {
+      return;
+    }
+    const historyIndex = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (historyIndex > 0) {
+      return;
+    }
+
+    didSeedClipHistoryRef.current = true;
+    const cleanedSearch = stripStartRoutingParams(location.search);
+    const listPath = `/clips${cleanedSearch ? `?${cleanedSearch}` : ''}`;
+    const clipPath = `/clips/${encodeURIComponent(clipId)}${cleanedSearch ? `?${cleanedSearch}` : ''}`;
+
+    navigate(listPath, { replace: true });
+    window.setTimeout(() => navigate(clipPath, { replace: false }), 0);
+  }, [clipId, location.search, navigate, navigationType]);
 
   useEffect(() => {
     if (clipId) {

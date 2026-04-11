@@ -23,7 +23,24 @@ export async function fetchClips(state: ClipQueryState): Promise<ClipListRespons
 export async function fetchClip(id: string, currency?: string): Promise<ClipItem> {
   const query = currency ? `?currency=${encodeURIComponent(currency)}` : '';
   const response = await fetch(`${API_BASE}/clips/${encodeURIComponent(id)}${query}`, { credentials: 'include' });
-  if (!response.ok) throw new Error('Unable to load clip details.');
+  if (!response.ok) {
+    let detail = '';
+    try {
+      const text = await response.text();
+      if (text) {
+        try {
+          const parsed = JSON.parse(text) as { detail?: unknown };
+          detail = typeof parsed?.detail === 'string' ? parsed.detail : text;
+        } catch {
+          detail = text;
+        }
+      }
+    } catch {
+      // ignore body parsing errors
+    }
+    const suffix = detail ? `: ${detail}` : '';
+    throw new Error(`Unable to load clip details (HTTP ${response.status})${suffix}`);
+  }
   return response.json();
 }
 
