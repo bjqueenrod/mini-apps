@@ -95,6 +95,8 @@ def create_order(
     *,
     items: list[dict[str, Any]],
     chat_id: int | None = None,
+    username: str | None = None,
+    first_name: str | None = None,
     application_id: str | None = None,
     flow_id: str | None = None,
     clip_mode: str | None = None,
@@ -111,6 +113,8 @@ def create_order(
         payload: dict[str, Any] = {
             "mode": clip_mode,
             "chat_id": chat_id,
+            "username": username,
+            "first_name": first_name,
             "application_id": application_id,
             "flow_id": flow_id,
         }
@@ -138,6 +142,8 @@ def create_order(
     payload: dict[str, Any] = {
         "items": items,
         "chat_id": chat_id,
+        "username": username,
+        "first_name": first_name,
         "application_id": application_id,
         "flow_id": flow_id,
     }
