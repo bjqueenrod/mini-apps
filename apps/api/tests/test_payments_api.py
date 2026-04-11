@@ -273,6 +273,7 @@ def test_invoice_status_does_not_require_session_cookie(client, monkeypatch) -> 
             "provider_invoice_url": f"https://provider.example/{invoice_id}",
             "order": {
                 "delivery_url": f"https://stream.example/{invoice_id}",
+                "delivery_mode": "stream",
             },
         },
     )
@@ -285,6 +286,7 @@ def test_invoice_status_does_not_require_session_cookie(client, monkeypatch) -> 
     assert response.json()["paymentUrl"] == f"https://example.com/inv_123"
     assert response.json()["providerInvoiceUrl"] == f"https://provider.example/inv_123"
     assert response.json()["deliveryUrl"] == f"https://stream.example/inv_123"
+    assert response.json()["deliveryMode"] == "stream"
     assert response.headers["cache-control"] == "no-store, no-cache, must-revalidate, max-age=0"
     assert response.headers["pragma"] == "no-cache"
 
@@ -326,6 +328,7 @@ def test_invoice_status_refreshes_pending_invoices(client, monkeypatch) -> None:
                 "provider_invoice_url": None,
                 "order": {
                     "delivery_url": None,
+                    "delivery_mode": None,
                 },
             }
         return {
@@ -337,6 +340,7 @@ def test_invoice_status_refreshes_pending_invoices(client, monkeypatch) -> None:
             "provider_invoice_url": "https://example.com/provider",
             "order": {
                 "delivery_url": "https://stream.example/invoice",
+                "delivery_mode": "download",
             },
         }
 
@@ -350,6 +354,7 @@ def test_invoice_status_refreshes_pending_invoices(client, monkeypatch) -> None:
     assert second.status_code == 200
     assert second.json()["status"] == "paid"
     assert second.json()["deliveryUrl"] == "https://stream.example/invoice"
+    assert second.json()["deliveryMode"] == "download"
     assert calls["count"] == 2
 
 
@@ -390,6 +395,7 @@ def test_invoice_status_surfaces_delivery_url_from_nested_order(client, monkeypa
             "provider_invoice_url": "https://provider.example/invoice",
             "order": {
                 "delivery_url": "https://stream.example/invoice",
+                "delivery_mode": "stream",
             },
         },
     )
@@ -399,3 +405,4 @@ def test_invoice_status_surfaces_delivery_url_from_nested_order(client, monkeypa
     assert response.status_code == 200
     assert response.json()["status"] == "paid"
     assert response.json()["deliveryUrl"] == "https://stream.example/invoice"
+    assert response.json()["deliveryMode"] == "stream"

@@ -41,4 +41,5 @@ export type InvoiceStatusResponse = {
   paymentUrl?: string | null;
   providerInvoiceUrl?: string | null;
   deliveryUrl?: string | null;
+  deliveryMode?: string | null;
 };

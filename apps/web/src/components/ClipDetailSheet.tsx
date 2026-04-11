@@ -187,9 +187,16 @@ export function ClipDetailSheet({ clip, loading, currency = 'GBP' }: { clip?: Cl
                 }}
                 onClose={() => setShowPayment(null)}
                 onSuccess={(result) => {
-                  if (showPayment === 'stream' && isTelegramWebView() && result?.deliveryUrl) {
-                    window.location.assign(result.deliveryUrl);
-                    return;
+                  if (result?.deliveryUrl) {
+                    if (isTelegramWebView() && result.deliveryMode === 'stream') {
+                      window.location.assign(result.deliveryUrl);
+                      return;
+                    }
+                    if (isTelegramWebView() && result.deliveryMode === 'download') {
+                      window.open(result.deliveryUrl, '_blank', 'noopener,noreferrer');
+                      setShowPayment(null);
+                      return;
+                    }
                   }
                   setShowPayment(null);
                 }}

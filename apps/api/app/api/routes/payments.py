@@ -80,6 +80,22 @@ def _invoice_delivery_url(data: dict[str, Any] | None) -> str | None:
     return None
 
 
+def _invoice_delivery_mode(data: dict[str, Any] | None) -> str | None:
+    if not isinstance(data, dict):
+        return None
+    order = data.get("order")
+    if isinstance(order, dict):
+        delivery_mode = str(order.get("delivery_mode") or order.get("deliveryMode") or "").strip().lower()
+        if delivery_mode:
+            return delivery_mode
+    payload = _invoice_payload(data)
+    if isinstance(payload, dict):
+        delivery_mode = str(payload.get("delivery_mode") or payload.get("deliveryMode") or "").strip().lower()
+        if delivery_mode:
+            return delivery_mode
+    return None
+
+
 def _invoice_payload(data: dict[str, Any] | None) -> dict[str, Any] | None:
     if not isinstance(data, dict):
         return None
@@ -311,6 +327,7 @@ def invoice_status(invoice_id: str, response: Response) -> InvoiceStatusResponse
     invoice_payload = _invoice_payload(invoice)
     invoice_url, provider_url = _invoice_urls(invoice)
     delivery_url = _invoice_delivery_url(invoice)
+    delivery_mode = _invoice_delivery_mode(invoice)
     status_value = invoice_payload.get("status") if isinstance(invoice_payload, dict) else None
     result = InvoiceStatusResponse(
         invoiceId=invoice_id,
@@ -318,6 +335,7 @@ def invoice_status(invoice_id: str, response: Response) -> InvoiceStatusResponse
         paymentUrl=invoice_url,
         providerInvoiceUrl=provider_url,
         deliveryUrl=delivery_url,
+        deliveryMode=delivery_mode,
     )
     _cache_invoice_status(invoice_id, result.status, result)
     return result
@@ -363,6 +381,7 @@ def payment_webhook(
         invoice_payload = _invoice_payload(invoice)
         invoice_url, provider_url = _invoice_urls(invoice)
         delivery_url = _invoice_delivery_url(invoice)
+        delivery_mode = _invoice_delivery_mode(invoice)
         status_value = invoice_payload.get("status") if isinstance(invoice_payload, dict) else None
         result = InvoiceStatusResponse(
             invoiceId=invoice_id,
@@ -370,6 +389,7 @@ def payment_webhook(
             paymentUrl=invoice_url,
             providerInvoiceUrl=provider_url,
             deliveryUrl=delivery_url,
+            deliveryMode=delivery_mode,
         )
         _cache_invoice_status(invoice_id, result.status, result)
         logger.info("payment webhook refreshed invoice %s -> %s", invoice_id, result.status)
