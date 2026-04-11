@@ -44,9 +44,7 @@ export function KeyholdingPage() {
 
   return (
     <AppShell>
-      {!session.isTelegram && (
-        <CurrencyToggleBanner />
-      )}
+      <CurrencyToggleBanner />
 
       <section className="hero hero--tasks">
         <img

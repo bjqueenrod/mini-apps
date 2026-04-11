@@ -376,9 +376,7 @@ export function TasksPage() {
 
   return (
     <AppShell>
-      {!session.isTelegram && (
-        <CurrencyToggleBanner />
-      )}
+      <CurrencyToggleBanner />
       <section className="hero hero--tasks">
         <img
           className="hero__banner"
