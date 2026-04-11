@@ -3,13 +3,18 @@ import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
 type CurrencyToggleBannerProps = {
   onBackClick?: () => void;
   showBackButton?: boolean;
+  alignRight?: boolean;
 };
 
-export function CurrencyToggleBanner({ onBackClick, showBackButton = false }: CurrencyToggleBannerProps) {
+export function CurrencyToggleBanner({ onBackClick, showBackButton = false, alignRight = false }: CurrencyToggleBannerProps) {
   const [currency, setCurrency] = useCurrencyPreference();
 
   return (
-    <div className={`dev-banner currency-banner${showBackButton ? ' currency-banner--with-back' : ''}`}>
+    <div
+      className={`dev-banner currency-banner${showBackButton ? ' currency-banner--with-back' : ''}${
+        alignRight ? ' currency-banner--right-aligned' : ''
+      }`}
+    >
       <div className="currency-banner__row">
         {showBackButton ? (
           <button type="button" className="currency-banner__back" onClick={onBackClick} aria-label="Back to Home">

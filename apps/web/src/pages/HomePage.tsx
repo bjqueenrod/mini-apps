@@ -50,7 +50,7 @@ export function HomePage() {
 
   return (
     <AppShell>
-      <CurrencyToggleBanner />
+      <CurrencyToggleBanner alignRight />
       <section className="hero">
         <img
           className="hero__banner"

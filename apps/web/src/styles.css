@@ -98,6 +98,10 @@ button {
   gap: 12px;
 }
 
+.currency-banner--right-aligned .currency-banner__row {
+  justify-content: flex-end;
+}
+
 .currency-banner__label {
   font-weight: 600;
   color: #f3e9ff;
