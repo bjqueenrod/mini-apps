@@ -341,7 +341,7 @@ export function BrowsePage() {
       setIsSearchPinned(true);
       setFiltersExpanded(false);
       frameTwo = window.requestAnimationFrame(() => {
-        searchPanelRef.current?.scrollIntoView({ block: 'start', behavior: 'auto' });
+        searchPanelSentinelRef.current?.scrollIntoView({ block: 'start', behavior: 'auto' });
         navigate(`${location.pathname}${location.search}`, { replace: true });
       });
     });
