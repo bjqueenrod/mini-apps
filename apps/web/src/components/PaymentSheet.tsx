@@ -211,6 +211,17 @@ export function PaymentSheet({
     () => selectedMethodInfo?.label || 'Pay',
     [selectedMethodInfo],
   );
+  const resolvedDeliveryMode = useMemo(() => {
+    if (deliveryMode === 'stream' || deliveryMode === 'download') {
+      return deliveryMode;
+    }
+    if (successResult?.deliveryMode === 'stream' || successResult?.deliveryMode === 'download') {
+      return successResult.deliveryMode;
+    }
+    if (mode === 'watch') return 'stream';
+    if (mode === 'download') return 'download';
+    return undefined;
+  }, [deliveryMode, successResult?.deliveryMode, mode]);
   const isPaypalSelected = selectedMethodInfo?.paymentMethod === 'paypal';
   const isThroneSelected = selectedMethodInfo?.paymentMethod === 'throne';
   const isBrandPayButton = isPaypalSelected || isThroneSelected;
@@ -630,7 +641,7 @@ export function PaymentSheet({
 
         {state === 'success' ? (
           <div className="payment-sheet__body">
-            {deliveryMode === 'stream' ? (
+            {resolvedDeliveryMode === 'stream' ? (
               <>
                 <div className="payment-sheet__success">Stream Ready</div>
                 <p>You can now watch the stream below. I’ve also sent the link to you in DM so you can watch later.</p>
@@ -644,7 +655,7 @@ export function PaymentSheet({
                   </button>
                 ) : null}
               </>
-            ) : deliveryMode === 'download' ? (
+            ) : resolvedDeliveryMode === 'download' ? (
               <>
                 <div className="payment-sheet__success">Download Ready</div>
                 <p>You can now download the clip below. I’ve also sent the link to you in DM so you can download later.</p>
