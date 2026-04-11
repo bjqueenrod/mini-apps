@@ -272,7 +272,7 @@ def invoice_status(invoice_id: str, response: Response) -> InvoiceStatusResponse
         return cached
 
     try:
-        invoice = payment_gateway.get_invoice(invoice_id)
+        invoice = payment_gateway.get_invoice(invoice_id, cache_bust=True)
     except payment_gateway.PaymentSystemError as exc:
         logger.warning("invoice status error: %s", exc)
         detail = str(exc).strip() or "invoice unavailable"
@@ -328,7 +328,7 @@ def payment_webhook(
         logger.info("payment webhook received without invoice_id: keys=%s", list(payload.keys()))
         return {"ok": True, "refreshed": False}
     try:
-        invoice = payment_gateway.get_invoice(invoice_id)
+        invoice = payment_gateway.get_invoice(invoice_id, cache_bust=True)
         invoice_url, provider_url = _invoice_urls(invoice)
         status_value = invoice.get("status") if isinstance(invoice, dict) else None
         result = InvoiceStatusResponse(

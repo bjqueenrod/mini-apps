@@ -66,3 +66,26 @@ def test_invoice_options_returns_friendly_message_for_persistent_502(monkeypatch
         assert str(exc) == "unable to load payment options"
 
     assert calls["count"] == 2
+
+
+def test_get_invoice_can_cache_bust(monkeypatch) -> None:
+    from app.services import payment_gateway
+
+    seen = {}
+
+    def fake_get(*args, **kwargs):
+        seen["params"] = kwargs.get("params")
+        return _FakeResponse(200, {"invoice_id": "inv-1", "status": "paid"})
+
+    monkeypatch.setattr(payment_gateway.httpx, "get", fake_get)
+    monkeypatch.setattr(
+        payment_gateway.settings,
+        "payment_system_api_url",
+        "https://payment-system.example",
+    )
+
+    result = payment_gateway.get_invoice("inv-1", cache_bust=True)
+
+    assert result == {"invoice_id": "inv-1", "status": "paid"}
+    assert isinstance(seen.get("params"), dict)
+    assert "_" in seen["params"]

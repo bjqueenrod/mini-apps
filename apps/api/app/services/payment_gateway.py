@@ -233,14 +233,18 @@ def create_invoice(
         raise PaymentSystemError("unable to create invoice") from exc
 
 
-def get_invoice(invoice_id: str) -> dict[str, Any]:
+def get_invoice(invoice_id: str, *, cache_bust: bool = False) -> dict[str, Any]:
     base = _api_base_url()
     if not base:
         raise PaymentSystemError("PAYMENT_SYSTEM_API_URL is not configured")
     try:
+        params = None
+        if cache_bust:
+            params = {"_": int(time.time() * 1000)}
         response = httpx.get(
             f"{base}/api/invoices/{invoice_id}",
             headers=_headers(),
+            params=params,
             timeout=settings.payment_system_timeout_seconds,
         )
         response.raise_for_status()

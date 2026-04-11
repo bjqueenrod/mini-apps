@@ -264,7 +264,7 @@ def test_invoice_status_does_not_require_session_cookie(client, monkeypatch) -> 
     monkeypatch.setattr(
         payment_gateway,
         "get_invoice",
-        lambda invoice_id: {
+        lambda invoice_id, **kwargs: {
             "status": "pending",
             "invoice_url": f"https://example.com/{invoice_id}",
             "provider_invoice_url": f"https://provider.example/{invoice_id}",
