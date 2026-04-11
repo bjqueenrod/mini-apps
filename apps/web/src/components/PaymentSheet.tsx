@@ -385,6 +385,7 @@ export function PaymentSheet({
       const res = await startCheckout(productId, selectedMethod, quantity, mode, {
         ...itemContext,
         currency,
+        ...(selectedTributeCode ? { paymentCode: selectedTributeCode } : {}),
         ...(orderId ? { orderId } : {}),
       });
       setOrderId(res.orderId);

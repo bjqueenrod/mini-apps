@@ -157,7 +157,7 @@ def test_checkout_uses_tribute_code_when_selected_method_requires_code(client, m
                     "id": -1,
                     "payment_method": "paypal",
                     "requires_code": True,
-                    "tribute_code": "MBJQ-KEY-TEST",
+                    "tribute_code": "MBJQ-KEY-SERVER",
                     "instruction_templates": {"checkout_default": "Use {code}"},
                     "method_details": {},
                 }
@@ -186,6 +186,7 @@ def test_checkout_uses_tribute_code_when_selected_method_requires_code(client, m
                 "productId": "BJQ0001",
                 "paymentMethod": "paypal",
                 "quantity": 1,
+                "paymentCode": "MBJQ-KEY-DISPLAY",
             },
         )
     finally:
@@ -193,8 +194,8 @@ def test_checkout_uses_tribute_code_when_selected_method_requires_code(client, m
 
     assert response.status_code == 200
     body = response.json()
-    assert body["paymentCode"] == "MBJQ-KEY-TEST"
-    assert captured["code"] == "MBJQ-KEY-TEST"
+    assert body["paymentCode"] == "MBJQ-KEY-DISPLAY"
+    assert captured["code"] == "MBJQ-KEY-DISPLAY"
 
 
 def test_checkout_retries_when_code_conflicts(client, monkeypatch) -> None:

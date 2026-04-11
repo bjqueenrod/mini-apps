@@ -47,6 +47,7 @@ class CheckoutRequest(BaseModel):
     quantity: int = 1
     mode: str | None = None
     currency: str | None = None
+    payment_code: str | None = Field(default=None, alias="paymentCode")
     unit_price_pence: int | None = Field(default=None, alias="unitPriceCents")
     clip_id: str | None = Field(default=None, alias="clipId")
     template_values: dict[str, Any] | None = Field(default=None, alias="templateValues")

@@ -112,6 +112,7 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
     invoice_currency = (payload.currency or "").strip().upper()
     if invoice_currency not in {"GBP", "USD"}:
         invoice_currency = None
+    requested_code = (payload.payment_code or "").strip() or None
 
     if not chat_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
@@ -177,6 +178,8 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
             )
         options = payment_gateway.invoice_options(order_id=int(order.get("id")), flow_id=flow_id)
         selected_method, code_value, requires_code = _select_payment_method(options)
+        if requested_code:
+            code_value = requested_code
         if requires_code and not code_value:
             raise payment_gateway.PaymentSystemError("missing payment code for selected method")
     except payment_gateway.PaymentSystemError as exc:
@@ -197,7 +200,10 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
         )
     except payment_gateway.PaymentSystemError as exc:
         error_text = str(exc).strip().lower()
-        if "payment code conflict" in error_text or "payment_code_conflict" in error_text:
+        if (
+            not requested_code
+            and ("payment code conflict" in error_text or "payment_code_conflict" in error_text)
+        ):
             try:
                 retry_options = payment_gateway.invoice_options(order_id=int(order.get("id")), flow_id=flow_id)
                 retry_method, retry_code_value, retry_requires_code = _select_payment_method(retry_options)
