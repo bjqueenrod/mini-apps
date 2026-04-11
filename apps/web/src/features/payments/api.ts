@@ -103,7 +103,7 @@ export async function startCheckout(
 }
 
 export async function pollInvoice(invoiceId: string): Promise<InvoiceStatusResponse> {
-  const response = await fetch(`${API_BASE}/payments/invoices/${encodeURIComponent(invoiceId)}`, {
+  const response = await fetch(`${API_BASE}/payments/invoices/${encodeURIComponent(invoiceId)}?_=${Date.now()}`, {
     cache: 'no-store',
     credentials: 'include',
   });
