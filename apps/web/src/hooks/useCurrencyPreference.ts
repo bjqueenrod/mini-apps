@@ -23,6 +23,7 @@ async function fetchTelegramCurrencyPreference(telegramUserId?: number | null): 
       }
       const response = await fetch(url.toString(), {
         credentials: 'include',
+        cache: 'no-store',
       });
       if (response.ok) {
         const data = (await response.json()) as { currency?: CurrencyCode };
@@ -113,7 +114,7 @@ export function useCurrencyPreference(
   }, [currency]);
 
   useEffect(() => {
-    if (!syncWithServer || !isTelegramWebView()) return;
+    if (!isTelegramWebView()) return;
     let cancelled = false;
 
     const syncPreference = async () => {
