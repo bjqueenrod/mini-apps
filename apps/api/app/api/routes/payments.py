@@ -73,6 +73,13 @@ def _normalize_status(value: str | None) -> str:
     return "pending"
 
 
+def _cache_invoice_status(invoice_id: str, status: str, result: InvoiceStatusResponse) -> None:
+    if status in {"paid", "cancelled"}:
+        INVOICE_CACHE[invoice_id] = result
+    else:
+        INVOICE_CACHE.pop(invoice_id, None)
+
+
 @router.post("/payments/checkout-options", response_model=CheckoutOptionsResponse)
 def checkout_options(payload: CheckoutOptionsRequest, session: dict = Depends(get_session)) -> CheckoutOptionsResponse:
     flow_id = session.get("start_param") or session.get("flow_id")
@@ -258,7 +265,7 @@ def checkout(payload: CheckoutRequest, session: dict = Depends(get_session)) -> 
 @router.get("/payments/invoices/{invoice_id}", response_model=InvoiceStatusResponse)
 def invoice_status(invoice_id: str) -> InvoiceStatusResponse:
     cached = INVOICE_CACHE.get(invoice_id)
-    if cached:
+    if cached and cached.status in {"paid", "cancelled"}:
         return cached
 
     try:
@@ -278,7 +285,7 @@ def invoice_status(invoice_id: str) -> InvoiceStatusResponse:
         paymentUrl=invoice_url,
         providerInvoiceUrl=provider_url,
     )
-    INVOICE_CACHE[invoice_id] = result
+    _cache_invoice_status(invoice_id, result.status, result)
     return result
 
 
@@ -294,7 +301,12 @@ def cancel_invoice(invoice_id: str) -> dict[str, bool | str]:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=detail) from exc
 
     if isinstance(invoice, dict):
-        INVOICE_CACHE.pop(invoice_id, None)
+        _cache_invoice_status(invoice_id, "cancelled", InvoiceStatusResponse(
+            invoiceId=invoice_id,
+            status="cancelled",
+            paymentUrl=None,
+            providerInvoiceUrl=None,
+        ))
     return {"ok": True}
 
 
@@ -322,7 +334,7 @@ def payment_webhook(
             paymentUrl=invoice_url,
             providerInvoiceUrl=provider_url,
         )
-        INVOICE_CACHE[invoice_id] = result
+        _cache_invoice_status(invoice_id, result.status, result)
         logger.info("payment webhook refreshed invoice %s -> %s", invoice_id, result.status)
         return {"ok": True, "refreshed": True, "status": result.status}
     except payment_gateway.PaymentSystemError as exc:

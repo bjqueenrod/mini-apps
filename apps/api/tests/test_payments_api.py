@@ -271,7 +271,47 @@ def test_invoice_status_surfaces_not_found_detail(client, monkeypatch) -> None:
     assert response.json()["detail"] == "invoice not found"
 
 
-def test_cancel_invoice_clears_cached_status(client, monkeypatch) -> None:
+def test_invoice_status_refreshes_pending_invoices(client, monkeypatch) -> None:
+    from app.api.routes import payments as payments_routes
+    from app.services import payment_gateway
+
+    payments_routes.INVOICE_CACHE["abc-123"] = payments_routes.InvoiceStatusResponse(
+        invoiceId="abc-123",
+        status="pending",
+        paymentUrl=None,
+        providerInvoiceUrl=None,
+    )
+    calls = {"count": 0}
+
+    def fake_get_invoice(*args, **kwargs):
+        calls["count"] += 1
+        if calls["count"] == 1:
+            return {
+                "invoice_id": "abc-123",
+                "status": "pending",
+                "invoice_url": None,
+                "provider_invoice_url": None,
+            }
+        return {
+            "invoice_id": "abc-123",
+            "status": "paid",
+            "invoice_url": "https://example.com/invoice",
+            "provider_invoice_url": "https://example.com/provider",
+        }
+
+    monkeypatch.setattr(payment_gateway, "get_invoice", fake_get_invoice)
+
+    first = client.get("/api/payments/invoices/abc-123")
+    second = client.get("/api/payments/invoices/abc-123")
+
+    assert first.status_code == 200
+    assert first.json()["status"] == "pending"
+    assert second.status_code == 200
+    assert second.json()["status"] == "paid"
+    assert calls["count"] == 2
+
+
+def test_cancel_invoice_updates_cached_status(client, monkeypatch) -> None:
     from app.api.routes import payments as payments_routes
     from app.services import payment_gateway
 
@@ -290,4 +330,4 @@ def test_cancel_invoice_clears_cached_status(client, monkeypatch) -> None:
 
     assert response.status_code == 200
     assert response.json() == {"ok": True}
-    assert "abc-123" not in payments_routes.INVOICE_CACHE
+    assert payments_routes.INVOICE_CACHE["abc-123"].status == "cancelled"
