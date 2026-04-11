@@ -41,7 +41,7 @@ async function persistTelegramCurrencyPreference(currency: CurrencyCode): Promis
   }
 }
 
-function readCurrency(): CurrencyCode {
+function readCurrency(allowStoredPreference: boolean): CurrencyCode {
   if (typeof window === 'undefined') return 'GBP';
 
   const params = new URLSearchParams(window.location.search);
@@ -57,13 +57,13 @@ function readCurrency(): CurrencyCode {
 
   const fromUrl = pick(queryCurrency);
   const fromStart = pick(fromStartParam);
-  const stored = pick(window.localStorage.getItem(STORAGE_KEY));
+  const stored = allowStoredPreference ? pick(window.localStorage.getItem(STORAGE_KEY)) : undefined;
 
   return fromUrl || fromStart || stored || 'GBP';
 }
 
 export function useCurrencyPreference(syncWithServer = false): [CurrencyCode, (next: CurrencyCode) => void] {
-  const [currency, setCurrency] = useState<CurrencyCode>(() => readCurrency());
+  const [currency, setCurrency] = useState<CurrencyCode>(() => readCurrency(!isTelegramWebView()));
   const hasLocalOverrideRef = useRef(false);
 
   const applyCurrency = useCallback((next: CurrencyCode, options?: { persist?: boolean; broadcast?: boolean }) => {
@@ -135,5 +135,5 @@ export function useCurrencyPreference(syncWithServer = false): [CurrencyCode, (n
 }
 
 export function readCurrencyPreference(): CurrencyCode {
-  return readCurrency();
+  return readCurrency(!isTelegramWebView());
 }
