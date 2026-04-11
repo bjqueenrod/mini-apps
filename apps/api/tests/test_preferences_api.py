@@ -4,8 +4,14 @@ from app.api import deps
 from app.db.session import engine
 
 
-def test_currency_preference_round_trip_for_telegram_session(client) -> None:
+def test_currency_preference_round_trip_for_telegram_session(client, monkeypatch) -> None:
     app = __import__("app.main", fromlist=["app"]).app
+    calls = []
+
+    monkeypatch.setattr(
+        "app.api.routes.preferences.refresh_currency_menu",
+        lambda **kwargs: calls.append(kwargs),
+    )
 
     app.dependency_overrides[deps.get_optional_session] = lambda: {
         "telegram_user_id": 123456,
@@ -21,6 +27,7 @@ def test_currency_preference_round_trip_for_telegram_session(client) -> None:
     assert post_response.json()["currency"] == "USD"
     assert get_response.status_code == 200
     assert get_response.json()["currency"] == "USD"
+    assert calls == [{"telegram_user_id": 123456, "currency": "USD"}]
 
     with engine.begin() as conn:
         row = conn.exec_driver_sql(

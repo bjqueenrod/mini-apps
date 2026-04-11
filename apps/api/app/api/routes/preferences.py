@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, get_optional_session
 from app.schemas.preferences import CurrencyPreferenceRequest, CurrencyPreferenceResponse
+from app.services.bot_menu_service import refresh_currency_menu
 
 router = APIRouter(prefix="/preferences", tags=["preferences"])
 logger = logging.getLogger(__name__)
@@ -130,4 +131,5 @@ def set_currency_preference(
     )
     currency = _save_currency_preference(db, user_id, payload.currency)
     logger.info("Saved currency preference user_id=%s currency=%s", user_id, currency)
+    refresh_currency_menu(telegram_user_id=user_id, currency=currency)
     return CurrencyPreferenceResponse(currency=currency)
