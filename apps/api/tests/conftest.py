@@ -123,6 +123,15 @@ def clear_payment_clip_pricing_cache() -> None:
     clear_clip_pricing_cache()
 
 
+@pytest.fixture(autouse=True)
+def clear_miniapp_tracking_dedupe() -> None:
+    from app.services.tracking_service import clear_miniapp_open_notify_dedupe
+
+    clear_miniapp_open_notify_dedupe()
+    yield
+    clear_miniapp_open_notify_dedupe()
+
+
 @pytest.fixture()
 def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
     monkeypatch.setattr(

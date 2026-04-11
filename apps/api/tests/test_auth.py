@@ -5,6 +5,9 @@ import hmac
 import json
 import urllib.parse
 
+import httpx
+
+from app.core.config import get_settings
 from app.core.telegram import validate_init_data
 
 
@@ -155,3 +158,54 @@ def test_auth_telegram_prefers_init_data_start_param_over_body(client, monkeypat
 
     assert response.status_code == 200
     assert calls == [("clips_BJQ0169__l_e", 123)]
+
+
+def test_telegram_track_open_matches_auth_notify(client, monkeypatch) -> None:
+    calls: list[tuple[str | None, int]] = []
+
+    def _capture(start_param: str | None, user) -> None:
+        calls.append((start_param, user.id))
+
+    monkeypatch.setattr("app.api.routes.auth.notify_miniapp_open", _capture)
+
+    init_payload = {"initData": _build_init_data("test-token", start_param="l_1z")}
+    track = client.post("/api/auth/telegram/track-open", json=init_payload)
+    assert track.status_code == 200
+    assert track.json() == {"ok": True, "tracked": False}
+
+    auth = client.post("/api/auth/telegram", json=init_payload)
+    assert auth.status_code == 200
+    assert calls == [("l_1z", 123), ("l_1z", 123)]
+
+
+def test_track_open_then_auth_dedupes_successful_cms_post(client, monkeypatch) -> None:
+    posts = {"n": 0}
+
+    class _Ok:
+        status_code = 200
+        text = ""
+
+        def raise_for_status(self) -> None:
+            return None
+
+    def _fake_post(*_args, **_kwargs):
+        posts["n"] += 1
+        return _Ok()
+
+    monkeypatch.setenv("CMS_API_URL", "https://cms.example.test")
+    monkeypatch.setenv("CMS_API_TOKEN", "test-cms-token")
+    get_settings.cache_clear()
+
+    monkeypatch.setattr(httpx, "post", _fake_post)
+
+    init_payload = {"initData": _build_init_data("test-token", start_param="l_1z")}
+    track = client.post("/api/auth/telegram/track-open", json=init_payload)
+    assert track.status_code == 200
+    assert track.json()["tracked"] is True
+
+    auth = client.post("/api/auth/telegram", json=init_payload)
+    assert auth.status_code == 200
+
+    assert posts["n"] == 1
+
+    get_settings.cache_clear()

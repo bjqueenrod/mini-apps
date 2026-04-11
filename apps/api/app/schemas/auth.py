@@ -37,3 +37,12 @@ class TelegramAuthResponse(BaseModel):
     session_expires_at: int = Field(alias="sessionExpiresAt")
 
     model_config = ConfigDict(populate_by_name=True)
+
+
+class TelegramTrackOpenResponse(BaseModel):
+    ok: bool = True
+    tracked: bool = Field(
+        description="True when a tracked start_param was forwarded to CMS miniapp-open successfully."
+    )
+
+    model_config = ConfigDict(populate_by_name=True)

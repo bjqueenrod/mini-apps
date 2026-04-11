@@ -9,7 +9,12 @@ from app.api.deps import SESSION_COOKIE_NAME
 from app.core.config import get_settings
 from app.core.security import get_session_serializer
 from app.core.telegram import TelegramUser, TelegramInitDataError
-from app.schemas.auth import AuthUserResponse, TelegramAuthRequest, TelegramAuthResponse
+from app.schemas.auth import (
+    AuthUserResponse,
+    TelegramAuthRequest,
+    TelegramAuthResponse,
+    TelegramTrackOpenResponse,
+)
 from app.services.auth_service import authenticate_telegram, build_session_payload
 from app.services.tracking_service import notify_miniapp_open, resolve_effective_start_param
 
@@ -18,9 +23,8 @@ settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
-@router.post("/telegram", response_model=TelegramAuthResponse)
-def auth_telegram(payload: TelegramAuthRequest, response: Response) -> TelegramAuthResponse:
-    source = "telegram"
+def _resolve_telegram_identity(payload: TelegramAuthRequest) -> tuple[TelegramUser, str | None, str]:
+    """Return Telegram user, effective start_param, and session source label."""
     if payload.init_data:
         try:
             result = authenticate_telegram(payload.init_data)
@@ -30,12 +34,33 @@ def auth_telegram(payload: TelegramAuthRequest, response: Response) -> TelegramA
         # Prefer start_param from signed initData (Telegram supplies it for startapp launches); the
         # client-sent field can be missing when launch params are not exposed to JS reliably.
         effective_start_param = resolve_effective_start_param(result.start_param, payload.start_param)
-    elif settings.is_dev and payload.dev_user:
-        source = "development"
-        user = TelegramUser(id=payload.dev_user.id, username=payload.dev_user.username, first_name=payload.dev_user.first_name)
+        return user, effective_start_param, "telegram"
+    if settings.is_dev and payload.dev_user:
+        user = TelegramUser(
+            id=payload.dev_user.id,
+            username=payload.dev_user.username,
+            first_name=payload.dev_user.first_name,
+        )
         effective_start_param = (payload.start_param or "").strip() or None
-    else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="initData is required")
+        return user, effective_start_param, "development"
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="initData is required")
+
+
+@router.post("/telegram/track-open", response_model=TelegramTrackOpenResponse)
+def telegram_track_open(payload: TelegramAuthRequest) -> TelegramTrackOpenResponse:
+    """Record a CMS mini-app open using the same validation as /auth/telegram, without issuing a session.
+
+    The web client calls this before session auth so attribution is captured even when cookie/session
+    setup fails afterward.
+    """
+    user, effective_start_param, _source = _resolve_telegram_identity(payload)
+    tracked = bool(notify_miniapp_open(effective_start_param, user))
+    return TelegramTrackOpenResponse(tracked=tracked)
+
+
+@router.post("/telegram", response_model=TelegramAuthResponse)
+def auth_telegram(payload: TelegramAuthRequest, response: Response) -> TelegramAuthResponse:
+    user, effective_start_param, source = _resolve_telegram_identity(payload)
 
     notify_miniapp_open(effective_start_param, user)
 

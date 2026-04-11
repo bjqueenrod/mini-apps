@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import re
+import time
 
 import httpx
 
@@ -9,7 +10,26 @@ from app.core.config import get_settings
 from app.core.telegram import TelegramUser
 
 logger = logging.getLogger(__name__)
-settings = get_settings()
+
+# Suppress duplicate CMS miniapp-open posts when the client calls track-open before /auth/telegram.
+_MINIAPP_NOTIFY_DEDUPE_SECONDS = 60.0
+_recent_successful_miniapp_notify: dict[tuple[int, str], float] = {}
+
+
+def clear_miniapp_open_notify_dedupe() -> None:
+    """Reset dedupe state (for tests)."""
+    _recent_successful_miniapp_notify.clear()
+
+
+def _prune_miniapp_notify_dedupe(now: float) -> None:
+    if len(_recent_successful_miniapp_notify) <= 512:
+        return
+    cutoff = now - _MINIAPP_NOTIFY_DEDUPE_SECONDS
+    dead = [k for k, t in _recent_successful_miniapp_notify.items() if t < cutoff]
+    for key in dead[:256]:
+        _recent_successful_miniapp_notify.pop(key, None)
+
+
 # Match plain l_<id> and mini-app startapp prefixes (clips_BJQ…__l_<id>, keyholding__l_<id>, …).
 TRACKED_START_PARAM_PATTERN = re.compile(
     r"^(?:"
@@ -54,9 +74,10 @@ def resolve_effective_start_param(
 
 
 def notify_miniapp_open(start_param: str | None, user: TelegramUser) -> bool:
+    cfg = get_settings()
     normalized_start_param = (start_param or "").strip()
-    cms_api_url = settings.normalized_cms_api_url
-    cms_api_token = settings.cms_api_token.strip()
+    cms_api_url = cfg.normalized_cms_api_url
+    cms_api_token = cfg.cms_api_token.strip()
 
     if not is_tracked_start_param(normalized_start_param):
         return False
@@ -67,6 +88,12 @@ def notify_miniapp_open(start_param: str | None, user: TelegramUser) -> bool:
             normalized_start_param,
         )
         return False
+
+    dedupe_key = (int(user.id), normalized_start_param)
+    now = time.monotonic()
+    prev = _recent_successful_miniapp_notify.get(dedupe_key)
+    if prev is not None and (now - prev) < _MINIAPP_NOTIFY_DEDUPE_SECONDS:
+        return True
 
     url = f"{cms_api_url}/internal/tracking/miniapp-open"
     try:
@@ -81,10 +108,12 @@ def notify_miniapp_open(start_param: str | None, user: TelegramUser) -> bool:
                 "start_param": normalized_start_param,
             },
             headers={"X-Internal-Token": cms_api_token},
-            timeout=settings.cms_tracking_timeout_seconds,
+            timeout=cfg.cms_tracking_timeout_seconds,
             follow_redirects=True,
         )
         response.raise_for_status()
+        _recent_successful_miniapp_notify[dedupe_key] = time.monotonic()
+        _prune_miniapp_notify_dedupe(_recent_successful_miniapp_notify[dedupe_key])
         return True
     except httpx.HTTPStatusError as exc:
         snippet = (exc.response.text or "")[:800].replace("\n", " ")

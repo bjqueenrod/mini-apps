@@ -10,7 +10,14 @@ def test_analytics_events_forward_to_cms_with_session(client, monkeypatch) -> No
         def raise_for_status(self) -> None:
             return None
 
-    def _fake_post(url: str, *, json: dict[str, Any], headers: dict[str, str], timeout: float):
+    def _fake_post(
+        url: str,
+        *,
+        json: dict[str, Any],
+        headers: dict[str, str],
+        timeout: float,
+        **_kwargs: Any,
+    ):
         captured["url"] = url
         captured["json"] = json
         captured["headers"] = headers
