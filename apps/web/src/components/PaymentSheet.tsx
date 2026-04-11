@@ -416,7 +416,7 @@ export function PaymentSheet({
         {state === 'confirm' ? (
           <div className="payment-sheet__body">
             {paymentNotes}
-            <div className="payment-sheet__actions">
+            <div className="payment-sheet__actions payment-sheet__actions--confirm">
               <button type="button" className="payment-sheet__primary" onClick={handleCheckout} disabled={primaryButtonDisabled}>
                 {payButtonLabel}
               </button>

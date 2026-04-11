@@ -2624,6 +2624,10 @@ button {
   align-items: center;
 }
 
+.payment-sheet__actions--confirm {
+  margin-top: 12px;
+}
+
 .payment-sheet__note {
   width: 100%;
   border: 1px dashed var(--line, #2c2335);
