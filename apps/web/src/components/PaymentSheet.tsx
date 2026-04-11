@@ -35,6 +35,7 @@ export function PaymentSheet({
   quantity = 1,
   mode,
   priceLabel,
+  deliveryMode,
   botFallbackUrl,
   onClose,
   onSuccess,
@@ -44,6 +45,7 @@ export function PaymentSheet({
   quantity?: number;
   mode?: string;
   priceLabel?: string;
+  deliveryMode?: 'stream' | 'download';
   botFallbackUrl?: string;
   onClose: () => void;
   onSuccess?: (result?: InvoiceStatusResponse) => void;
@@ -60,6 +62,7 @@ export function PaymentSheet({
   const [copiedTributeCode, setCopiedTributeCode] = useState(false);
   const [waitingStartedAt, setWaitingStartedAt] = useState<number | null>(null);
   const [waitingRemainingSeconds, setWaitingRemainingSeconds] = useState<number>(WAITING_TIMEOUT_MS / 1000);
+  const [successResult, setSuccessResult] = useState<InvoiceStatusResponse | null>(null);
   const [currency] = useCurrencyPreference(false);
   const storageKey = useMemo(
     () => `paymentSheet:${productId}:${mode || 'default'}`,
@@ -354,6 +357,7 @@ export function PaymentSheet({
       try {
         const res = await pollInvoice(invoiceId);
         if (res.status === 'paid') {
+          setSuccessResult(res);
           setState('success');
           onSuccess?.(res);
           return;
@@ -470,6 +474,12 @@ export function PaymentSheet({
       clearProgress();
     }
   }, [state, clearProgress]);
+
+  useEffect(() => {
+    if (state !== 'success') {
+      setSuccessResult(null);
+    }
+  }, [state]);
 
   const showRetry = state === 'error' && showBotFallbackActions;
 
@@ -611,16 +621,48 @@ export function PaymentSheet({
 
         {state === 'success' ? (
           <div className="payment-sheet__body">
-            <div className="payment-sheet__success">Payment received!</div>
-            <p>You can close this window. If needed, continue in the bot.</p>
-            <button type="button" className="payment-sheet__primary" onClick={onClose}>
-              Close
-            </button>
-            {showBotFallbackActions ? (
-              <button type="button" className="payment-sheet__ghost" onClick={() => openBotDeepLink(botFallbackLink)}>
-                Open bot
-              </button>
-            ) : null}
+            {deliveryMode === 'stream' ? (
+              <>
+                <div className="payment-sheet__success">Stream Ready</div>
+                <p>You can now watch the stream below. I’ve also sent the link to you in DM so you can watch later.</p>
+                {successResult?.deliveryUrl ? (
+                  <button
+                    type="button"
+                    className="payment-sheet__primary"
+                    onClick={() => openPaymentUrl(successResult.deliveryUrl || undefined)}
+                  >
+                    🎬 Stream Now
+                  </button>
+                ) : null}
+              </>
+            ) : deliveryMode === 'download' ? (
+              <>
+                <div className="payment-sheet__success">Download Ready</div>
+                <p>You can now download the clip below. I’ve also sent the link to you in DM so you can download later.</p>
+                {successResult?.deliveryUrl ? (
+                  <button
+                    type="button"
+                    className="payment-sheet__primary"
+                    onClick={() => openPaymentUrl(successResult.deliveryUrl || undefined)}
+                  >
+                    📥 Download Now
+                  </button>
+                ) : null}
+              </>
+            ) : (
+              <>
+                <div className="payment-sheet__success">Payment received!</div>
+                <p>You can close this window. If needed, continue in the bot.</p>
+                <button type="button" className="payment-sheet__primary" onClick={onClose}>
+                  Close
+                </button>
+                {showBotFallbackActions ? (
+                  <button type="button" className="payment-sheet__ghost" onClick={() => openBotDeepLink(botFallbackLink)}>
+                    Open bot
+                  </button>
+                ) : null}
+              </>
+            )}
           </div>
         ) : null}
 

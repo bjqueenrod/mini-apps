@@ -180,26 +180,13 @@ export function ClipDetailSheet({ clip, loading, currency = 'GBP' }: { clip?: Cl
                 quantity={1}
                 mode={showPayment === 'stream' ? 'watch' : 'download'}
                 priceLabel={showPayment === 'stream' ? streamPriceLabel : downloadPriceLabel}
+                deliveryMode={showPayment === 'stream' ? 'stream' : 'download'}
                 botFallbackUrl={showPayment === 'stream' ? clip.botStreamUrl : clip.botDownloadUrl}
                 itemContext={{
                   unitPriceCents: showPayment === 'stream' ? streamUnitPence : downloadUnitPence,
                   clipId: clip.id,
                 }}
                 onClose={() => setShowPayment(null)}
-                onSuccess={(result) => {
-                  if (result?.deliveryUrl) {
-                    if (isTelegramWebView() && result.deliveryMode === 'stream') {
-                      window.location.assign(result.deliveryUrl);
-                      return;
-                    }
-                    if (isTelegramWebView() && result.deliveryMode === 'download') {
-                      window.open(result.deliveryUrl, '_blank', 'noopener,noreferrer');
-                      setShowPayment(null);
-                      return;
-                    }
-                  }
-                  setShowPayment(null);
-                }}
               />
             ) : null}
           </>
