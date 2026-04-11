@@ -255,3 +255,16 @@ def test_checkout_retries_when_code_conflicts(client, monkeypatch) -> None:
     body = response.json()
     assert body["paymentCode"] == "MBJQ-KEY-RETRY2"
     assert captured_codes == ["MBJQ-KEY-RETRY1", "MBJQ-KEY-RETRY2"]
+
+
+def test_invoice_status_surfaces_not_found_detail(client, monkeypatch) -> None:
+    from app.services import payment_gateway
+
+    def fake_get_invoice(*args, **kwargs):
+        raise payment_gateway.PaymentSystemError("invoice not found")
+
+    monkeypatch.setattr(payment_gateway, "get_invoice", fake_get_invoice)
+    response = client.get("/api/payments/invoices/abc-123")
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "invoice not found"

@@ -259,7 +259,10 @@ def invoice_status(invoice_id: str) -> InvoiceStatusResponse:
         invoice = payment_gateway.get_invoice(invoice_id)
     except payment_gateway.PaymentSystemError as exc:
         logger.warning("invoice status error: %s", exc)
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="invoice unavailable") from exc
+        detail = str(exc).strip() or "invoice unavailable"
+        if "not found" in detail.lower():
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail) from exc
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=detail) from exc
 
     invoice_url, provider_url = _invoice_urls(invoice)
     status_value = invoice.get("status") if isinstance(invoice, dict) else None
