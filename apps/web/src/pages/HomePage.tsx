@@ -49,7 +49,23 @@ export function HomePage() {
       {!session.isTelegram && (
         <CurrencyToggleBanner />
       )}
+      <section className="hero">
+        <img
+          className="hero__banner"
+          src="/header-telegram.jpeg?v=20260409a"
+          alt="Mistress BJQueen Telegram Mini-app banner"
+        />
+      </section>
+
       <section className="chooser-panel">
+        <div className="chooser-panel__header">
+          <p className="hero__eyebrow">Choose your experience</p>
+          <h1>Open the Mini App you want to explore.</h1>
+          <p>
+            Browse the clip store or shop custom obedience task packages, all inside the same Telegram-ready
+            experience.
+          </p>
+        </div>
         <div className="chooser-grid">
           <Link
             to="/keyholding"
