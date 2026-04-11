@@ -22,7 +22,7 @@ function SectionEyebrow({ children }: { children: string }) {
 export function KeyholdingPage() {
   const session = useTelegramSession();
   const navigate = useNavigate();
-  const [currency] = useCurrencyPreference();
+  const [currency] = useCurrencyPreference(session.ready);
   const tiersQuery = useKeyholdingTiers(currency);
   const optionsQuery = useKeyholdingOptions(currency);
   const didInitRef = useRef(false);
@@ -48,6 +48,7 @@ export function KeyholdingPage() {
     <AppShell>
       <CurrencyToggleBanner
         showBackButton
+        syncWithServer={session.ready}
         onBackClick={() => navigate('/', { replace: true, state: { bypassHomeRedirect: true } })}
       />
 

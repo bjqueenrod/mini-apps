@@ -50,7 +50,7 @@ export function HomePage() {
 
   return (
     <AppShell>
-      <CurrencyToggleBanner alignRight />
+      <CurrencyToggleBanner alignRight syncWithServer={session.ready} />
       <section className="hero">
         <img
           className="hero__banner"

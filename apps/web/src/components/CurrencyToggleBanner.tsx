@@ -4,10 +4,16 @@ type CurrencyToggleBannerProps = {
   onBackClick?: () => void;
   showBackButton?: boolean;
   alignRight?: boolean;
+  syncWithServer?: boolean;
 };
 
-export function CurrencyToggleBanner({ onBackClick, showBackButton = false, alignRight = false }: CurrencyToggleBannerProps) {
-  const [currency, setCurrency] = useCurrencyPreference();
+export function CurrencyToggleBanner({
+  onBackClick,
+  showBackButton = false,
+  alignRight = false,
+  syncWithServer = false,
+}: CurrencyToggleBannerProps) {
+  const [currency, setCurrency] = useCurrencyPreference(syncWithServer);
 
   return (
     <div

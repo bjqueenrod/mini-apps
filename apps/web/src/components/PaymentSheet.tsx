@@ -59,7 +59,7 @@ export function PaymentSheet({
   const [copiedTributeCode, setCopiedTributeCode] = useState(false);
   const [waitingStartedAt, setWaitingStartedAt] = useState<number | null>(null);
   const [waitingRemainingSeconds, setWaitingRemainingSeconds] = useState<number>(WAITING_TIMEOUT_MS / 1000);
-  const [currency] = useCurrencyPreference();
+  const [currency] = useCurrencyPreference(false);
   const storageKey = useMemo(
     () => `paymentSheet:${productId}:${mode || 'default'}`,
     [productId, mode],

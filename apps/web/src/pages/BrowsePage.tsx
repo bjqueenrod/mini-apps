@@ -31,7 +31,7 @@ export function BrowsePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { clipId } = useParams();
   const session = useTelegramSession();
-  const [currency] = useCurrencyPreference();
+  const [currency] = useCurrencyPreference(session.ready);
   const urlQueryState = useMemo(() => readQueryState(searchParams), [searchParams]);
   const [searchValue, setSearchValue] = useState(() => {
     return composeSearchText(urlQueryState.q, urlQueryState.tags);
@@ -378,6 +378,7 @@ export function BrowsePage() {
     <AppShell>
       <CurrencyToggleBanner
         showBackButton
+        syncWithServer={session.ready}
         onBackClick={() => navigate('/', { replace: true, state: { bypassHomeRedirect: true } })}
       />
       <section className="hero">

@@ -348,7 +348,7 @@ function TaskIcon({ name }: { name: TaskIconName }) {
 export function TasksPage() {
   const session = useTelegramSession();
   const navigate = useNavigate();
-  const [currency] = useCurrencyPreference();
+  const [currency] = useCurrencyPreference(session.ready);
   const tiersQuery = useTiers(currency);
   const didTrackOpenRef = useRef(false);
 
@@ -380,6 +380,7 @@ export function TasksPage() {
     <AppShell>
       <CurrencyToggleBanner
         showBackButton
+        syncWithServer={session.ready}
         onBackClick={() => navigate('/', { replace: true, state: { bypassHomeRedirect: true } })}
       />
       <section className="hero hero--tasks">
