@@ -376,7 +376,6 @@ export function BrowsePage() {
 
   return (
     <AppShell>
-      <CurrencyToggleBanner />
       <section className="hero">
         <img
           className="hero__banner"
@@ -408,6 +407,7 @@ export function BrowsePage() {
         ref={searchPanelRef}
         className={`search-panel${isSearchPinned ? ' search-panel--pinned' : ''}${isSearchPinned && !filtersExpanded ? ' search-panel--collapsed' : ''}`}
       >
+        <CurrencyToggleBanner />
         <section className="toolbar">
           <div className="toolbar__search">
             <div className="toolbar__header">
