@@ -214,6 +214,15 @@ export function PaymentSheet({
   const isPaypalSelected = selectedMethodInfo?.paymentMethod === 'paypal';
   const isThroneSelected = selectedMethodInfo?.paymentMethod === 'throne';
   const isBrandPayButton = isPaypalSelected || isThroneSelected;
+  const checkoutMessage = useMemo(() => {
+    if (isPaypalSelected) {
+      return "Opening PayPal website in a new window. Come back here when you're done paying.";
+    }
+    if (isThroneSelected) {
+      return "Opening Throne website in a new window. Come back here when you're done paying.";
+    }
+    return 'Opening your payment link now.';
+  }, [isPaypalSelected, isThroneSelected]);
 
   const payButtonLabel = useMemo(() => {
     const methodPriceLabel = selectedMethodPriceLabel || selectedMethodInfo?.label || '';
@@ -578,7 +587,7 @@ export function PaymentSheet({
               <div className="payment-sheet__spinner-wheel" aria-hidden />
               <span>Checking out…</span>
             </div>
-            <p className="payment-sheet__muted-text">Opening your payment link now.</p>
+            <p className="payment-sheet__muted-text">{checkoutMessage}</p>
           </div>
         ) : null}
 
