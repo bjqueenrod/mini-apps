@@ -64,6 +64,22 @@ def _invoice_urls(data: dict[str, Any] | None) -> tuple[str | None, str | None]:
     return invoice_url, provider_url
 
 
+def _invoice_delivery_url(data: dict[str, Any] | None) -> str | None:
+    if not isinstance(data, dict):
+        return None
+    order = data.get("order")
+    if isinstance(order, dict):
+        delivery_url = str(order.get("delivery_url") or order.get("deliveryUrl") or "").strip()
+        if delivery_url:
+            return delivery_url
+    payload = _invoice_payload(data)
+    if isinstance(payload, dict):
+        delivery_url = str(payload.get("delivery_url") or payload.get("deliveryUrl") or "").strip()
+        if delivery_url:
+            return delivery_url
+    return None
+
+
 def _invoice_payload(data: dict[str, Any] | None) -> dict[str, Any] | None:
     if not isinstance(data, dict):
         return None
@@ -294,12 +310,14 @@ def invoice_status(invoice_id: str, response: Response) -> InvoiceStatusResponse
 
     invoice_payload = _invoice_payload(invoice)
     invoice_url, provider_url = _invoice_urls(invoice)
+    delivery_url = _invoice_delivery_url(invoice)
     status_value = invoice_payload.get("status") if isinstance(invoice_payload, dict) else None
     result = InvoiceStatusResponse(
         invoiceId=invoice_id,
         status=_normalize_status(status_value),
         paymentUrl=invoice_url,
         providerInvoiceUrl=provider_url,
+        deliveryUrl=delivery_url,
     )
     _cache_invoice_status(invoice_id, result.status, result)
     return result
@@ -344,12 +362,14 @@ def payment_webhook(
         invoice = payment_gateway.get_invoice(invoice_id, cache_bust=True)
         invoice_payload = _invoice_payload(invoice)
         invoice_url, provider_url = _invoice_urls(invoice)
+        delivery_url = _invoice_delivery_url(invoice)
         status_value = invoice_payload.get("status") if isinstance(invoice_payload, dict) else None
         result = InvoiceStatusResponse(
             invoiceId=invoice_id,
             status=_normalize_status(status_value),
             paymentUrl=invoice_url,
             providerInvoiceUrl=provider_url,
+            deliveryUrl=delivery_url,
         )
         _cache_invoice_status(invoice_id, result.status, result)
         logger.info("payment webhook refreshed invoice %s -> %s", invoice_id, result.status)

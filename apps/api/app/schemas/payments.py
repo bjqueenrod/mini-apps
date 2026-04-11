@@ -75,6 +75,7 @@ class InvoiceStatusResponse(BaseModel):
     status: str
     payment_url: str | None = Field(default=None, alias="paymentUrl")
     provider_invoice_url: str | None = Field(default=None, alias="providerInvoiceUrl")
+    delivery_url: str | None = Field(default=None, alias="deliveryUrl")
 
     class Config:
         populate_by_name = True

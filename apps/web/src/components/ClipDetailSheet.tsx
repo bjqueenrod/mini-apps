@@ -186,6 +186,13 @@ export function ClipDetailSheet({ clip, loading, currency = 'GBP' }: { clip?: Cl
                   clipId: clip.id,
                 }}
                 onClose={() => setShowPayment(null)}
+                onSuccess={(result) => {
+                  if (showPayment === 'stream' && isTelegramWebView() && result?.deliveryUrl) {
+                    window.location.assign(result.deliveryUrl);
+                    return;
+                  }
+                  setShowPayment(null);
+                }}
               />
             ) : null}
           </>

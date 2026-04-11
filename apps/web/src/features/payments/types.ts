@@ -40,4 +40,5 @@ export type InvoiceStatusResponse = {
   status: 'pending' | 'paid' | 'cancelled';
   paymentUrl?: string | null;
   providerInvoiceUrl?: string | null;
+  deliveryUrl?: string | null;
 };

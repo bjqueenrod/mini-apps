@@ -271,6 +271,9 @@ def test_invoice_status_does_not_require_session_cookie(client, monkeypatch) -> 
             },
             "invoice_url": f"https://example.com/{invoice_id}",
             "provider_invoice_url": f"https://provider.example/{invoice_id}",
+            "order": {
+                "delivery_url": f"https://stream.example/{invoice_id}",
+            },
         },
     )
 
@@ -281,6 +284,7 @@ def test_invoice_status_does_not_require_session_cookie(client, monkeypatch) -> 
     assert response.json()["status"] == "pending"
     assert response.json()["paymentUrl"] == f"https://example.com/inv_123"
     assert response.json()["providerInvoiceUrl"] == f"https://provider.example/inv_123"
+    assert response.json()["deliveryUrl"] == f"https://stream.example/inv_123"
     assert response.headers["cache-control"] == "no-store, no-cache, must-revalidate, max-age=0"
     assert response.headers["pragma"] == "no-cache"
 
@@ -320,6 +324,9 @@ def test_invoice_status_refreshes_pending_invoices(client, monkeypatch) -> None:
                 },
                 "invoice_url": None,
                 "provider_invoice_url": None,
+                "order": {
+                    "delivery_url": None,
+                },
             }
         return {
             "invoice": {
@@ -328,6 +335,9 @@ def test_invoice_status_refreshes_pending_invoices(client, monkeypatch) -> None:
             },
             "invoice_url": "https://example.com/invoice",
             "provider_invoice_url": "https://example.com/provider",
+            "order": {
+                "delivery_url": "https://stream.example/invoice",
+            },
         }
 
     monkeypatch.setattr(payment_gateway, "get_invoice", fake_get_invoice)
@@ -339,6 +349,7 @@ def test_invoice_status_refreshes_pending_invoices(client, monkeypatch) -> None:
     assert first.json()["status"] == "pending"
     assert second.status_code == 200
     assert second.json()["status"] == "paid"
+    assert second.json()["deliveryUrl"] == "https://stream.example/invoice"
     assert calls["count"] == 2
 
 
@@ -362,3 +373,29 @@ def test_cancel_invoice_updates_cached_status(client, monkeypatch) -> None:
     assert response.status_code == 200
     assert response.json() == {"ok": True}
     assert payments_routes.INVOICE_CACHE["abc-123"].status == "cancelled"
+
+
+def test_invoice_status_surfaces_delivery_url_from_nested_order(client, monkeypatch) -> None:
+    from app.services import payment_gateway
+
+    monkeypatch.setattr(
+        payment_gateway,
+        "get_invoice",
+        lambda invoice_id, **kwargs: {
+            "invoice": {
+                "invoice_id": invoice_id,
+                "status": "paid",
+            },
+            "invoice_url": "https://example.com/invoice",
+            "provider_invoice_url": "https://provider.example/invoice",
+            "order": {
+                "delivery_url": "https://stream.example/invoice",
+            },
+        },
+    )
+
+    response = client.get("/api/payments/invoices/inv_999")
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "paid"
+    assert response.json()["deliveryUrl"] == "https://stream.example/invoice"

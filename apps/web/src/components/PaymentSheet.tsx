@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { cancelInvoice, pollInvoice, fetchCheckoutOptions, startCheckout } from '../features/payments/api';
+import type { InvoiceStatusResponse } from '../features/payments/types';
 import { PaymentMethod } from '../features/payments/types';
 import { resolvePriceLabelOptional } from '../utils/pricing';
 import { isTelegramWebView, openBotDeepLink } from '../app/telegram';
@@ -45,7 +46,7 @@ export function PaymentSheet({
   priceLabel?: string;
   botFallbackUrl?: string;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess?: (result?: InvoiceStatusResponse) => void;
   itemContext?: Record<string, unknown>;
 }) {
   const [state, setState] = useState<SheetState>('loading');
@@ -354,7 +355,7 @@ export function PaymentSheet({
         const res = await pollInvoice(invoiceId);
         if (res.status === 'paid') {
           setState('success');
-          onSuccess?.();
+          onSuccess?.(res);
           return;
         }
         if (res.status === 'cancelled') {
