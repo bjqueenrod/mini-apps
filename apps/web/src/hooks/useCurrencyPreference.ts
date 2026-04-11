@@ -14,6 +14,10 @@ function getTelegramCurrencyUserId(telegramUserId?: number | null): number | nul
   return window.Telegram?.WebApp?.initDataUnsafe?.user?.id ?? telegramUserId ?? null;
 }
 
+function shouldSyncTelegramCurrency(telegramUserId?: number | null): boolean {
+  return Boolean(window.Telegram?.WebApp || telegramUserId != null);
+}
+
 async function fetchTelegramCurrencyPreference(telegramUserId?: number | null): Promise<CurrencyCode | null> {
   for (let attempt = 0; attempt < 5; attempt += 1) {
     try {
@@ -115,7 +119,7 @@ export function useCurrencyPreference(
   }, [currency]);
 
   useEffect(() => {
-    if (!isTelegramSession) return;
+    if (!shouldSyncTelegramCurrency(telegramUserId) || typeof window === 'undefined') return;
     let cancelled = false;
 
     const syncPreference = async () => {
@@ -131,7 +135,7 @@ export function useCurrencyPreference(
     return () => {
       cancelled = true;
     };
-  }, [applyCurrency, syncWithServer, telegramUserId]);
+  }, [applyCurrency, telegramUserId]);
 
   useEffect(() => {
     const handleChange = (event: Event) => {
