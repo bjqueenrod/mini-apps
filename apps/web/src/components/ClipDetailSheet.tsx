@@ -134,7 +134,7 @@ export function ClipDetailSheet({ clip, loading, currency = 'GBP' }: { clip?: Cl
                   <Link
                     key={tag}
                     to={tagHref(tag)}
-                    state={{ pinSearchPanel: true }}
+                    state={{ pinSearchPanel: true, searchText: `#${tag}` }}
                     onClick={() => trackClipTagSelect({ tag, source: 'detail_sheet', clip })}
                   >
                     #{tag}

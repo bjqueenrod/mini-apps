@@ -42,6 +42,7 @@ export function BrowsePage() {
   const [isSearchPinned, setIsSearchPinned] = useState(false);
   const [filtersExpanded, setFiltersExpanded] = useState(true);
   const [visibleClips, setVisibleClips] = useState<ClipItem[]>([]);
+  const pinnedSearchText = (location.state as { searchText?: string } | null)?.searchText ?? '';
   const searchText = useMemo(() => stripHashtagTokens(searchValue), [searchValue]);
   const searchTags = useMemo(() => extractHashtagTokens(searchValue), [searchValue]);
   const queryState = useMemo(
@@ -140,6 +141,14 @@ export function BrowsePage() {
     setPage(1);
     setVisibleClips([]);
   }, [queryIdentity]);
+
+  useEffect(() => {
+    if (clipId || !pinnedSearchText || pinnedSearchText === searchValue) {
+      return;
+    }
+
+    setSearchValue(pinnedSearchText);
+  }, [clipId, pinnedSearchText, searchValue]);
 
   useEffect(() => {
     const normalize = (value: string) => value.trim().toLowerCase();
