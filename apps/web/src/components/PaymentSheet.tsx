@@ -450,6 +450,23 @@ export function PaymentSheet({
       try {
         const res = await pollInvoice(invoiceId);
         if (res.status === 'paid') {
+          trackInteraction({
+            screen: 'payment_sheet',
+            actionKey: 'payment_poll_paid',
+            properties: {
+              invoice_id: invoiceId,
+              order_id: orderId ?? undefined,
+              product_id: productId,
+              payment_method: selectedMethod || undefined,
+              payment_method_label: selectedMethodInfo?.label || undefined,
+              quantity,
+              mode: mode || undefined,
+              delivery_mode: deliveryMode || undefined,
+              currency,
+              clip_title: clipTitle || undefined,
+              elapsed_ms: Date.now() - startedAt,
+            },
+          });
           setSuccessResult(res);
           setState('success');
           onSuccess?.(res);
@@ -465,6 +482,24 @@ export function PaymentSheet({
       }
       const elapsed = Date.now() - startedAt;
       if (elapsed > 5 * 60 * 1000) {
+        trackInteraction({
+          screen: 'payment_sheet',
+          actionKey: 'payment_poll_timeout',
+          properties: {
+            invoice_id: invoiceId,
+            order_id: orderId ?? undefined,
+            product_id: productId,
+            payment_method: selectedMethod || undefined,
+            payment_method_label: selectedMethodInfo?.label || undefined,
+            quantity,
+            mode: mode || undefined,
+            delivery_mode: deliveryMode || undefined,
+            currency,
+            clip_title: clipTitle || undefined,
+            elapsed_ms: elapsed,
+            timeout_ms: 5 * 60 * 1000,
+          },
+        });
         try {
           await cancelInvoice(invoiceId);
         } catch {
@@ -483,7 +518,7 @@ export function PaymentSheet({
     return () => {
       if (timer) window.clearTimeout(timer);
     };
-  }, [clearTimedOutCheckout, invoiceId, onSuccess, state]);
+  }, [clearTimedOutCheckout, clipTitle, currency, deliveryMode, invoiceId, mode, onSuccess, orderId, productId, quantity, selectedMethod, selectedMethodInfo?.label, state]);
 
   const handleCheckout = useCallback(async (options?: { freshCheckout?: boolean }) => {
     if (!selectedMethod) return;
