@@ -89,7 +89,7 @@ export function HomePage() {
               obedience tasks, enforced rules, and clear consequences.
             </p>
             <p>A structured, hands-on keyholding service with clear expectations.</p>
-            <span className="chooser-card__cta">View Keyholding Options</span>
+            <span className="chooser-card__cta">➡️ View Keyholding Options</span>
           </Link>
           <Link
             to="/tasks"
@@ -106,7 +106,7 @@ export function HomePage() {
               You complete the tasks, submit proof, and I review it myself to decide if you followed my orders
               correctly.
             </p>
-            <span className="chooser-card__cta">Start Your Tasks</span>
+            <span className="chooser-card__cta">➡️ Start Your Tasks</span>
           </Link>
           <Link
             to="/clips"
@@ -123,7 +123,7 @@ export function HomePage() {
               Use hashtag search to find exactly what you want, preview before you buy, and unlock full access when
               you’re ready.
             </p>
-            <span className="chooser-card__cta">Enter Clip Store</span>
+            <span className="chooser-card__cta">➡️ Enter Clip Store</span>
           </Link>
         </div>
       </section>
