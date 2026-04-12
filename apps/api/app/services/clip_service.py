@@ -329,23 +329,36 @@ def _row_to_item(
 
 
 
-def search_clips(db: Session, params: ClipQueryParams) -> dict[str, Any]:
+def search_clips(db: Session, params: ClipQueryParams, *, include_total: bool | None = None) -> dict[str, Any]:
     mapping = get_clip_mapping(engine)
     table = mapping.table
     filters = _build_filters(params, mapping)
     page = max(1, params.page)
     limit = max(1, min(params.limit, 50))
     offset = (page - 1) * limit
+    if include_total is None:
+        # COUNT(*) is expensive on large tables; page 2+ only needs a window + hasMore.
+        include_total = page <= 1
 
     query = select(table)
     count_query = select(func.count()).select_from(table)
     if filters:
         query = query.where(and_(*filters))
         count_query = count_query.where(and_(*filters))
-    query = query.order_by(_sort_expression(params.sort, mapping)).offset(offset).limit(limit)
+    query = query.order_by(_sort_expression(params.sort, mapping))
 
-    total = int(db.execute(count_query).scalar_one())
-    rows = db.execute(query).all()
+    if include_total:
+        query = query.offset(offset).limit(limit)
+        total = int(db.execute(count_query).scalar_one())
+        rows = db.execute(query).all()
+        has_more = offset + len(rows) < total
+    else:
+        query = query.offset(offset).limit(limit + 1)
+        rows = db.execute(query).all()
+        has_more = len(rows) > limit
+        rows = rows[:limit]
+        total = 0
+
     fx_snapshot = _fx_snapshot()
     clip_ids = {str(row._mapping.get("clip_id") or row._mapping.get("id") or "").upper() for row in rows}
     clip_pricing_by_id = _clip_pricing_map({clip_id for clip_id in clip_ids if clip_id})
@@ -372,7 +385,7 @@ def search_clips(db: Session, params: ClipQueryParams) -> dict[str, Any]:
         "page": page,
         "limit": limit,
         "total": total,
-        "hasMore": offset + len(items) < total,
+        "hasMore": has_more,
         "categories": categories,
     }
 

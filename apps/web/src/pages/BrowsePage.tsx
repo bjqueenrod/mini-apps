@@ -18,7 +18,7 @@ import {
   trackClipTagSelect,
   trackMiniAppOpenAttributed,
 } from '../features/clips/analytics';
-import { useClipDetail, useClipHashtags, useClipSearch, useNewClips, useTopSellers } from '../features/clips/hooks';
+import { useClipDetail, useClipHashtags, useClipSearchInfinite, useNewClips, useTopSellers } from '../features/clips/hooks';
 import { readQueryState, toSearchParams } from '../features/clips/queryState';
 import { ClipItem } from '../features/clips/types';
 import { pushRecentSearch } from '../utils/storage';
@@ -93,28 +93,47 @@ export function BrowsePage() {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const searchPanelSentinelRef = useRef<HTMLDivElement | null>(null);
   const searchPanelRef = useRef<HTMLElement | null>(null);
-  const [page, setPage] = useState(1);
   const [isSearchPinned, setIsSearchPinned] = useState(false);
   const [filtersExpanded, setFiltersExpanded] = useState(true);
-  const [visibleClips, setVisibleClips] = useState<ClipItem[]>([]);
   const [showFaq, setShowFaq] = useState(false);
   const [openFaqQuestion, setOpenFaqQuestion] = useState<string | null>(null);
   const pinnedSearchText = (location.state as { searchText?: string } | null)?.searchText ?? '';
   const searchText = useMemo(() => stripHashtagTokens(searchValue), [searchValue]);
   const searchTags = useMemo(() => extractHashtagTokens(searchValue), [searchValue]);
-  const queryState = useMemo(
+  const clipSearchFilters = useMemo(
     () => ({
       q: searchText,
       category: urlQueryState.category,
       tags: searchTags,
       sort: urlQueryState.sort,
-      page,
       currency,
     }),
-    [currency, page, searchTags, searchText, urlQueryState.category, urlQueryState.sort],
+    [currency, searchTags, searchText, urlQueryState.category, urlQueryState.sort],
   );
-  const activeQueryState = queryState;
-  const clipsQuery = useClipSearch(activeQueryState);
+  const clipsQuery = useClipSearchInfinite(clipSearchFilters);
+  const visibleClips = useMemo(() => {
+    const pages = clipsQuery.data?.pages ?? [];
+    const seen = new Set<string>();
+    const out: ClipItem[] = [];
+    for (const page of pages) {
+      for (const item of page.items) {
+        if (seen.has(item.id)) {
+          continue;
+        }
+        seen.add(item.id);
+        out.push(item);
+      }
+    }
+    return out;
+  }, [clipsQuery.data?.pages]);
+  const firstSearchPage = clipsQuery.data?.pages?.[0];
+  const queryState = useMemo(
+    () => ({
+      ...clipSearchFilters,
+      page: 1,
+    }),
+    [clipSearchFilters],
+  );
   const clipHashtagsQuery = useClipHashtags();
   const newClipsQuery = useNewClips(currency);
   const topSellersQuery = useTopSellers(currency);
@@ -171,9 +190,11 @@ export function BrowsePage() {
     [searchValue, selectedFeaturedTag],
   );
   const queryIdentity = useMemo(
-    () => `${queryState.q}::${queryState.category}::${queryState.sort}::${queryState.tags.join(',')}`,
-    [queryState.category, queryState.q, queryState.sort, queryState.tags],
+    () =>
+      `${clipSearchFilters.q}::${clipSearchFilters.category}::${clipSearchFilters.sort}::${clipSearchFilters.tags.join(',')}`,
+    [clipSearchFilters.category, clipSearchFilters.q, clipSearchFilters.sort, clipSearchFilters.tags],
   );
+  const lastTrackedSearchPageRef = useRef(0);
 
   useEffect(() => {
     applyTelegramTheme();
@@ -218,7 +239,7 @@ export function BrowsePage() {
     if (!pendingClipId || clipId) {
       return;
     }
-    if (!clipsQuery.isFetched || clipsQuery.isFetching) {
+    if (!clipsQuery.isFetched || clipsQuery.isLoading) {
       return;
     }
 
@@ -226,7 +247,7 @@ export function BrowsePage() {
     const cleanedSearch = stripStartRoutingParams(location.search);
     const suffix = cleanedSearch ? `?${cleanedSearch}` : '';
     navigate(`/clips/${encodeURIComponent(pendingClipId)}${suffix}`, { replace: false });
-  }, [clipId, clipsQuery.isFetched, clipsQuery.isFetching, location.search, navigate]);
+  }, [clipId, clipsQuery.isFetched, clipsQuery.isLoading, location.search, navigate]);
 
   useEffect(() => {
     if (clipId) {
@@ -265,8 +286,7 @@ export function BrowsePage() {
   }, [location.pathname, location.search, session.isTelegram, session.startParam]);
 
   useEffect(() => {
-    setPage(1);
-    setVisibleClips([]);
+    lastTrackedSearchPageRef.current = 0;
   }, [queryIdentity]);
 
   useEffect(() => {
@@ -324,7 +344,6 @@ export function BrowsePage() {
         q: stripHashtagTokens(searchValue),
         page: 1,
       };
-      setPage(1);
       setSearchParams(toSearchParams(next));
       if (searchValue.trim()) {
         pushRecentSearch(searchValue);
@@ -332,21 +351,6 @@ export function BrowsePage() {
     }, 250);
     return () => window.clearTimeout(timer);
   }, [searchValue, setSearchParams, urlQueryState]);
-
-  useEffect(() => {
-    if (!clipsQuery.data || clipsQuery.data.page !== page) {
-      return;
-    }
-
-    setVisibleClips((current) => {
-      if (page === 1) {
-        return clipsQuery.data?.items ?? [];
-      }
-      const seen = new Set(current.map((item) => item.id));
-      const nextItems = (clipsQuery.data?.items ?? []).filter((item) => !seen.has(item.id));
-      return nextItems.length ? [...current, ...nextItems] : current;
-    });
-  }, [clipsQuery.data, page]);
 
   useEffect(() => {
     if (newClipsQuery.isFetching || !newClipsQuery.data?.items.length) {
@@ -381,18 +385,26 @@ export function BrowsePage() {
   }, [topSellersQuery.data, topSellersQuery.isFetching]);
 
   useEffect(() => {
-    if (!clipsQuery.data || clipsQuery.isFetching || clipsQuery.data.page !== page) {
+    const pages = clipsQuery.data?.pages;
+    if (!pages?.length || clipsQuery.isFetchingNextPage) {
       return;
     }
 
-    const listViewKey = `search_results:${queryIdentity}:${page}:${clipsQuery.data.items.length}:${clipsQuery.data.total}`;
+    const n = pages.length;
+    if (n <= lastTrackedSearchPageRef.current) {
+      return;
+    }
+    lastTrackedSearchPageRef.current = n;
+    const last = pages[n - 1];
+    const totalCount = pages[0].total;
+    const listViewKey = `search_results:${queryIdentity}:${n}:${last.items.length}:${totalCount}`;
     if (!trackedListViewKeysRef.current.has(listViewKey)) {
       trackedListViewKeysRef.current.add(listViewKey);
       trackClipListView({
         listType: 'search_results',
-        itemCount: clipsQuery.data.items.length,
-        totalCount: clipsQuery.data.total,
-        page,
+        itemCount: last.items.length,
+        totalCount,
+        page: n,
         query: queryState.q,
         tags: queryState.tags,
       });
@@ -402,7 +414,11 @@ export function BrowsePage() {
       return;
     }
 
-    const searchKey = `${queryIdentity}:${clipsQuery.data.total}`;
+    if (n !== 1) {
+      return;
+    }
+
+    const searchKey = `${queryIdentity}:${totalCount}`;
     if (trackedSearchKeysRef.current.has(searchKey)) {
       return;
     }
@@ -410,13 +426,13 @@ export function BrowsePage() {
     trackClipSearch({
       query: queryState.q,
       tags: queryState.tags,
-      resultCount: clipsQuery.data.total,
+      resultCount: totalCount,
     });
-  }, [clipsQuery.data, clipsQuery.isFetching, page, queryIdentity, queryState.q, queryState.tags]);
+  }, [clipsQuery.data?.pages, clipsQuery.isFetchingNextPage, queryIdentity, queryState.q, queryState.tags]);
 
   useEffect(() => {
     const node = loadMoreRef.current;
-    if (!node || !clipsQuery.data?.hasMore || clipsQuery.isFetching) {
+    if (!node || !clipsQuery.hasNextPage || clipsQuery.isFetchingNextPage) {
       return;
     }
 
@@ -424,7 +440,7 @@ export function BrowsePage() {
       (entries) => {
         const [entry] = entries;
         if (entry?.isIntersecting) {
-          setPage((current) => current + 1);
+          void clipsQuery.fetchNextPage();
         }
       },
       { rootMargin: '220px 0px' },
@@ -432,7 +448,7 @@ export function BrowsePage() {
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [clipsQuery.data?.hasMore, clipsQuery.isFetching]);
+  }, [clipsQuery.fetchNextPage, clipsQuery.hasNextPage, clipsQuery.isFetchingNextPage]);
 
   useEffect(() => {
     const node = searchPanelSentinelRef.current;
@@ -495,10 +511,10 @@ export function BrowsePage() {
     }
     setSearchValue((current) => replaceRowTag(current, selectedSecondaryTag, value));
   };
-  const showResultsLoading = visibleClips.length === 0 && (clipsQuery.isLoading || (clipsQuery.isFetching && page === 1));
-  const resultsCountLabel = clipsQuery.data
-    ? `${clipsQuery.data.total} result${clipsQuery.data.total === 1 ? '' : 's'}`
-    : '';
+  const showResultsLoading = visibleClips.length === 0 && clipsQuery.isLoading;
+  const resultsTotal = firstSearchPage?.total ?? 0;
+  const resultsCountLabel =
+    firstSearchPage && resultsTotal > 0 ? `${resultsTotal} result${resultsTotal === 1 ? '' : 's'}` : '';
 
   return (
     <AppShell>
@@ -627,7 +643,9 @@ export function BrowsePage() {
           </>
         )}
 
-        {!showResultsLoading && clipsQuery.data && <p className="results-summary results-summary--inside">{resultsCountLabel}</p>}
+        {!showResultsLoading && firstSearchPage && resultsCountLabel && (
+          <p className="results-summary results-summary--inside">{resultsCountLabel}</p>
+        )}
       </section>
 
       {clipsQuery.isError && <ErrorState message={(clipsQuery.error as Error).message} />}
@@ -638,11 +656,13 @@ export function BrowsePage() {
         </div>
       )}
       {!showResultsLoading && visibleClips.length > 0 && <ClipGrid items={visibleClips} currency={currency} />}
-      {clipsQuery.data && !clipsQuery.isLoading && !clipsQuery.isFetching && visibleClips.length === 0 && <EmptyState />}
+      {clipsQuery.isFetched && !clipsQuery.isLoading && !clipsQuery.isError && visibleClips.length === 0 && (
+        <EmptyState />
+      )}
 
-      {clipsQuery.data?.hasMore && (
+      {clipsQuery.hasNextPage ? (
         <div ref={loadMoreRef} className="load-more load-more--passive">
-          {visibleClips.length > 0 && page > 1 && clipsQuery.isFetching ? (
+          {visibleClips.length > 0 && clipsQuery.isFetchingNextPage ? (
             <>
               <span className="load-more__spinner" aria-hidden="true" />
               <span>Loading more...</span>
@@ -651,7 +671,7 @@ export function BrowsePage() {
             ''
           )}
         </div>
-      )}
+      ) : null}
 
       {clipId && (
         <ClipDetailSheet

@@ -102,6 +102,21 @@ def test_list_clips_filters_inactive_and_returns_preview(client) -> None:
     assert "BJQ0003" not in active_ids
 
 
+def test_list_clips_page_two_skips_total_count_for_performance(client) -> None:
+    """Deep pages omit COUNT(*); total is 0 and hasMore uses limit+1 window."""
+    response = client.get("/api/clips", params={"page": 2, "limit": 1})
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["total"] == 0
+    assert payload["page"] == 2
+    assert len(payload["items"]) == 1
+    assert payload["hasMore"] is False
+
+    page1 = client.get("/api/clips", params={"page": 1, "limit": 1}).json()
+    assert page1["total"] == 2
+    assert page1["hasMore"] is True
+
+
 
 def test_custom_thumbnail_url_overrides_bunny_thumbnail(client) -> None:
     response = client.get("/api/clips/BJQ0001")

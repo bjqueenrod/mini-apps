@@ -1,8 +1,11 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { CurrencyCode } from '../../utils/format';
 import { fetchClip, fetchClipHashtags, fetchClips, fetchNewClips, fetchTopSellers } from './api';
 import { ClipQueryState } from './types';
+
+/** Filters for catalog search (page is supplied by infinite query). */
+export type ClipSearchFilters = Omit<ClipQueryState, 'page'>;
 
 export function useClipSearch(queryState: ClipQueryState) {
   const normalized = useMemo(() => queryState, [queryState]);
@@ -10,6 +13,25 @@ export function useClipSearch(queryState: ClipQueryState) {
     queryKey: ['clips', normalized],
     queryFn: () => fetchClips(normalized),
     placeholderData: (previousData) => previousData,
+  });
+}
+
+export function useClipSearchInfinite(filters: ClipSearchFilters) {
+  const tagsKey = useMemo(() => [...filters.tags].sort().join('\0'), [filters.tags]);
+
+  return useInfiniteQuery({
+    queryKey: ['clips', 'infinite', filters.q, filters.category, filters.sort, filters.currency ?? '', tagsKey],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) =>
+      fetchClips({
+        q: filters.q,
+        category: filters.category,
+        tags: filters.tags,
+        sort: filters.sort,
+        currency: filters.currency,
+        page: pageParam as number,
+      }),
+    getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.page + 1 : undefined),
   });
 }
 
