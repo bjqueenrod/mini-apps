@@ -552,10 +552,10 @@ button {
   pointer-events: none;
   align-self: end;
   justify-self: end;
-  width: min(52%, 200px);
-  margin: 0 -6px -14px 0;
-  color: var(--accent);
-  opacity: 0.11;
+  width: min(58%, 230px);
+  margin: 0 -8px -16px 0;
+  color: var(--accent-strong);
+  opacity: 0.32;
   line-height: 0;
 }
 
@@ -563,21 +563,22 @@ button {
   width: 100%;
   height: auto;
   display: block;
+  filter: drop-shadow(0 0 28px rgba(193, 128, 229, 0.55));
 }
 
 .chooser-card--keyholding .chooser-card__watermark {
-  opacity: 0.1;
+  opacity: 0.3;
 }
 
 .chooser-card--tasks .chooser-card__watermark {
-  opacity: 0.1;
-  width: min(48%, 190px);
+  opacity: 0.3;
+  width: min(54%, 220px);
 }
 
 .chooser-card--clips .chooser-card__watermark {
-  opacity: 0.09;
-  width: min(56%, 210px);
-  margin-bottom: -18px;
+  opacity: 0.28;
+  width: min(62%, 240px);
+  margin-bottom: -20px;
 }
 
 .chooser-card__body {
