@@ -537,10 +537,56 @@ button {
 
 .chooser-card {
   display: grid;
-  gap: 10px;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
   padding: 18px;
   color: var(--text);
   background: var(--shell-card-bg);
+  position: relative;
+}
+
+.chooser-card__watermark {
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 0;
+  pointer-events: none;
+  align-self: end;
+  justify-self: end;
+  width: min(52%, 200px);
+  margin: 0 -6px -14px 0;
+  color: var(--accent);
+  opacity: 0.11;
+  line-height: 0;
+}
+
+.chooser-card__watermark svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.chooser-card--keyholding .chooser-card__watermark {
+  opacity: 0.1;
+}
+
+.chooser-card--tasks .chooser-card__watermark {
+  opacity: 0.1;
+  width: min(48%, 190px);
+}
+
+.chooser-card--clips .chooser-card__watermark {
+  opacity: 0.09;
+  width: min(56%, 210px);
+  margin-bottom: -18px;
+}
+
+.chooser-card__body {
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 1;
+  display: grid;
+  gap: 10px;
+  min-width: 0;
 }
 
 .chooser-card strong {
