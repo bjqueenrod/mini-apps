@@ -41,7 +41,7 @@ function normalizeStartParam(value?: string | null): string | undefined {
 }
 
 /** Telegram may surface the same launch param in several places; some parsers truncate. Prefer the longest non-empty candidate. */
-function coalesceStartParamCandidates(...candidates: (string | undefined)[]): string | undefined {
+function coalesceStartParamCandidates(...candidates: (string | null | undefined)[]): string | undefined {
   const seen = new Set<string>();
   let best: string | undefined;
   for (const raw of candidates) {
