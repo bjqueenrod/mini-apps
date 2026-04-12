@@ -516,7 +516,7 @@ button {
 .tier-card,
 .clip-card,
 .skeleton-card {
-  background: var(--surface);
+  background: var(--shell-card-bg);
   border: 1px solid var(--line);
   border-radius: 24px;
   overflow: hidden;
@@ -703,7 +703,6 @@ button {
   position: sticky;
   top: 0;
   z-index: 4;
-  backdrop-filter: blur(12px);
 }
 
 .search-panel--pinned {
@@ -1169,10 +1168,8 @@ button {
 }
 
 .top-sellers--tiers .top-sellers__card--tier {
-  background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.12), transparent 42%),
-    linear-gradient(180deg, rgba(33, 27, 39, 0.98), rgba(20, 16, 25, 0.98));
-  box-shadow: 0 22px 42px rgba(7, 4, 10, 0.32);
+  background: var(--shell-card-bg);
+  box-shadow: var(--shadow-card);
 }
 
 .top-sellers--tiers .top-sellers__card--featured {
@@ -1227,9 +1224,9 @@ button {
 
 .top-sellers__meta-item,
 .top-sellers__price-block {
-  border: 1px solid rgba(176, 106, 214, 0.14);
+  border: 1px solid rgba(176, 106, 214, 0.12);
   border-radius: 18px;
-  background: rgba(24, 19, 30, 0.7);
+  background: var(--shell-panel-bg);
 }
 
 .top-sellers__meta-item {
@@ -1253,19 +1250,14 @@ button {
 
 .top-sellers__price-block {
   padding: 15px 16px;
-  background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.12), transparent 48%),
-    rgba(24, 19, 30, 0.72);
+  background: var(--shell-panel-bg);
 }
 
 .top-sellers__price-block--keyholding {
   padding: 18px 18px 16px;
-  border: 1px solid rgba(193, 128, 229, 0.32);
-  background:
-    radial-gradient(circle at top right, rgba(193, 128, 229, 0.16), transparent 52%),
-    radial-gradient(circle at bottom left, rgba(176, 106, 214, 0.12), transparent 48%),
-    linear-gradient(180deg, rgba(38, 31, 45, 0.98), rgba(26, 21, 31, 0.98));
-  box-shadow: 0 18px 36px rgba(7, 4, 10, 0.32), 0 0 0 1px rgba(193, 128, 229, 0.08) inset;
+  border: 1px solid rgba(176, 106, 214, 0.16);
+  background: var(--shell-card-bg);
+  box-shadow: var(--shadow-card);
 }
 
 .top-sellers__price-block strong {
@@ -1397,7 +1389,7 @@ button {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--surface);
+  background: var(--shell-card-bg);
   border: 1px solid var(--line);
   border-radius: 24px;
   overflow: hidden;
@@ -1421,15 +1413,15 @@ button {
 }
 
 .top-sellers__card--light {
-  background: #2a2231;
+  background: var(--shell-panel-bg);
 }
 
 .top-sellers__card--light .top-sellers__body {
-  background: linear-gradient(180deg, rgba(49, 40, 59, 0.98), rgba(34, 28, 42, 0.98));
+  background: var(--shell-card-bg);
 }
 
 .top-sellers__card--base {
-  background: var(--surface);
+  background: var(--shell-card-bg);
 }
 
 .top-sellers__card--skeleton,
@@ -1440,7 +1432,7 @@ button {
 .top-sellers__media {
   height: clamp(180px, 24vw, 230px);
   position: relative;
-  background: linear-gradient(135deg, rgba(44, 36, 52, 0.98), rgba(24, 19, 30, 0.96));
+  background: var(--shell-card-bg);
 }
 
 .top-sellers__pagination {
@@ -1596,7 +1588,7 @@ button {
   flex-direction: column;
   gap: 10px;
   padding: 18px;
-  background: linear-gradient(180deg, rgba(33, 27, 39, 0.96), rgba(24, 19, 30, 0.98));
+  background: var(--shell-card-bg);
 }
 
 .top-sellers__line {
@@ -1933,9 +1925,7 @@ button {
   padding: 16px;
   text-align: center;
   color: var(--muted);
-  background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.16), transparent 35%),
-    linear-gradient(135deg, rgba(44, 36, 52, 0.98), rgba(24, 19, 30, 0.96));
+  background: var(--shell-card-bg);
 }
 
 .clip-card__body {
@@ -1943,7 +1933,7 @@ button {
   flex: 1;
   flex-direction: column;
   padding: 14px 14px 16px;
-  background: linear-gradient(180deg, rgba(33, 27, 39, 0.96), rgba(24, 19, 30, 0.98));
+  background: var(--shell-card-bg);
 }
 
 .clip-card__eyebrow,
@@ -1961,7 +1951,7 @@ button {
   display: grid;
   gap: 12px;
   padding: 16px;
-  background: linear-gradient(180deg, rgba(33, 27, 39, 0.96), rgba(24, 19, 30, 0.98));
+  background: var(--shell-card-bg);
 }
 
 .tier-card__tags {
