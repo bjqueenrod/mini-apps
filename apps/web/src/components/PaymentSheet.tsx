@@ -568,6 +568,15 @@ export function PaymentSheet({
         return;
       }
       if (selectedMethod === 'crypto') {
+        const waitingStartedAt = Date.now();
+        saveProgress({
+          invoiceId: res.invoiceId,
+          paymentUrl: url,
+          paymentCode: res.paymentCode || '',
+          selectedMethod,
+          orderId: res.orderId,
+          waitingStartedAt,
+        });
         window.location.assign(url);
         return;
       }
@@ -736,6 +745,12 @@ export function PaymentSheet({
         {state === 'confirm' ? (
           <div className="payment-sheet__body">
             {paymentNotes}
+            {selectedMethod === 'crypto' ? (
+              <p className="payment-sheet__muted-text">
+                The NOWPayments checkout page often has no link back here. After you send crypto, use Telegram&apos;s
+                back control or reopen this mini-app — we keep checking your payment.
+              </p>
+            ) : null}
             <div className="payment-sheet__actions payment-sheet__actions--confirm">
               <button
                 type="button"
