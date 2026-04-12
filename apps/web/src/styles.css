@@ -1,9 +1,11 @@
 :root {
-  --surface: var(--tg-secondary_bg_color, #211b27);
+  color-scheme: dark;
+  /* Fixed palette: Telegram light theme uses dark ink + pale surfaces; we force a dark canvas (see telegram.ts), so never tie text/surface to --tg-*. */
+  --surface: #211b27;
   --surface-strong: #18131e;
   --surface-soft: #2c2434;
-  --text: var(--tg-text_color, #f3edf7);
-  --muted: var(--tg-hint_color, #cbbfd4);
+  --text: #f3edf7;
+  --muted: #cbbfd4;
   --muted-strong: #a495ae;
   --line: #3b3144;
   --accent: #b06ad6;
