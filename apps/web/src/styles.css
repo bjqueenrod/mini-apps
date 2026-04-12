@@ -34,6 +34,23 @@ body {
   color: var(--text);
 }
 
+#root {
+  color: var(--text);
+}
+
+.app-shell__content {
+  color: var(--text);
+}
+
+/* Telegram light WebView can style headings/bold for light pages; keep our dark ink. */
+.app-shell h1,
+.app-shell h2,
+.app-shell h3,
+.app-shell strong,
+.app-shell b {
+  color: var(--text);
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -74,6 +91,7 @@ button {
 .chooser-panel,
 .tasks-hero,
 .tasks-section {
+  color: var(--text);
   border: 1px solid rgba(176, 106, 214, 0.12);
   border-radius: 28px;
   padding: 14px;
@@ -88,6 +106,7 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: var(--text);
 }
 
 .currency-banner__row {
@@ -503,6 +522,7 @@ button {
   display: grid;
   gap: 10px;
   padding: 18px;
+  color: var(--text);
   background:
     radial-gradient(circle at top left, rgba(176, 106, 214, 0.16), transparent 42%),
     linear-gradient(180deg, rgba(33, 27, 39, 0.96), rgba(24, 19, 30, 0.98));
@@ -511,6 +531,7 @@ button {
 .chooser-card strong {
   font-size: 1.2rem;
   line-height: 1.08;
+  color: var(--text);
 }
 
 .chooser-card p {
@@ -669,6 +690,7 @@ button {
 .top-sellers {
   margin: 4px 0 18px;
   padding: 14px;
+  color: var(--text);
   border: 1px solid rgba(176, 106, 214, 0.12);
   border-radius: 28px;
   background:
@@ -2094,6 +2116,7 @@ button {
   height: calc(100dvh - 18px);
   max-height: calc(100dvh - 18px);
   overflow: auto;
+  color: var(--text);
   background: var(--surface-strong);
   border: 1px solid var(--line);
   border-radius: 28px 28px 0 0;
@@ -2619,6 +2642,7 @@ button {
 }
 
 .payment-sheet {
+  color: var(--text);
   background: var(--panel, #0f0b15);
   border: 1px solid var(--line, #2c2335);
   border-radius: 16px;
