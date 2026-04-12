@@ -13,13 +13,13 @@
   --accent-soft: rgba(176, 106, 214, 0.16);
   --danger: #f1b0c1;
   --shadow-card: 0 20px 40px rgba(7, 4, 10, 0.34);
-  /* Homepage chooser: outer panel + inner cards — reuse on tasks / clips / keyholding */
+  /* Match perceived depth to homepage: page gradient is deep (#16131e–#262030); panels were too translucent and read lighter on subpages. */
   --shell-panel-bg:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.08), transparent 38%),
-    linear-gradient(180deg, rgba(31, 25, 36, 0.54), rgba(24, 19, 30, 0.62));
+    radial-gradient(circle at top left, rgba(176, 106, 214, 0.055), transparent 40%),
+    linear-gradient(180deg, rgba(22, 19, 30, 0.9), rgba(16, 13, 22, 0.94));
   --shell-card-bg:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.16), transparent 42%),
-    linear-gradient(180deg, rgba(33, 27, 39, 0.96), rgba(24, 19, 30, 0.98));
+    radial-gradient(circle at top left, rgba(176, 106, 214, 0.1), transparent 44%),
+    linear-gradient(180deg, rgba(26, 21, 32, 0.97), rgba(18, 15, 24, 0.99));
   font-family: 'Avenir Next', 'Segoe UI', sans-serif;
   color: var(--text);
   background:
@@ -887,8 +887,8 @@ button {
 }
 
 .tasks-strip--hero .tasks-chip {
-  background: rgba(26, 21, 31, 0.88);
-  border-color: rgba(176, 106, 214, 0.22);
+  background: rgba(20, 17, 26, 0.94);
+  border-color: rgba(176, 106, 214, 0.2);
 }
 
 .tasks-manifesto {
