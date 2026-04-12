@@ -5,6 +5,7 @@ const sdk = vi.hoisted(() => ({
   openLinkMock: vi.fn(),
   openTelegramLinkMock: vi.fn(),
   retrieveLaunchParamsMock: vi.fn(),
+  retrieveRawInitDataMock: vi.fn(),
   sendDataMock: vi.fn(),
 }));
 
@@ -13,6 +14,7 @@ vi.mock('@tma.js/sdk', () => ({
   openLink: sdk.openLinkMock,
   openTelegramLink: sdk.openTelegramLinkMock,
   retrieveLaunchParams: sdk.retrieveLaunchParamsMock,
+  retrieveRawInitData: sdk.retrieveRawInitDataMock,
 }));
 
 import { getTelegramContext, sendBotWebAppData } from './telegram';
@@ -20,6 +22,8 @@ import { getTelegramContext, sendBotWebAppData } from './telegram';
 describe('getTelegramContext', () => {
   beforeEach(() => {
     sdk.retrieveLaunchParamsMock.mockClear();
+    sdk.retrieveRawInitDataMock.mockClear();
+    sdk.retrieveRawInitDataMock.mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -47,11 +51,39 @@ describe('getTelegramContext', () => {
     expect(ctx.isTelegram).toBe(true);
   });
 
+  it('uses retrieveRawInitData when WebApp.initData is empty but launch params include tgWebAppData', () => {
+    sdk.retrieveLaunchParamsMock.mockReturnValue({
+      tgWebAppData: { user: { id: 1, firstName: 'x', username: 'u' } },
+      tgWebAppStartParam: 'clips_BJQ0169__l_e',
+      tgWebAppPlatform: 'ios',
+      tgWebAppThemeParams: {},
+      tgWebAppVersion: '8.0',
+    });
+    sdk.retrieveRawInitDataMock.mockReturnValue('user=%7B%22id%22%3A1%7D&hash=abc');
+    vi.stubGlobal('window', {
+      location: {
+        search: '',
+        hash: '',
+      },
+      Telegram: {
+        WebApp: {
+          initData: '',
+          initDataUnsafe: {},
+        },
+      },
+    });
+    const ctx = getTelegramContext();
+    expect(ctx.initData).toBe('user=%7B%22id%22%3A1%7D&hash=abc');
+    expect(ctx.startParam).toBe('clips_BJQ0169__l_e');
+  });
+
   it('prefers the longest start param when Telegram exposes both a short and a full value', () => {
     sdk.retrieveLaunchParamsMock.mockReturnValue({
       tgWebAppData: { user: { id: 1, firstName: 'x', username: 'u' } },
       tgWebAppStartParam: 'clips',
-      initDataRaw: undefined,
+      tgWebAppPlatform: 'ios',
+      tgWebAppThemeParams: {},
+      tgWebAppVersion: '8.0',
     });
     vi.stubGlobal('window', {
       location: {

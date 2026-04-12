@@ -1,4 +1,10 @@
-import { miniApp, openLink, openTelegramLink, retrieveLaunchParams } from '@tma.js/sdk';
+import {
+  miniApp,
+  openLink,
+  openTelegramLink,
+  retrieveLaunchParams,
+  retrieveRawInitData,
+} from '@tma.js/sdk';
 
 declare global {
   interface Window {
@@ -78,17 +84,31 @@ function startParamFromLocationHash(): string | undefined {
   }
 }
 
+/** Signed init string for POST /auth/telegram. WebApp.initData is sometimes empty; launch params still carry tgWebAppData in the URL. */
+function resolveSignedInitData(webAppInitData: string | undefined | null): string | undefined {
+  const fromWebApp = webAppInitData?.trim();
+  if (fromWebApp) {
+    return fromWebApp;
+  }
+  try {
+    const raw = retrieveRawInitData();
+    const trimmed = raw?.trim();
+    return trimmed || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export function getTelegramContext(): TelegramContext {
   const webApp = window.Telegram?.WebApp;
   const queryParams = new URLSearchParams(window.location.search);
+  const initDataStr = resolveSignedInitData(webApp?.initData);
   try {
     const launch = retrieveLaunchParams() as {
       tgWebAppData?: { user?: { id: number; username?: string; firstName?: string } };
       tgWebAppStartParam?: string;
-      initDataRaw?: string;
     };
     const user = launch.tgWebAppData?.user;
-    const initDataStr = webApp?.initData || launch.initDataRaw;
     webApp?.ready?.();
     webApp?.expand?.();
     return {
@@ -109,7 +129,7 @@ export function getTelegramContext(): TelegramContext {
     const unsafe = webApp?.initDataUnsafe?.user;
     return {
       isTelegram: Boolean(webApp),
-      initData: webApp?.initData,
+      initData: initDataStr,
       startParam: coalesceStartParamCandidates(
         startParamFromInitDataQuery(webApp?.initData),
         queryParams.get('tgWebAppStartParam'),
