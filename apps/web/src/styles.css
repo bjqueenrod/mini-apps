@@ -234,7 +234,6 @@ button {
   padding: 18px;
 }
 
-.chooser-panel__header h1,
 .tasks-hero h1 {
   margin: 6px 0 10px;
   font-size: clamp(1.6rem, 6vw, 2.5rem);
@@ -242,7 +241,6 @@ button {
   max-width: 18ch;
 }
 
-.chooser-panel__header p:last-child,
 .tasks-hero p:last-child {
   margin: 0;
   color: var(--muted);
