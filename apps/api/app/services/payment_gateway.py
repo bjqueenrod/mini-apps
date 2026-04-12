@@ -28,34 +28,53 @@ def _headers() -> dict[str, str]:
     return headers
 
 
+def _looks_like_html_error(text: str) -> bool:
+    trimmed = (text or "").strip().lower()
+    return trimmed.startswith("<!doctype html") or trimmed.startswith("<html") or "cloudflare" in trimmed
+
+
 def _response_error_message(response: httpx.Response, fallback: str) -> str:
+    """Extract a message from JSON error bodies even for 5xx (e.g. NOWPayments details on 502)."""
     status_code = getattr(response, "status_code", None)
-    if isinstance(status_code, int) and status_code >= 500:
-        return fallback
+    payload: dict[str, Any] | None = None
     try:
-        payload = response.json()
+        raw = response.json()
+        if isinstance(raw, dict):
+            payload = raw
     except Exception:
         payload = None
 
-    if isinstance(payload, dict):
+    if payload is not None:
+        details = str(payload.get("details") or "").strip()
+        err = str(payload.get("error") or "").strip()
+        if details:
+            if err and err.lower() not in details.lower():
+                return f"{err}: {details}"
+            return details
         for key in ("detail", "error", "message"):
             value = payload.get(key)
-            if value:
+            if value not in (None, ""):
                 return str(value)
 
     text = (response.text or "").strip()
-    if text:
-      try:
+    if text and not _looks_like_html_error(text):
+        try:
             parsed = json.loads(text)
-      except Exception:
-            return text
-      if isinstance(parsed, dict):
+        except Exception:
+            parsed = None
+        if isinstance(parsed, dict):
+            details = str(parsed.get("details") or "").strip()
+            if details:
+                return details
             for key in ("detail", "error", "message"):
                 value = parsed.get(key)
-                if value:
+                if value not in (None, ""):
                     return str(value)
-      return text
+        if isinstance(status_code, int) and status_code < 500:
+            return text
 
+    if isinstance(status_code, int) and status_code >= 500:
+        return fallback
     return fallback
 
 

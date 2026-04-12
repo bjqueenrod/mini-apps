@@ -13,27 +13,40 @@ function looksLikeHtmlError(text: string): boolean {
 }
 
 async function readFriendlyErrorMessage(response: Response, fallback: string): Promise<string> {
-  if (response.status >= 500) {
-    return fallback;
-  }
+  let text = '';
   try {
-    const text = await response.text();
-    if (!text) {
-      return fallback;
-    }
-    if (looksLikeHtmlError(text)) {
-      return fallback;
-    }
-    try {
-      const data = JSON.parse(text);
-      const detail = data?.detail || data?.error;
-      return detail ? `${fallback}: ${detail}` : `${fallback}: ${text}`;
-    } catch {
-      return `${fallback}: ${text}`;
-    }
+    text = await response.text();
   } catch {
     return fallback;
   }
+  if (!text) {
+    return fallback;
+  }
+  if (looksLikeHtmlError(text)) {
+    return fallback;
+  }
+  try {
+    const data = JSON.parse(text) as Record<string, unknown>;
+    const details = data?.details != null ? String(data.details).trim() : '';
+    const err = data?.error != null ? String(data.error).trim() : '';
+    const detail = data?.detail != null ? String(data.detail).trim() : '';
+    if (details) {
+      if (err && !details.toLowerCase().includes(err.toLowerCase())) {
+        return `${fallback}: ${err}: ${details}`;
+      }
+      return `${fallback}: ${details}`;
+    }
+    const primary = detail || err;
+    if (primary) {
+      return `${fallback}: ${primary}`;
+    }
+  } catch {
+    /* not JSON */
+  }
+  if (response.status < 500) {
+    return `${fallback}: ${text}`;
+  }
+  return fallback;
 }
 
 function buildCheckoutOptionsRequestKey(
