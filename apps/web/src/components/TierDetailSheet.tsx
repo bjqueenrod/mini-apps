@@ -179,6 +179,7 @@ export function TierDetailSheet({
                 quantity={1}
                 priceLabel={tierPriceLabel}
                 botFallbackUrl={tier.botBuyUrl}
+                preferredCurrency={currency}
                 onClose={() => setShowPayment(false)}
               />
             ) : null}

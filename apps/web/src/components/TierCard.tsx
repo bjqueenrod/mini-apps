@@ -83,6 +83,7 @@ export function TierCard({
           quantity={1}
           priceLabel={tierPriceLabel}
           botFallbackUrl={tier.botBuyUrl}
+          preferredCurrency={currency}
           itemContext={{ tierId: tier.id }}
           onClose={() => setShowPayment(false)}
         />

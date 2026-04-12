@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { cancelInvoice, pollInvoice, fetchCheckoutOptions, startCheckout } from '../features/payments/api';
 import type { InvoiceStatusResponse } from '../features/payments/types';
 import { PaymentMethod } from '../features/payments/types';
+import { CurrencyCode } from '../utils/format';
 import { resolvePriceLabelOptional } from '../utils/pricing';
 import { isTelegramWebView, openBotDeepLink } from '../app/telegram';
 import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
@@ -49,6 +50,7 @@ export function PaymentSheet({
   onClosePreview,
   onSuccess,
   itemContext,
+  preferredCurrency,
 }: {
   productId: string;
   quantity?: number;
@@ -61,6 +63,7 @@ export function PaymentSheet({
   onClosePreview?: () => void;
   onSuccess?: (result?: InvoiceStatusResponse) => void;
   itemContext?: Record<string, unknown>;
+  preferredCurrency?: CurrencyCode;
 }) {
   const [state, setState] = useState<SheetState>('loading');
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
@@ -74,7 +77,8 @@ export function PaymentSheet({
   const [waitingStartedAt, setWaitingStartedAt] = useState<number | null>(null);
   const [waitingRemainingSeconds, setWaitingRemainingSeconds] = useState<number>(WAITING_TIMEOUT_MS / 1000);
   const [successResult, setSuccessResult] = useState<InvoiceStatusResponse | null>(null);
-  const [currency] = useCurrencyPreference(false);
+  const [preferenceCurrency] = useCurrencyPreference(false);
+  const currency = preferredCurrency ?? preferenceCurrency;
   const storageKey = useMemo(
     () => `paymentSheet:${productId}:${mode || 'default'}`,
     [productId, mode],
@@ -265,6 +269,7 @@ export function PaymentSheet({
         }
         const data = await fetchCheckoutOptions(productId, quantity, mode, {
           ...itemContext,
+          currency,
           ...(persistedOrderId ? { orderId: persistedOrderId } : {}),
         });
         if (cancelled) return;
@@ -283,7 +288,7 @@ export function PaymentSheet({
     return () => {
       cancelled = true;
     };
-  }, [productId, quantity, mode, itemContextKey, storageKey]);
+  }, [productId, quantity, mode, itemContextKey, storageKey, currency]);
 
   const selectedLabel = useMemo(
     () => selectedMethodInfo?.label || 'Pay',

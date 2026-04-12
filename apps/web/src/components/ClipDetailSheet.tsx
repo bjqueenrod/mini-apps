@@ -203,6 +203,7 @@ export function ClipDetailSheet({
                 deliveryMode={showPayment === 'stream' ? 'stream' : 'download'}
                 clipTitle={clip.title}
                 botFallbackUrl={showPayment === 'stream' ? clip.botStreamUrl : clip.botDownloadUrl}
+                preferredCurrency={currency}
                 itemContext={{
                   unitPriceCents: showPayment === 'stream' ? streamUnitPence : downloadUnitPence,
                   clipId: clip.id,

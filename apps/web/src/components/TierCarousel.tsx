@@ -228,6 +228,7 @@ export function TierCarousel({
           quantity={1}
           priceLabel={priceLabel(paymentTier, currency)}
           botFallbackUrl={paymentTier.botBuyUrl}
+          preferredCurrency={currency}
           itemContext={{ tierId: paymentTier.id }}
           onClose={() => setPaymentTier(null)}
         />
