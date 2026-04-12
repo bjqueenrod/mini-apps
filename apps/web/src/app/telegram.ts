@@ -107,7 +107,8 @@ function tgWebAppDataFromLaunchSegment(segment: string | undefined | null): stri
 const TMA_LAUNCH_PARAMS_STORAGE_KEY = 'tapps/launchParams';
 
 /** Matches the top of `styles.css` page gradient; must be explicit RGB so Telegram does not keep theme `bg_color`. */
-const MINI_APP_BACKDROP_HEX = '#060509';
+/** Match `styles.css` :root gradient top so native chrome is not ink-black. */
+const MINI_APP_BACKDROP_HEX = '#16131e';
 
 let tmaSdkInitAttempted = false;
 
