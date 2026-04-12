@@ -36,9 +36,12 @@ describe('getTelegramContext', () => {
     });
     vi.stubGlobal('window', {
       location: {
+        href: 'https://app.test/#tgWebAppStartParam=clips_BJQ0169__l_e&tgWebAppPlatform=ios',
         search: '',
         hash: '#tgWebAppStartParam=clips_BJQ0169__l_e&tgWebAppPlatform=ios',
       },
+      performance: { getEntriesByType: () => [] },
+      sessionStorage: { getItem: () => null },
       Telegram: {
         WebApp: {
           initData: '',
@@ -62,9 +65,12 @@ describe('getTelegramContext', () => {
     sdk.retrieveRawInitDataMock.mockReturnValue('user=%7B%22id%22%3A1%7D&hash=abc');
     vi.stubGlobal('window', {
       location: {
+        href: 'https://app.test/',
         search: '',
         hash: '',
       },
+      performance: { getEntriesByType: () => [] },
+      sessionStorage: { getItem: () => null },
       Telegram: {
         WebApp: {
           initData: '',
@@ -77,6 +83,35 @@ describe('getTelegramContext', () => {
     expect(ctx.startParam).toBe('clips_BJQ0169__l_e');
   });
 
+  it('reads tgWebAppData from the URL when strict SDK retrieval fails (e.g. Telegram Desktop)', () => {
+    sdk.retrieveLaunchParamsMock.mockImplementation(() => {
+      throw new Error('simulated strict parse failure');
+    });
+    sdk.retrieveRawInitDataMock.mockImplementation(() => {
+      throw new Error('simulated raw retrieve failure');
+    });
+    const initPayload = 'user=test&hash=abc';
+    const encoded = encodeURIComponent(initPayload);
+    vi.stubGlobal('window', {
+      location: {
+        href: `https://app.test/page#tgWebAppData=${encoded}&tgWebAppVersion=7.0&tgWebAppPlatform=tdesktop`,
+        search: '',
+        hash: `#tgWebAppData=${encoded}&tgWebAppVersion=7.0&tgWebAppPlatform=tdesktop`,
+      },
+      performance: { getEntriesByType: () => [] as PerformanceEntryList },
+      sessionStorage: { getItem: () => null },
+      Telegram: {
+        WebApp: {
+          initData: '',
+          initDataUnsafe: { start_param: 'clips_x' },
+        },
+      },
+    });
+    const ctx = getTelegramContext();
+    expect(ctx.initData).toBe(initPayload);
+    expect(ctx.isTelegram).toBe(true);
+  });
+
   it('prefers the longest start param when Telegram exposes both a short and a full value', () => {
     sdk.retrieveLaunchParamsMock.mockReturnValue({
       tgWebAppData: { user: { id: 1, firstName: 'x', username: 'u' } },
@@ -87,9 +122,12 @@ describe('getTelegramContext', () => {
     });
     vi.stubGlobal('window', {
       location: {
+        href: 'https://app.test/',
         search: '',
         hash: '',
       },
+      performance: { getEntriesByType: () => [] },
+      sessionStorage: { getItem: () => null },
       Telegram: {
         WebApp: {
           initData: 'start_param=clips_BJQ0169__l_e',

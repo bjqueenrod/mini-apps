@@ -84,6 +84,65 @@ function startParamFromLocationHash(): string | undefined {
   }
 }
 
+/** Same as @tma.js/bridge bootstrap: turn query or hash on the URL into an &-joined segment for URLSearchParams. */
+function extractQueryLikeSegmentFromHref(href: string): string {
+  return href.replace(/^[^?#]*[?#]/, '').replace(/[?#]/g, '&');
+}
+
+function tgWebAppDataFromLaunchSegment(segment: string | undefined | null): string | undefined {
+  const raw = segment?.trim();
+  if (!raw) {
+    return undefined;
+  }
+  try {
+    const value = new URLSearchParams(raw).get('tgWebAppData');
+    return value?.trim() || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+const TMA_LAUNCH_PARAMS_STORAGE_KEY = 'tapps/launchParams';
+
+/**
+ * Telegram Desktop sometimes passes launch data that fails @tma.js strict validation, so
+ * retrieveRawInitData/retrieveLaunchParams throw or omit data — but tgWebAppData is still in the URL.
+ */
+function extractTgWebAppDataLoose(): string | undefined {
+  const segments: string[] = [];
+  try {
+    segments.push(extractQueryLikeSegmentFromHref(window.location.href));
+  } catch {
+    /* ignore */
+  }
+  try {
+    const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+    if (nav?.name) {
+      segments.push(extractQueryLikeSegmentFromHref(nav.name));
+    }
+  } catch {
+    /* ignore */
+  }
+  try {
+    const stored = sessionStorage.getItem(TMA_LAUNCH_PARAMS_STORAGE_KEY);
+    if (stored) {
+      const parsed: unknown = JSON.parse(stored);
+      if (typeof parsed === 'string') {
+        segments.push(parsed);
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+  for (const seg of segments) {
+    const data = tgWebAppDataFromLaunchSegment(seg);
+    if (data) {
+      return data;
+    }
+  }
+  return undefined;
+}
+
 /** Signed init string for POST /auth/telegram. WebApp.initData is sometimes empty; launch params still carry tgWebAppData in the URL. */
 function resolveSignedInitData(webAppInitData: string | undefined | null): string | undefined {
   const fromWebApp = webAppInitData?.trim();
@@ -93,14 +152,19 @@ function resolveSignedInitData(webAppInitData: string | undefined | null): strin
   try {
     const raw = retrieveRawInitData();
     const trimmed = raw?.trim();
-    return trimmed || undefined;
+    if (trimmed) {
+      return trimmed;
+    }
   } catch {
-    return undefined;
+    /* fall through — Desktop may fail strict launch-param parsing */
   }
+  return extractTgWebAppDataLoose();
 }
 
 export function getTelegramContext(): TelegramContext {
   const webApp = window.Telegram?.WebApp;
+  webApp?.ready?.();
+  webApp?.expand?.();
   const queryParams = new URLSearchParams(window.location.search);
   const initDataStr = resolveSignedInitData(webApp?.initData);
   try {
@@ -109,8 +173,6 @@ export function getTelegramContext(): TelegramContext {
       tgWebAppStartParam?: string;
     };
     const user = launch.tgWebAppData?.user;
-    webApp?.ready?.();
-    webApp?.expand?.();
     return {
       isTelegram: true,
       initData: initDataStr || undefined,
@@ -131,7 +193,7 @@ export function getTelegramContext(): TelegramContext {
       isTelegram: Boolean(webApp),
       initData: initDataStr,
       startParam: coalesceStartParamCandidates(
-        startParamFromInitDataQuery(webApp?.initData),
+        startParamFromInitDataQuery(initDataStr),
         queryParams.get('tgWebAppStartParam'),
         queryParams.get('startapp'),
         startParamFromLocationHash(),
