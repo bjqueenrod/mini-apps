@@ -543,18 +543,27 @@ export function PaymentSheet({
         clearTimedOutCheckout();
         effectivePaymentCode = '';
       }
-      const waitingStartedAt = Date.now();
       const res = await startCheckout(productId, selectedMethod, quantity, mode, {
         ...itemContext,
         currency,
         ...(effectivePaymentCode ? { paymentCode: effectivePaymentCode } : {}),
         ...(effectiveOrderId ? { orderId: effectiveOrderId } : {}),
       });
+      const url = res.paymentUrl || res.providerInvoiceUrl || '';
+      if (!url) {
+        setError('No checkout URL returned.');
+        setState('error');
+        return;
+      }
+      if (selectedMethod === 'crypto') {
+        window.location.assign(url);
+        return;
+      }
+      const waitingStartedAt = Date.now();
       setOrderId(res.orderId);
       setInvoiceId(res.invoiceId);
       setSavedPaymentCode(res.paymentCode || '');
       setWaitingStartedAt(waitingStartedAt);
-      const url = res.paymentUrl || res.providerInvoiceUrl || '';
       setPaymentUrl(url);
       saveProgress({
         invoiceId: res.invoiceId,
