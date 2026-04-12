@@ -1,4 +1,4 @@
-import { MouseEvent, useEffect, useRef, useState } from 'react';
+import { MouseEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { isTelegramWebView, openBotDeepLink, sendBotWebAppData } from '../app/telegram';
 import { trackClipBotCtaClick, trackClipDetailView, trackClipTagSelect } from '../features/clips/analytics';
@@ -14,11 +14,15 @@ export function ClipDetailSheet({
   loading,
   currency = 'GBP',
   errorMessage,
+  clipPaymentResume,
+  onClipPaymentResumeConsumed,
 }: {
   clip?: ClipItem;
   loading?: boolean;
   currency?: CurrencyCode;
   errorMessage?: string | null;
+  clipPaymentResume?: { invoiceId: string; payment: 'watch' | 'download' } | null;
+  onClipPaymentResumeConsumed?: () => void;
 }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -92,6 +96,11 @@ export function ClipDetailSheet({
     lastTrackedClipIdRef.current = clip.id;
     trackClipDetailView(clip);
   }, [clip]);
+
+  useLayoutEffect(() => {
+    if (!clipPaymentResume || !clip) return;
+    setShowPayment(clipPaymentResume.payment === 'watch' ? 'stream' : 'download');
+  }, [clip, clipPaymentResume]);
 
   const streamPriceLabel = clip
     ? resolvePriceLabel({
@@ -204,11 +213,15 @@ export function ClipDetailSheet({
                 clipTitle={clip.title}
                 botFallbackUrl={showPayment === 'stream' ? clip.botStreamUrl : clip.botDownloadUrl}
                 preferredCurrency={currency}
+                cryptoReturnInvoiceId={clipPaymentResume?.invoiceId}
                 itemContext={{
                   unitPriceCents: showPayment === 'stream' ? streamUnitPence : downloadUnitPence,
                   clipId: clip.id,
                 }}
-                onClose={() => setShowPayment(null)}
+                onClose={() => {
+                  setShowPayment(null);
+                  onClipPaymentResumeConsumed?.();
+                }}
                 onClosePreview={() => navigate(backTarget, { replace: true })}
               />
             ) : null}

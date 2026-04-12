@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useNavigationType, useParams, useSearchParams } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
 import { SearchBar } from '../components/SearchBar';
@@ -97,6 +97,12 @@ export function BrowsePage() {
   const [filtersExpanded, setFiltersExpanded] = useState(true);
   const [showFaq, setShowFaq] = useState(false);
   const [openFaqQuestion, setOpenFaqQuestion] = useState<string | null>(null);
+  const [clipPaymentResume, setClipPaymentResume] = useState<{
+    invoiceId: string;
+    payment: 'watch' | 'download';
+  } | null>(null);
+  const clipResumeHandledKeyRef = useRef<string>('');
+  const prevClipIdForResumeRef = useRef<string | undefined>(undefined);
   const pinnedSearchText = (location.state as { searchText?: string } | null)?.searchText ?? '';
   const searchText = useMemo(() => stripHashtagTokens(searchValue), [searchValue]);
   const searchTags = useMemo(() => extractHashtagTokens(searchValue), [searchValue]);
@@ -110,6 +116,31 @@ export function BrowsePage() {
     }),
     [currency, searchTags, searchText, urlQueryState.category, urlQueryState.sort],
   );
+  useLayoutEffect(() => {
+    if (!clipId) return;
+    const inv = searchParams.get('invoice_id') || searchParams.get('invoiceId');
+    const pay = searchParams.get('payment');
+    if (!inv?.trim() || (pay !== 'watch' && pay !== 'download')) return;
+    const handleKey = `${clipId}:${searchParams.toString()}`;
+    if (clipResumeHandledKeyRef.current === handleKey) return;
+    clipResumeHandledKeyRef.current = handleKey;
+    setClipPaymentResume({ invoiceId: inv.trim(), payment: pay });
+    const next = new URLSearchParams(searchParams);
+    next.delete('invoice_id');
+    next.delete('invoiceId');
+    next.delete('payment');
+    const qs = next.toString();
+    navigate(`/clips/${encodeURIComponent(clipId)}${qs ? `?${qs}` : ''}`, { replace: true });
+  }, [clipId, navigate, searchParams]);
+
+  useEffect(() => {
+    if (prevClipIdForResumeRef.current !== undefined && prevClipIdForResumeRef.current !== clipId) {
+      setClipPaymentResume(null);
+      clipResumeHandledKeyRef.current = '';
+    }
+    prevClipIdForResumeRef.current = clipId;
+  }, [clipId]);
+
   const clipsQuery = useClipSearchInfinite(clipSearchFilters);
   const visibleClips = useMemo(() => {
     const pages = clipsQuery.data?.pages ?? [];
@@ -679,6 +710,8 @@ export function BrowsePage() {
           loading={clipDetailQuery.isLoading}
           errorMessage={clipDetailQuery.isError ? (clipDetailQuery.error as Error).message : null}
           currency={currency}
+          clipPaymentResume={clipPaymentResume}
+          onClipPaymentResumeConsumed={() => setClipPaymentResume(null)}
         />
       )}
     </AppShell>

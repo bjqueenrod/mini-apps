@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { cancelInvoice, pollInvoice, fetchCheckoutOptions, startCheckout } from '../features/payments/api';
 import type { InvoiceStatusResponse } from '../features/payments/types';
 import { PaymentMethod } from '../features/payments/types';
@@ -51,6 +51,7 @@ export function PaymentSheet({
   onSuccess,
   itemContext,
   preferredCurrency,
+  cryptoReturnInvoiceId,
 }: {
   productId: string;
   quantity?: number;
@@ -64,6 +65,7 @@ export function PaymentSheet({
   onSuccess?: (result?: InvoiceStatusResponse) => void;
   itemContext?: Record<string, unknown>;
   preferredCurrency?: CurrencyCode;
+  cryptoReturnInvoiceId?: string;
 }) {
   const [state, setState] = useState<SheetState>('loading');
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
@@ -122,7 +124,17 @@ export function PaymentSheet({
     }
   }, [storageKey]);
 
+  useLayoutEffect(() => {
+    const id = (cryptoReturnInvoiceId || '').trim();
+    if (!id) return;
+    setInvoiceId(id);
+    setSelectedMethod('crypto');
+    setWaitingStartedAt(Date.now());
+    setState('waiting');
+  }, [cryptoReturnInvoiceId]);
+
   useEffect(() => {
+    if ((cryptoReturnInvoiceId || '').trim()) return;
     try {
       const raw = sessionStorage.getItem(storageKey);
       if (!raw) return;
@@ -148,7 +160,7 @@ export function PaymentSheet({
     } catch {
       // ignore parse errors
     }
-  }, [storageKey]);
+  }, [cryptoReturnInvoiceId, storageKey]);
 
   const selectedMethodInfo = useMemo(
     () => methods.find((m) => m.paymentMethod === selectedMethod),
@@ -762,7 +774,11 @@ export function PaymentSheet({
                 {waitingCountdownLabel}
               </span>
             </div>
-            <p className="payment-sheet__muted-text">Checkout opened in your browser. Complete payment and we’ll update here.</p>
+            <p className="payment-sheet__muted-text">
+              {(cryptoReturnInvoiceId || '').trim()
+                ? 'Thanks — confirming your payment…'
+                : 'Checkout opened in your browser. Complete payment and we’ll update here.'}
+            </p>
             <div className="payment-sheet__actions payment-sheet__actions--inline">
               {paymentUrl ? (
                 <button
