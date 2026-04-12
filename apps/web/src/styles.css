@@ -14,9 +14,9 @@
   font-family: 'Avenir Next', 'Segoe UI', sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.09), transparent 38%),
-    radial-gradient(circle at top right, rgba(193, 128, 229, 0.05), transparent 32%),
-    linear-gradient(180deg, #141118 0%, #100d14 44%, #0e0b11 100%);
+    radial-gradient(circle at top left, rgba(176, 106, 214, 0.18), transparent 32%),
+    radial-gradient(circle at top right, rgba(193, 128, 229, 0.10), transparent 26%),
+    linear-gradient(180deg, #1b1720 0%, #130f17 46%, #1f1924 100%);
 }
 
 * {
@@ -54,8 +54,8 @@ button {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(circle at top right, rgba(176, 106, 214, 0.09), transparent 36%),
-    radial-gradient(circle at bottom left, rgba(193, 128, 229, 0.045), transparent 28%);
+    radial-gradient(circle at top right, rgba(176, 106, 214, 0.17), transparent 32%),
+    radial-gradient(circle at bottom left, rgba(193, 128, 229, 0.08), transparent 24%);
   pointer-events: none;
 }
 
@@ -77,8 +77,8 @@ button {
   padding: 14px;
   margin-bottom: 18px;
   background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.05), transparent 40%),
-    linear-gradient(180deg, rgba(22, 18, 28, 0.78), rgba(14, 11, 18, 0.92));
+    radial-gradient(circle at top left, rgba(176, 106, 214, 0.08), transparent 38%),
+    linear-gradient(180deg, rgba(31, 25, 36, 0.54), rgba(24, 19, 30, 0.62));
   box-shadow: var(--shadow-card);
 }
 
