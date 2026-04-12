@@ -1,4 +1,5 @@
 import {
+  init,
   miniApp,
   openLink,
   openTelegramLink,
@@ -16,6 +17,7 @@ declare global {
         openLink?: (url: string) => void;
         openTelegramLink?: (url: string) => void;
         sendData?: (data: string) => void;
+        setBackgroundColor?: (color: string) => void;
         themeParams?: Record<string, string>;
         initData?: string;
         initDataUnsafe?: {
@@ -103,6 +105,11 @@ function tgWebAppDataFromLaunchSegment(segment: string | undefined | null): stri
 }
 
 const TMA_LAUNCH_PARAMS_STORAGE_KEY = 'tapps/launchParams';
+
+/** Matches the top of `styles.css` page gradient; must be explicit RGB so Telegram does not keep theme `bg_color`. */
+const MINI_APP_BACKDROP_HEX = '#060509';
+
+let tmaSdkInitAttempted = false;
 
 /**
  * Telegram Desktop sometimes passes launch data that fails @tma.js strict validation, so
@@ -205,12 +212,49 @@ export function getTelegramContext(): TelegramContext {
   }
 }
 
+function ensureTmaSdkInitialized(): void {
+  if (tmaSdkInitAttempted || !window.Telegram?.WebApp) {
+    return;
+  }
+  tmaSdkInitAttempted = true;
+  try {
+    init();
+  } catch {
+    /* strict launch-param parsing can fail on some Telegram Desktop builds */
+  }
+}
+
+/** Telegram / @tma.js miniApp defaults to theme `bg_color`, which replaces the native backdrop after mount — flashes then “eats” the CSS gradient. */
+function syncMiniAppNativeBackdrop(): void {
+  const webApp = window.Telegram?.WebApp;
+  if (!webApp) {
+    return;
+  }
+  ensureTmaSdkInitialized();
+  try {
+    miniApp.mount();
+  } catch {
+    /* unsupported or init failed */
+  }
+  try {
+    miniApp.setBgColor(MINI_APP_BACKDROP_HEX);
+  } catch {
+    /* older clients */
+  }
+  try {
+    webApp.setBackgroundColor?.(MINI_APP_BACKDROP_HEX);
+  } catch {
+    /* optional legacy API */
+  }
+}
+
 export function applyTelegramTheme(): void {
   const theme = window.Telegram?.WebApp?.themeParams ?? {};
   const root = document.documentElement;
   Object.entries(theme).forEach(([key, value]) => {
     root.style.setProperty(`--tg-${key}`, value);
   });
+  syncMiniAppNativeBackdrop();
 }
 
 export function isTelegramWebView(): boolean {
