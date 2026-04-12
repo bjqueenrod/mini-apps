@@ -13,6 +13,13 @@
   --accent-soft: rgba(176, 106, 214, 0.16);
   --danger: #f1b0c1;
   --shadow-card: 0 20px 40px rgba(7, 4, 10, 0.34);
+  /* Homepage chooser: outer panel + inner cards — reuse on tasks / clips / keyholding */
+  --shell-panel-bg:
+    radial-gradient(circle at top left, rgba(176, 106, 214, 0.08), transparent 38%),
+    linear-gradient(180deg, rgba(31, 25, 36, 0.54), rgba(24, 19, 30, 0.62));
+  --shell-card-bg:
+    radial-gradient(circle at top left, rgba(176, 106, 214, 0.16), transparent 42%),
+    linear-gradient(180deg, rgba(33, 27, 39, 0.96), rgba(24, 19, 30, 0.98));
   font-family: 'Avenir Next', 'Segoe UI', sans-serif;
   color: var(--text);
   background:
@@ -96,9 +103,7 @@ button {
   border-radius: 28px;
   padding: 14px;
   margin-bottom: 18px;
-  background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.08), transparent 38%),
-    linear-gradient(180deg, rgba(31, 25, 36, 0.54), rgba(24, 19, 30, 0.62));
+  background: var(--shell-panel-bg);
   box-shadow: var(--shadow-card);
 }
 
@@ -523,9 +528,7 @@ button {
   gap: 10px;
   padding: 18px;
   color: var(--text);
-  background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.16), transparent 42%),
-    linear-gradient(180deg, rgba(33, 27, 39, 0.96), rgba(24, 19, 30, 0.98));
+  background: var(--shell-card-bg);
 }
 
 .chooser-card strong {
@@ -693,9 +696,7 @@ button {
   color: var(--text);
   border: 1px solid rgba(176, 106, 214, 0.12);
   border-radius: 28px;
-  background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.08), transparent 38%),
-    linear-gradient(180deg, rgba(31, 25, 36, 0.54), rgba(24, 19, 30, 0.62));
+  background: var(--shell-panel-bg);
 }
 
 .search-panel {
@@ -767,9 +768,7 @@ button {
 .tasks-section {
   padding: 22px;
   border-radius: 30px;
-  background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.10), transparent 36%),
-    linear-gradient(180deg, rgba(28, 23, 33, 0.74), rgba(20, 16, 25, 0.78));
+  background: var(--shell-panel-bg);
   box-shadow: var(--shadow-card);
 }
 
@@ -786,10 +785,7 @@ button {
   gap: 16px;
   padding: 22px 20px;
   border-radius: 32px;
-  background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.2), transparent 42%),
-    radial-gradient(circle at bottom right, rgba(214, 159, 247, 0.08), transparent 28%),
-    linear-gradient(180deg, rgba(34, 27, 41, 0.9), rgba(19, 15, 23, 0.96));
+  background: var(--shell-panel-bg);
   box-shadow: var(--shadow-card);
 }
 
@@ -835,9 +831,7 @@ button {
   padding: 18px;
   border: 1px solid rgba(176, 106, 214, 0.2);
   border-radius: 24px;
-  background:
-    radial-gradient(circle at top right, rgba(214, 159, 247, 0.12), transparent 34%),
-    linear-gradient(180deg, rgba(29, 23, 35, 0.84), rgba(18, 15, 23, 0.96));
+  background: var(--shell-card-bg);
 }
 
 .tasks-hero__private-kicker {
@@ -978,9 +972,7 @@ button {
   border-radius: 26px;
   padding: 24px 18px 26px;
   margin-bottom: 30px;
-  background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.12), transparent 46%),
-    linear-gradient(180deg, rgba(34, 28, 41, 0.9), rgba(21, 17, 27, 0.94));
+  background: var(--shell-panel-bg);
   box-shadow: var(--shadow-card);
 }
 
@@ -1035,9 +1027,7 @@ button {
   gap: 14px;
   align-items: start;
   padding: 18px;
-  background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.1), transparent 46%),
-    rgba(28, 23, 33, 0.62);
+  background: var(--shell-card-bg);
 }
 
 .tasks-benefit strong,
@@ -1080,9 +1070,7 @@ button {
 
 .tasks-stepper__item {
   padding: 18px;
-  background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.12), transparent 44%),
-    linear-gradient(180deg, rgba(34, 28, 41, 0.94), rgba(21, 17, 27, 0.98));
+  background: var(--shell-card-bg);
 }
 
 .tasks-stepper__topline {
@@ -1110,9 +1098,7 @@ button {
 
 .tasks-style-card {
   padding: 18px;
-  background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.08), transparent 42%),
-    rgba(28, 23, 33, 0.54);
+  background: var(--shell-card-bg);
 }
 
 .tasks-style-card__header {
@@ -1134,11 +1120,9 @@ button {
   display: grid;
   gap: 14px;
   padding: 18px;
-  border: 1px solid rgba(176, 106, 214, 0.16);
+  border: 1px solid rgba(176, 106, 214, 0.12);
   border-radius: 24px;
-  background:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.1), transparent 42%),
-    rgba(28, 23, 33, 0.56);
+  background: var(--shell-panel-bg);
 }
 
 .tasks-strip--soft {
@@ -2302,7 +2286,7 @@ button {
 .faq-card {
   border: 1px solid rgba(176, 106, 214, 0.16);
   border-radius: 22px;
-  background: rgba(28, 23, 33, 0.58);
+  background: var(--shell-card-bg);
   overflow: hidden;
 }
 
@@ -2356,12 +2340,9 @@ button {
 .tasks-panel--cta {
   margin: 0 0 24px;
   padding: 22px 20px;
-  border: 1px solid rgba(176, 106, 214, 0.2);
+  border: 1px solid rgba(176, 106, 214, 0.12);
   border-radius: 32px;
-  background:
-    radial-gradient(circle at top right, rgba(193, 128, 229, 0.18), transparent 34%),
-    radial-gradient(circle at bottom left, rgba(176, 106, 214, 0.12), transparent 26%),
-    linear-gradient(180deg, rgba(40, 31, 47, 0.82), rgba(22, 18, 28, 0.94));
+  background: var(--shell-panel-bg);
   box-shadow: var(--shadow-card);
 }
 
@@ -2374,11 +2355,8 @@ button {
   padding: 18px 18px 20px;
   border: 1px solid rgba(176, 106, 214, 0.12);
   border-radius: 24px;
-  background:
-    radial-gradient(circle at top left, rgba(193, 128, 229, 0.22), transparent 36%),
-    radial-gradient(circle at bottom right, rgba(176, 106, 214, 0.12), transparent 30%),
-    linear-gradient(135deg, rgba(56, 42, 78, 0.66), rgba(27, 21, 35, 0.16) 54%, rgba(20, 16, 27, 0.02));
-  box-shadow: 0 16px 34px rgba(12, 10, 16, 0.22);
+  background: var(--shell-panel-bg);
+  box-shadow: var(--shadow-card);
 }
 
 .clips-faq .tasks-panel__header h2 {
