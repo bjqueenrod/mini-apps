@@ -13,13 +13,25 @@
   --accent-soft: rgba(176, 106, 214, 0.16);
   --danger: #f1b0c1;
   --shadow-card: 0 20px 40px rgba(7, 4, 10, 0.34);
-  /* Match perceived depth to homepage: page gradient is deep (#16131e–#262030); panels were too translucent and read lighter on subpages. */
+  /* Echo :root vertical gradient (darkest at top) so subpage panels match homepage, not a flat wash. */
   --shell-panel-bg:
     radial-gradient(circle at top left, rgba(176, 106, 214, 0.055), transparent 40%),
-    linear-gradient(180deg, rgba(22, 19, 30, 0.9), rgba(16, 13, 22, 0.94));
+    linear-gradient(
+      180deg,
+      rgba(14, 12, 18, 0.94) 0%,
+      rgba(22, 19, 30, 0.93) 30%,
+      rgba(24, 20, 34, 0.91) 56%,
+      rgba(30, 26, 40, 0.88) 100%
+    );
   --shell-card-bg:
-    radial-gradient(circle at top left, rgba(176, 106, 214, 0.1), transparent 44%),
-    linear-gradient(180deg, rgba(26, 21, 32, 0.97), rgba(18, 15, 24, 0.99));
+    radial-gradient(circle at top left, rgba(176, 106, 214, 0.09), transparent 42%),
+    linear-gradient(
+      180deg,
+      rgba(16, 13, 21, 0.99) 0%,
+      rgba(24, 20, 32, 0.98) 32%,
+      rgba(26, 22, 36, 0.97) 55%,
+      rgba(32, 27, 42, 0.96) 100%
+    );
   font-family: 'Avenir Next', 'Segoe UI', sans-serif;
   color: var(--text);
   background:
