@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { cancelInvoice, pollInvoice, fetchCheckoutOptions, startCheckout } from '../features/payments/api';
 import type { InvoiceStatusResponse } from '../features/payments/types';
 import { PaymentMethod } from '../features/payments/types';
@@ -6,7 +6,7 @@ import { CurrencyCode } from '../utils/format';
 import { resolvePriceLabelOptional } from '../utils/pricing';
 import { isTelegramWebView, openBotDeepLink } from '../app/telegram';
 import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
-import { trackInteraction } from '../app/analytics';
+import { trackInteraction, trackOrderEvent } from '../app/analytics';
 
 type SheetState = 'loading' | 'select' | 'confirm' | 'submitting' | 'waiting' | 'success' | 'error';
 const WAITING_TIMEOUT_MS = 5 * 60 * 1000;
@@ -81,6 +81,8 @@ export function PaymentSheet({
   const [successResult, setSuccessResult] = useState<InvoiceStatusResponse | null>(null);
   const [preferenceCurrency] = useCurrencyPreference(false);
   const currency = preferredCurrency ?? preferenceCurrency;
+  const clipOrderPromptSentRef = useRef(false);
+  const isClipPurchase = mode === 'watch' || mode === 'download';
   const storageKey = useMemo(
     () => `paymentSheet:${productId}:${mode || 'default'}`,
     [productId, mode],
@@ -192,6 +194,64 @@ export function PaymentSheet({
   const hasInstructions = Boolean(selectedInstructions || selectedTributeCode || requiresCode);
   const isInitialLoading = state === 'loading';
   const isSubmittingCheckout = state === 'submitting';
+  const clipId =
+    itemContext && typeof itemContext === 'object' && 'clipId' in itemContext
+      ? String((itemContext as { clipId?: string }).clipId || '').trim() || undefined
+      : undefined;
+
+  const trackClipOrderState = useCallback(
+    (state: 'payment_method_prompted' | 'paid' | 'delivered') => {
+      if (!isClipPurchase) return;
+      trackOrderEvent({
+        state,
+        screen: 'payment_sheet',
+        flowId: 'clip_purchase',
+        properties: {
+          product_id: productId,
+          clip_id: clipId,
+          quantity,
+          mode: mode || undefined,
+          delivery_mode: deliveryMode || undefined,
+          currency,
+          order_id: orderId ?? undefined,
+          invoice_id: invoiceId || undefined,
+          clip_title: clipTitle || undefined,
+        },
+      });
+    },
+    [
+      clipId,
+      clipTitle,
+      currency,
+      deliveryMode,
+      invoiceId,
+      isClipPurchase,
+      mode,
+      orderId,
+      productId,
+      quantity,
+    ],
+  );
+
+  useEffect(() => {
+    if (!isClipPurchase || state !== 'select' || methods.length === 0 || clipOrderPromptSentRef.current) {
+      return;
+    }
+    clipOrderPromptSentRef.current = true;
+    trackClipOrderState('payment_method_prompted');
+  }, [isClipPurchase, methods.length, state, trackClipOrderState]);
+
+  const handleDeliveryNavigate = useCallback(
+    (url?: string | null) => {
+      if (!url) return;
+      if (isClipPurchase) {
+        trackClipOrderState('delivered');
+      }
+      navigateDeliveryUrl(url);
+    },
+    [isClipPurchase, trackClipOrderState],
+  );
+
   const trackPaymentConfirm = useCallback(() => {
     if (!selectedMethod) return;
     trackInteraction({
@@ -490,6 +550,9 @@ export function PaymentSheet({
               elapsed_ms: Date.now() - startedAt,
             },
           });
+          if (isClipPurchase) {
+            trackClipOrderState('paid');
+          }
           setSuccessResult(res);
           setState('success');
           onSuccess?.(res);
@@ -541,7 +604,23 @@ export function PaymentSheet({
     return () => {
       if (timer) window.clearTimeout(timer);
     };
-  }, [clearTimedOutCheckout, clipTitle, currency, deliveryMode, invoiceId, mode, onSuccess, orderId, productId, quantity, selectedMethod, selectedMethodInfo?.label, state]);
+  }, [
+    clearTimedOutCheckout,
+    clipTitle,
+    currency,
+    deliveryMode,
+    invoiceId,
+    isClipPurchase,
+    mode,
+    onSuccess,
+    orderId,
+    productId,
+    quantity,
+    selectedMethod,
+    selectedMethodInfo?.label,
+    state,
+    trackClipOrderState,
+  ]);
 
   const handleCheckout = useCallback(async (options?: { freshCheckout?: boolean }) => {
     if (!selectedMethod) return;
@@ -823,7 +902,7 @@ export function PaymentSheet({
                   <button
                     type="button"
                     className="payment-sheet__primary payment-sheet__primary--delivery"
-                    onClick={() => navigateDeliveryUrl(successResult.deliveryUrl)}
+                    onClick={() => handleDeliveryNavigate(successResult.deliveryUrl)}
                   >
                     🎬 Stream Now
                   </button>
@@ -846,7 +925,7 @@ export function PaymentSheet({
                   <button
                     type="button"
                     className="payment-sheet__primary payment-sheet__primary--delivery"
-                    onClick={() => navigateDeliveryUrl(successResult.deliveryUrl)}
+                    onClick={() => handleDeliveryNavigate(successResult.deliveryUrl)}
                   >
                     📥 Download Now
                   </button>

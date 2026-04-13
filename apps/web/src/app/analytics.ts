@@ -1,6 +1,11 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
-type MiniAppAnalyticsEventName = 'entry_started' | 'screen_viewed' | 'interaction_triggered';
+type MiniAppAnalyticsEventName =
+  | 'entry_started'
+  | 'screen_viewed'
+  | 'interaction_triggered'
+  | 'order_event'
+  | 'premium_event';
 
 type MiniAppAnalyticsEvent = {
   eventName: MiniAppAnalyticsEventName;
@@ -181,6 +186,39 @@ export function trackInteraction(params: {
     actionKey: params.actionKey,
     receivedStartParam: params.receivedStartParam,
     properties: params.properties,
+  });
+}
+
+/** CMS analytics: funnel states should use payment_method_prompted | paid | delivered | fulfilled */
+export function trackOrderEvent(params: {
+  state: string;
+  screen?: string;
+  flowId?: string;
+  receivedStartParam?: string;
+  properties?: Record<string, unknown>;
+}) {
+  queueOrSend({
+    eventName: 'order_event',
+    screen: params.screen,
+    flowId: params.flowId,
+    receivedStartParam: params.receivedStartParam,
+    properties: { state: params.state, ...(params.properties || {}) },
+  });
+}
+
+export function trackPremiumEvent(params: {
+  state: string;
+  screen?: string;
+  flowId?: string;
+  receivedStartParam?: string;
+  properties?: Record<string, unknown>;
+}) {
+  queueOrSend({
+    eventName: 'premium_event',
+    screen: params.screen,
+    flowId: params.flowId,
+    receivedStartParam: params.receivedStartParam,
+    properties: { state: params.state, ...(params.properties || {}) },
   });
 }
 

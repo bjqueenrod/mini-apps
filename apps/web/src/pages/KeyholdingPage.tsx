@@ -5,15 +5,11 @@ import { ErrorState } from '../components/ErrorState';
 import { EmptyState } from '../components/EmptyState';
 import { CurrencyToggleBanner } from '../components/CurrencyToggleBanner';
 import { applyTelegramTheme, openBotDeepLink, sendBotWebAppData } from '../app/telegram';
-import { setAnalyticsContext } from '../app/analytics';
+import { setAnalyticsContext, trackPremiumEvent } from '../app/analytics';
 import { useTelegramSession } from '../features/auth/hooks';
 import { useKeyholdingOptions, useKeyholdingTiers } from '../features/keyholding/hooks';
 import { KeyholdingTierCarousel } from '../components/KeyholdingTierCarousel';
 import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
-
-function handleApplyClick() {
-  window.location.href = 'https://apply.mistressbjqueen.com';
-}
 
 function SectionEyebrow({ children }: { children: string }) {
   return <p className="hero__eyebrow">{children}</p>;
@@ -27,6 +23,7 @@ export function KeyholdingPage() {
   const tiersQuery = useKeyholdingTiers(currency);
   const optionsQuery = useKeyholdingOptions(currency);
   const didInitRef = useRef(false);
+  const keyholdingPageViewSentRef = useRef(false);
 
   useEffect(() => {
     applyTelegramTheme();
@@ -44,6 +41,26 @@ export function KeyholdingPage() {
     if (didInitRef.current) return;
     didInitRef.current = true;
   }, []);
+
+  useEffect(() => {
+    if (!session.ready || session.error || keyholdingPageViewSentRef.current) return;
+    keyholdingPageViewSentRef.current = true;
+    trackPremiumEvent({
+      state: 'keyholding_page_viewed',
+      screen: 'keyholding',
+      flowId: 'keyholding',
+    });
+  }, [session.error, session.ready]);
+
+  const handleApplyClick = () => {
+    trackPremiumEvent({
+      state: 'keyholding_apply_redirect',
+      screen: 'keyholding',
+      flowId: 'keyholding',
+      properties: { destination: 'https://apply.mistressbjqueen.com' },
+    });
+    window.location.href = 'https://apply.mistressbjqueen.com';
+  };
 
   return (
     <AppShell>
