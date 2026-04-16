@@ -10,6 +10,7 @@ import { useTelegramSession } from '../features/auth/hooks';
 import { useKeyholdingOptions, useKeyholdingTiers } from '../features/keyholding/hooks';
 import { KeyholdingTierCarousel } from '../components/KeyholdingTierCarousel';
 import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
+import { buildKeyholdingApplyUrl } from '../utils/ga4Attribution';
 
 function SectionEyebrow({ children }: { children: string }) {
   return <p className="hero__eyebrow">{children}</p>;
@@ -53,13 +54,14 @@ export function KeyholdingPage() {
   }, [session.error, session.ready]);
 
   const handleApplyClick = () => {
+    const destination = buildKeyholdingApplyUrl();
     trackPremiumEvent({
       state: 'keyholding_apply_redirect',
       screen: 'keyholding',
       flowId: 'keyholding',
-      properties: { destination: 'https://apply.mistressbjqueen.com' },
+      properties: { destination },
     });
-    window.location.href = 'https://apply.mistressbjqueen.com';
+    window.location.href = destination;
   };
 
   return (
