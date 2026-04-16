@@ -1,3 +1,5 @@
+import { initGa4, ga4PageView, mirrorMiniAppEventToGa4 } from './ga4';
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
 type MiniAppAnalyticsEventName =
@@ -105,6 +107,7 @@ function flushPendingEvents() {
         continue;
       }
       await postEvent(next);
+      mirrorMiniAppEventToGa4(next);
     }
   })().finally(() => {
     flushPromise = null;
@@ -121,6 +124,7 @@ function queueOrSend(event: MiniAppAnalyticsEvent) {
   }
 
   void postEvent(event);
+  mirrorMiniAppEventToGa4(event);
 }
 
 export function initializeAnalytics() {
@@ -129,6 +133,7 @@ export function initializeAnalytics() {
   }
 
   initialized = true;
+  initGa4();
   trackPageView(`${window.location.pathname}${window.location.search}`);
 }
 
@@ -228,6 +233,7 @@ export function trackPageView(path: string) {
   }
 
   lastTrackedPath = path;
+  ga4PageView(path);
   trackScreenView({
     screen: screenFromPath(path),
     properties: {
