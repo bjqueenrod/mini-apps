@@ -1641,6 +1641,55 @@ button {
   line-height: 1.45;
 }
 
+/* Keyholding tier cards: clearer vertical rhythm (stacked pills, body gaps, price separation) */
+.top-sellers--keyholding .top-sellers__body--tier {
+  gap: 14px;
+  padding: 14px 16px 16px;
+}
+
+.top-sellers--keyholding .top-sellers__body--tier > .top-sellers__descriptor {
+  margin-top: 2px;
+}
+
+.top-sellers--keyholding .top-sellers__fact-grid {
+  gap: 10px;
+}
+
+.top-sellers--keyholding .top-sellers__fact {
+  padding: 12px 12px;
+}
+
+.top-sellers--keyholding .top-sellers__includes-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.top-sellers--keyholding .top-sellers__section-label {
+  margin: 0;
+}
+
+.top-sellers--keyholding .top-sellers__pill-grid {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.top-sellers--keyholding .top-sellers__pill {
+  padding: 12px 14px;
+  line-height: 1.5;
+}
+
+.top-sellers--keyholding .top-sellers__price-block--keyholding {
+  margin-top: 6px;
+}
+
+.top-sellers--keyholding .top-sellers__cta--apply {
+  margin-top: 4px;
+}
+
 .top-sellers__body {
   display: flex;
   flex: 1;

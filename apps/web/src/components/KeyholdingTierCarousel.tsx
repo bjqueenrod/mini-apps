@@ -3,6 +3,15 @@ import { KeyholdingTier } from '../features/keyholding/types';
 import { CurrencyCode } from '../utils/format';
 import { resolvePriceLabel } from '../utils/pricing';
 
+/** Avoid repeating the same copy in the intro line and the “Ideal for” fact when CMS sends duplicates. */
+function shouldShowTierDescriptor(desc: string | undefined, idealFor: string | undefined): boolean {
+  const d = desc?.replace(/\s+/g, ' ').trim();
+  if (!d) return false;
+  const i = idealFor?.replace(/\s+/g, ' ').trim();
+  if (!i) return true;
+  return d.toLowerCase() !== i.toLowerCase();
+}
+
 export function KeyholdingTierCarousel({
   items,
   loading = false,
@@ -22,7 +31,7 @@ export function KeyholdingTierCarousel({
   const { currentPage, scrollToPage, trackRef } = usePagedCarousel(pageCount);
 
   return (
-    <section className="top-sellers top-sellers--tiers">
+    <section className="top-sellers top-sellers--tiers top-sellers--keyholding">
       <div ref={trackRef} className="top-sellers__track">
         {loading
           ? Array.from({ length: 3 }, (_, index) => (
@@ -73,7 +82,9 @@ export function KeyholdingTierCarousel({
                   <div className="top-sellers__body top-sellers__body--tier">
                     <div className="top-sellers__eyebrow" aria-hidden="true" />
                     <h3>{tier.name}</h3>
-                    {tier.desc ? <p className="top-sellers__descriptor">{tier.desc}</p> : null}
+                    {shouldShowTierDescriptor(tier.desc, tier.idealFor) ? (
+                      <p className="top-sellers__descriptor">{tier.desc}</p>
+                    ) : null}
                     {controlLabel ? <p className="top-sellers__badge-inline">{controlLabel}</p> : null}
                     {(tier.duration || tier.idealFor) && (
                       <div className="top-sellers__fact-grid">
@@ -92,7 +103,7 @@ export function KeyholdingTierCarousel({
                       </div>
                     )}
                     {includes.length ? (
-                      <div>
+                      <div className="top-sellers__includes-block">
                         <p className="top-sellers__section-label">What you get</p>
                         <div className="top-sellers__pill-grid">
                           {includes.map((item) => (
