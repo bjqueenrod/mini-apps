@@ -5,6 +5,9 @@ COPY package.json pnpm-workspace.yaml ./
 COPY apps/web/package.json apps/web/package.json
 RUN pnpm install --filter ./apps/web... --frozen-lockfile=false
 COPY apps/web ./apps/web
+# GA4 measurement ID is public (client-side); override at build time if needed.
+ARG VITE_GA_MEASUREMENT_ID=G-1KNSC32BX5
+ENV VITE_GA_MEASUREMENT_ID=$VITE_GA_MEASUREMENT_ID
 RUN pnpm --dir apps/web build
 
 FROM python:3.12-slim AS runtime
