@@ -3,6 +3,10 @@
 .kh-page {
   --kh-gap: clamp(18px, 4vw, 28px);
   --kh-section-pad: clamp(16px, 4vw, 22px);
+  padding-bottom: 24px;
+}
+
+.kh-page--with-sticky {
   padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
 }
 

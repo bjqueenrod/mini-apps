@@ -9,7 +9,7 @@ import { useTelegramSession } from '../features/auth/hooks';
 import { useKeyholdingOptions, useKeyholdingTiers } from '../features/keyholding/hooks';
 import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
 import { buildKeyholdingApplyUrl } from '../utils/ga4Attribution';
-import './keyholding/keyholding.css?v=20260417t';
+import './keyholding/keyholding.css?v=20260417u';
 import { KeyholdingHero } from './keyholding/KeyholdingHero';
 import { KeyholdingWhatIs } from './keyholding/KeyholdingWhatIs';
 import { KeyholdingWhyDifferent } from './keyholding/KeyholdingWhyDifferent';
@@ -113,7 +113,7 @@ export function KeyholdingPage() {
         onBackClick={() => navigate('/', { replace: true, state: { bypassHomeRedirect: true } })}
       />
 
-      <main className="kh-page">
+      <main className={`kh-page${stickyVisible ? ' kh-page--with-sticky' : ''}`}>
         <KeyholdingHero onApply={handleApplyClick} />
         <KeyholdingWhatIs />
         <KeyholdingWhyDifferent />
