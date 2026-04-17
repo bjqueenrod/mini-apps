@@ -415,7 +415,7 @@ export function PaymentSheet({
     return (
       <>
         <img
-          src={isPaypalSelected ? '/paypal-logo.png' : '/throne-logo.png'}
+          src={isPaypalSelected ? '/paypal-logo.png' : '/throne-logo.svg'}
           alt=""
           aria-hidden="true"
           className={`payment-sheet__primary-logo${isThroneSelected ? ' payment-sheet__primary-logo--throne' : ''}`}
