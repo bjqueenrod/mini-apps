@@ -29,7 +29,7 @@ export function KeyholdingHowItWorks() {
         From application to owned calendar
       </h2>
       <p className="kh-section__lead">
-        Five beats: clear enough to decide fast, serious enough to mean something once you’re inside.
+        Five steps: quick to read when you’re deciding, binding once you’re in.
       </p>
       <div className="kh-steps kh-plain">
         {STEPS.map((step) => (
