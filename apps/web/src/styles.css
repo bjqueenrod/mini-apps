@@ -2559,23 +2559,26 @@ button {
 
 .clips-channel-cta__inner {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  flex-wrap: nowrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 14px 18px;
+  justify-content: center;
+  gap: 14px;
   padding: 16px 18px;
   border: 1px solid rgba(176, 106, 214, 0.14);
   border-radius: 22px;
   background: linear-gradient(135deg, rgba(34, 22, 48, 0.55), rgba(22, 18, 32, 0.72));
   box-shadow: var(--shadow-card);
+  text-align: center;
 }
 
 .clips-channel-cta__text {
   margin: 0;
-  flex: 1 1 220px;
+  max-width: 36ch;
   color: var(--muted);
   font-size: 0.95rem;
   line-height: 1.45;
+  text-align: center;
 }
 
 .clips-channel-cta__text strong {
@@ -2585,6 +2588,7 @@ button {
 
 .clips-channel-cta__button {
   flex-shrink: 0;
+  align-self: center;
   margin: 0;
   padding: 11px 18px;
   border: 1px solid rgba(193, 128, 229, 0.38);
