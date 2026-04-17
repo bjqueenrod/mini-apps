@@ -1,7 +1,7 @@
 const STEPS = [
   {
     title: 'Apply',
-    body: 'You choose a tier and submit: how long you want structure for, how heavy contact should be, and why you’re serious.',
+    body: 'Pick the tier that matches your availability, budget and appetite for control and complete the core application details.',
   },
   {
     title: 'Screening',
