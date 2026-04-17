@@ -2565,7 +2565,7 @@ button {
   justify-content: center;
   gap: 14px;
   padding: 16px 18px;
-  border: 1px solid rgba(176, 106, 214, 0.14);
+  border: 2px solid rgba(176, 106, 214, 0.42);
   border-radius: 22px;
   background: linear-gradient(135deg, rgba(34, 22, 48, 0.55), rgba(22, 18, 32, 0.72));
   box-shadow: var(--shadow-card);
