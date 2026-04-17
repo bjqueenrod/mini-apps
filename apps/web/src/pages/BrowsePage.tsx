@@ -580,6 +580,14 @@ export function BrowsePage() {
         isTelegramSession={session.isTelegram}
         onBackClick={() => navigate('/', { replace: true, state: { bypassHomeRedirect: true } })}
       />
+      <section className="hero">
+        <img
+          className="hero__banner"
+          src="/header-clipstore.jpeg?v=20260417q"
+          alt="Mistress BJQueen Clip Store banner"
+        />
+      </section>
+
       {featuredClipsQuery.data?.items?.length ? (
         <TopSellersCarousel
           items={featuredClipsQuery.data.items}
