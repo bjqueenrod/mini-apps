@@ -16,7 +16,7 @@ export function KeyholdingHero({ onApply }: KeyholdingHeroProps) {
     <header className="kh-hero">
       <img
         className="kh-hero__banner"
-        src="/header-keyholding.jpeg?v=20260409a"
+        src="/header-keyholding.jpeg?v=20260417g"
         alt="Mistress BJQueen, remote chastity keyholding"
       />
       <div className="kh-hero__panel">

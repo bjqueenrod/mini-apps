@@ -48,8 +48,7 @@
   width: 100%;
   height: auto;
   border-radius: 24px;
-  object-fit: cover;
-  max-height: min(200px, 38vh);
+  /* Full width, natural height: avoid object-fit:cover + max-height cropping the banner artwork */
 }
 
 .kh-hero__panel {
