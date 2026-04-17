@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
 import { EmptyState } from '../components/EmptyState';
@@ -352,6 +352,8 @@ export function TasksPage() {
   const [currency] = useCurrencyPreference(session.ready, telegramUserId);
   const tiersQuery = useTiers(currency);
   const didTrackOpenRef = useRef(false);
+  const [showFaq, setShowFaq] = useState(false);
+  const [openFaqQuestion, setOpenFaqQuestion] = useState<string | null>(null);
 
   useEffect(() => {
     applyTelegramTheme();
@@ -558,26 +560,51 @@ export function TasksPage() {
         </div>
       </section>
 
-      <section className="tasks-panel tasks-panel--faq">
+      <section className={`tasks-panel tasks-panel--faq clips-faq${showFaq ? ' clips-faq--open' : ''}`}>
         <div className="tasks-panel__header">
           <p className="hero__eyebrow">FAQ</p>
           <h2>Questions before you choose your package?</h2>
+          <button
+            type="button"
+            className="clips-faq__toggle"
+            aria-expanded={showFaq}
+            onClick={() => {
+              setShowFaq((current) => {
+                const next = !current;
+                if (!next) {
+                  setOpenFaqQuestion(null);
+                }
+                return next;
+              });
+            }}
+          >
+            {showFaq ? 'Hide FAQ' : 'Show FAQ'}
+          </button>
         </div>
-        <div className="faq-list">
-          {FAQS.map((item) => (
-            <details key={item.question} className="faq-card">
-              <summary>
-                <span className="faq-card__summary">
-                  <span className="faq-card__icon">
-                    <TaskIcon name={item.icon} />
-                  </span>
-                  <span className="faq-card__text">{item.question}</span>
-                  <span className="faq-card__chevron" aria-hidden="true" />
-                </span>
-              </summary>
-              <p>{item.answer}</p>
-            </details>
-          ))}
+        <div className="clips-faq__body" aria-hidden={!showFaq}>
+          <div className="clips-faq__body-inner">
+            <div className="faq-list">
+              {FAQS.map((item) => (
+                <details key={item.question} className="faq-card" open={openFaqQuestion === item.question}>
+                  <summary
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setOpenFaqQuestion((current) => (current === item.question ? null : item.question));
+                    }}
+                  >
+                    <span className="faq-card__summary">
+                      <span className="faq-card__icon" aria-hidden="true">
+                        <TaskIcon name={item.icon} />
+                      </span>
+                      <span className="faq-card__text">{item.question}</span>
+                      <span className="faq-card__chevron" aria-hidden="true" />
+                    </span>
+                  </summary>
+                  <p>{item.answer}</p>
+                </details>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
