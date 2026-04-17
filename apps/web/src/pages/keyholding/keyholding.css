@@ -660,6 +660,20 @@
   margin-top: 4px;
 }
 
+/* Avoid a dead band below the snapshot table inside the rounded panel */
+.kh-tier-section {
+  padding-bottom: 0;
+}
+
+/* Carousel slides match their own content height; no flex gap above the Apply CTA */
+.top-sellers--keyholding .top-sellers__track {
+  align-items: start;
+}
+
+.top-sellers--keyholding .top-sellers__cta--apply {
+  margin-top: 12px;
+}
+
 .kh-tier-compare {
   margin-top: 16px;
   overflow-x: auto;
