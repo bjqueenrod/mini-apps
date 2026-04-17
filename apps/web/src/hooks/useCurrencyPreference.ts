@@ -66,7 +66,7 @@ function pick(value?: string | null): CurrencyCode | undefined {
   return upper === 'USD' ? 'USD' : upper === 'GBP' ? 'GBP' : undefined;
 }
 
-/** Synchronous sources only — used for first paint so the toggle matches cached / URL preference. */
+/** Synchronous sources only; used for first paint so the toggle matches cached / URL preference. */
 function readCurrency(): CurrencyCode {
   if (typeof window === 'undefined') return 'GBP';
 

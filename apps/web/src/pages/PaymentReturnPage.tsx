@@ -53,7 +53,7 @@ export function PaymentReturnPage() {
       const elapsed = Date.now() - startedAt;
       if (elapsed > POLL_TIMEOUT_MS) {
         setStatus('error');
-        setErrorText('Still waiting for confirmation. If you paid, it may take a minute—try again or continue in the bot.');
+        setErrorText('Still waiting for confirmation. If you paid, it may take a minute. Try again or continue in the bot.');
         return;
       }
 

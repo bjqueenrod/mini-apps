@@ -129,7 +129,7 @@ const BENEFIT_POINTS = [
 const WHAT_YOURE_BUYING = [
   {
     title: 'A time-limited Custom Obedience package inside Telegram',
-    detail: 'Access ends when the paid period finishes—no auto-renewals.',
+    detail: 'Access ends when the paid period finishes. No auto-renewals.',
     icon: 'package',
   },
   {
@@ -429,7 +429,7 @@ export function TasksPage() {
           <aside className="tasks-hero__aside">
             <article className="tasks-hero__private-card">
               <p className="tasks-hero__private-kicker">Private Offering</p>
-              <strong>Structured, premium, and personal—inside Telegram.</strong>
+              <strong>Structured, premium, and personal, inside Telegram.</strong>
               <p>
                 Buy access, finish setup, and receive tasks that match your categories, sex toys/props, limits, and
                 chosen pace. One task stays active until you complete it, submit the required proof, and Mistress

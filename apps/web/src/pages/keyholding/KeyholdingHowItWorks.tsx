@@ -1,7 +1,7 @@
 const STEPS = [
   {
     title: 'Apply',
-    body: 'You choose a tier and submit—how long you want structure for, how heavy contact should be, and why you’re serious.',
+    body: 'You choose a tier and submit: how long you want structure for, how heavy contact should be, and why you’re serious.',
   },
   {
     title: 'Screening',
@@ -9,11 +9,11 @@ const STEPS = [
   },
   {
     title: 'Sign contract',
-    body: 'Terms, consent, and boundaries go in writing. Nothing vague once we start—you know what you’re agreeing to.',
+    body: 'Terms, consent, and boundaries go in writing. Nothing vague once we start. You know what you’re agreeing to.',
   },
   {
     title: 'Pay fees',
-    body: 'Your tier price is settled up front before the dynamic opens—no “we’ll figure it out later” on money.',
+    body: 'Your tier price is settled up front before the dynamic opens. No “we’ll figure it out later” on money.',
   },
   {
     title: 'Lock the cock',
@@ -29,7 +29,7 @@ export function KeyholdingHowItWorks() {
         From application to locked cock
       </h2>
       <p className="kh-section__lead">
-        Apply, screening, sign contract, pay fees, lock the cock—in that order, no shortcuts.
+        Apply, screening, sign contract, pay fees, lock the cock, in that order, no shortcuts.
       </p>
       <div className="kh-steps kh-plain">
         {STEPS.map((step) => (
