@@ -624,9 +624,6 @@ export function TasksPage() {
         </div>
       </section>
 
-      <div className="sticky-mobile-cta">
-        <div className="sticky-mobile-cta__content" />
-      </div>
     </AppShell>
   );
 }
