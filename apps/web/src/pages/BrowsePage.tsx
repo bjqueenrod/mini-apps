@@ -10,10 +10,11 @@ import { ErrorState } from '../components/ErrorState';
 import { CurrencyToggleBanner } from '../components/CurrencyToggleBanner';
 import { TopSellersCarousel } from '../components/TopSellersCarousel';
 import { setAnalyticsContext } from '../app/analytics';
-import { applyTelegramTheme } from '../app/telegram';
+import { applyTelegramTheme, openTelegramExternalLink } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
 import {
   trackClipListView,
+  trackClipLibraryChannelClick,
   trackClipSearch,
   trackClipTagSelect,
   trackMiniAppOpenAttributed,
@@ -33,6 +34,7 @@ import { composeSearchText, extractHashtagTokens, FEATURED_TAGS, normalizeTag, s
 import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
 import { resolveClipIdHint, stripStartRoutingParams } from '../utils/startRouting';
 import clipStoreHero from '../assets/header-clipstore.jpeg';
+import { CLIP_LIBRARY_CHANNEL_URL } from '../config/clips';
 
 const CLIPS_FAQ = [
   {
@@ -583,6 +585,23 @@ export function BrowsePage() {
       />
       <section className="hero">
         <img className="hero__banner" src={clipStoreHero} alt="Mistress BJQueen Clip Store banner" />
+      </section>
+      <section className="clips-channel-cta">
+        <div className="clips-channel-cta__inner">
+          <p className="clips-channel-cta__text">
+            <strong>Updates</strong> Get notified when fresh clips drop in the library channel.
+          </p>
+          <button
+            type="button"
+            className="clips-channel-cta__button"
+            onClick={() => {
+              trackClipLibraryChannelClick();
+              openTelegramExternalLink(CLIP_LIBRARY_CHANNEL_URL);
+            }}
+          >
+            Join Clip Library Channel
+          </button>
+        </div>
       </section>
 
       {featuredClipsQuery.isLoading || featuredClipsQuery.data?.items?.length ? (
