@@ -1,14 +1,33 @@
-type KeyholdingTierFinderProps = {
-  onJumpToTiers: () => void;
-};
-
 const OPTIONS = [
-  { label: 'Curious / first lock', hint: 'Start at the entry tier and feel it out.' },
-  { label: 'I want daily structure', hint: 'Look for tiers with tighter check-ins.' },
-  { label: 'Maximum control', hint: 'Sort by intensity — highest tiers pull the shortest leash.' },
+  {
+    label: 'Curious / first lock',
+    hint: 'Jumps to the entry tier — lighter accountability.',
+    tierIndex: 0,
+  },
+  {
+    label: 'I want daily structure',
+    hint: 'Jumps to the mid tier — tighter check-ins and pacing.',
+    tierIndex: 1,
+  },
+  {
+    label: 'Full enforcement',
+    hint: 'Jumps to the heavier tier — more tasks, stricter proof.',
+    tierIndex: 2,
+  },
+  {
+    label: 'Maximum control',
+    hint: 'Jumps to the most intense tier — shortest leash.',
+    tierIndex: 3,
+  },
 ] as const;
 
-export function KeyholdingTierFinder({ onJumpToTiers }: KeyholdingTierFinderProps) {
+type KeyholdingTierFinderProps = {
+  /** Number of tiers from the API (used to clamp index if fewer than four). */
+  tierCount: number;
+  onJumpToTier: (tierIndex: number) => void;
+};
+
+export function KeyholdingTierFinder({ tierCount, onJumpToTier }: KeyholdingTierFinderProps) {
   return (
     <section className="kh-section" aria-labelledby="kh-finder-heading">
       <p className="kh-section__eyebrow">Find your fit</p>
@@ -16,17 +35,32 @@ export function KeyholdingTierFinder({ onJumpToTiers }: KeyholdingTierFinderProp
         Where should you start?
       </h2>
       <p className="kh-section__lead">
-        Tap what sounds closest — then compare names, duration, and price in the tier strip below. Every tier spells out
-        what you get; progression should feel obvious from lighter to heavier contact.
+        Tap a lane — we scroll straight to that tier card below. Compare names, duration, and price; progression should
+        read from lighter to heavier contact. You still pick the exact tier in application.
       </p>
       <div className="kh-finder">
-        <p className="kh-finder__label">Self-select (nudges you to the tier list — you still choose in application).</p>
-        <div className="kh-finder__chips" role="group" aria-label="Starting point">
-          {OPTIONS.map((o) => (
-            <button key={o.label} type="button" className="kh-finder__chip" title={o.hint} onClick={onJumpToTiers}>
-              {o.label}
-            </button>
-          ))}
+        <p className="kh-finder__label">
+          Each option opens the matching position in the tier strip (if you have fewer than four tiers, we take you to
+          the closest one).
+        </p>
+        <div className="kh-finder__chips" role="group" aria-label="Jump to tier">
+          {OPTIONS.map((o) => {
+            const title =
+              tierCount === 0
+                ? `${o.hint} (tiers loading — opens tier section)`
+                : `${o.hint} Opens tier ${Math.min(o.tierIndex, Math.max(0, tierCount - 1)) + 1} of ${tierCount}.`;
+            return (
+              <button
+                key={o.label}
+                type="button"
+                className="kh-finder__chip"
+                title={title}
+                onClick={() => onJumpToTier(o.tierIndex)}
+              >
+                {o.label}
+              </button>
+            );
+          })}
         </div>
       </div>
     </section>

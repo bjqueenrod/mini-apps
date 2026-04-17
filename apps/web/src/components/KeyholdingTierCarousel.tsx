@@ -76,6 +76,7 @@ export function KeyholdingTierCarousel({
                         : undefined);
               return (
                 <article
+                  id={`keyholding-tier-${index}`}
                   key={tier.id || index}
                   className="top-sellers__card top-sellers__card--tier top-sellers__card--light"
                 >

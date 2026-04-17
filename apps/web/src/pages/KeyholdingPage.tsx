@@ -85,11 +85,23 @@ export function KeyholdingPage() {
     window.location.href = destination;
   }, []);
 
-  const scrollToTiers = useCallback(() => {
-    document.getElementById('tiers')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, []);
-
   const tierItems = tiersQuery.data?.items ?? [];
+
+  const scrollToTierIndex = useCallback((tierIndex: number) => {
+    const n = tierItems.length;
+    if (n === 0) {
+      document.getElementById('tiers')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    const idx = Math.min(Math.max(0, tierIndex), n - 1);
+    window.requestAnimationFrame(() => {
+      document.getElementById(`keyholding-tier-${idx}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    });
+  }, [tierItems.length]);
 
   return (
     <AppShell>
@@ -106,7 +118,7 @@ export function KeyholdingPage() {
         <KeyholdingWhatIs />
         <KeyholdingWhyDifferent />
         <KeyholdingHowItWorks />
-        <KeyholdingTierFinder onJumpToTiers={scrollToTiers} />
+        <KeyholdingTierFinder tierCount={tierItems.length} onJumpToTier={scrollToTierIndex} />
         <KeyholdingWhoItsFor />
 
         <KeyholdingTierGrid
