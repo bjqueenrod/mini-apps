@@ -13,7 +13,7 @@ const FAQ = [
   },
   {
     q: 'What happens if I break rules?',
-    a: 'Consequences are part of the dynamic: extra denial, task load, loss of privileges, or ended access if you’re wasting the container.',
+    a: 'Consequences are part of the dynamic: extra time, more tasks, monetary fines, loss of privileges, or contract termination.',
   },
   {
     q: 'What if I’m new to keyholding?',
