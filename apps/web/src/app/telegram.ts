@@ -289,6 +289,38 @@ export function sendBotWebAppData(data: string): boolean {
   }
 }
 
+/** Opens a t.me link (channel, bot, etc.) without closing the mini app. */
+export function openTelegramExternalLink(url: string): void {
+  const trimmed = url.trim();
+  if (!trimmed) {
+    return;
+  }
+  const webApp = window.Telegram?.WebApp;
+  try {
+    openTelegramLink(trimmed);
+    return;
+  } catch {
+    // fall through
+  }
+  try {
+    webApp?.openTelegramLink?.(trimmed);
+    return;
+  } catch {
+    // fall through
+  }
+  try {
+    webApp?.openLink?.(trimmed);
+    return;
+  } catch {
+    // fall through
+  }
+  try {
+    openLink(trimmed);
+  } catch {
+    window.open(trimmed, '_blank', 'noopener,noreferrer');
+  }
+}
+
 export function openBotDeepLink(url: string): void {
   const webApp = window.Telegram?.WebApp;
 

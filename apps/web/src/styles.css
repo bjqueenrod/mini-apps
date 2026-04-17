@@ -2552,6 +2552,61 @@ button {
   margin-top: 0;
 }
 
+.clips-channel-cta {
+  margin: 0 0 18px;
+  padding: 0 4px;
+}
+
+.clips-channel-cta__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 18px;
+  padding: 16px 18px;
+  border: 1px solid rgba(176, 106, 214, 0.14);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(34, 22, 48, 0.55), rgba(22, 18, 32, 0.72));
+  box-shadow: var(--shadow-card);
+}
+
+.clips-channel-cta__text {
+  margin: 0;
+  flex: 1 1 220px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.clips-channel-cta__text strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.clips-channel-cta__button {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 11px 18px;
+  border: 1px solid rgba(193, 128, 229, 0.38);
+  border-radius: 999px;
+  background: rgba(120, 62, 168, 0.35);
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.clips-channel-cta__button:hover,
+.clips-channel-cta__button:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(210, 160, 245, 0.55);
+  background: rgba(138, 78, 188, 0.45);
+}
+
 .clips-faq__body {
   max-height: 0;
   overflow: hidden;

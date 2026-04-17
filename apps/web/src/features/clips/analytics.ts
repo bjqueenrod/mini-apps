@@ -166,3 +166,10 @@ export function trackClipBotCtaClick(params: {
     },
   });
 }
+
+export function trackClipLibraryChannelClick() {
+  trackInteraction({
+    screen: 'clips_home',
+    actionKey: 'clip_library_channel_join',
+  });
+}
