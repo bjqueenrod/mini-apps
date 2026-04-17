@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 const FAQ = [
   {
     q: 'Do I need a cage already?',
@@ -30,26 +32,60 @@ const FAQ = [
 ] as const;
 
 export function KeyholdingFaq() {
+  const [showFaq, setShowFaq] = useState(false);
+  const [openFaqQuestion, setOpenFaqQuestion] = useState<string | null>(null);
+
   return (
-    <section className="kh-section kh-faq" id="faq" aria-labelledby="kh-faq-heading">
-      <p className="kh-section__eyebrow">FAQ</p>
-      <h2 className="kh-section__title" id="kh-faq-heading">
-        Questions that decide “yes or no”
-      </h2>
-      <p className="kh-section__lead">Straight answers. Read before you apply.</p>
-      <div className="faq-list">
-        {FAQ.map((item) => (
-          <details key={item.q} className="faq-card">
-            <summary>
-              <span className="faq-card__summary">
-                <span className="faq-card__icon">?</span>
-                <span className="faq-card__text">{item.q}</span>
-                <span className="faq-card__chevron" aria-hidden="true" />
-              </span>
-            </summary>
-            <p>{item.a}</p>
-          </details>
-        ))}
+    <section
+      className={`kh-section kh-faq tasks-panel tasks-panel--faq clips-faq${showFaq ? ' clips-faq--open' : ''}`}
+      id="faq"
+      aria-labelledby="kh-faq-heading"
+    >
+      <div className="tasks-panel__header">
+        <p className="kh-section__eyebrow">FAQ</p>
+        <h2 id="kh-faq-heading">Questions that decide “yes or no”</h2>
+        <p className="kh-section__lead">Straight answers. Read before you apply.</p>
+        <button
+          type="button"
+          className="clips-faq__toggle"
+          aria-expanded={showFaq}
+          onClick={() => {
+            setShowFaq((current) => {
+              const next = !current;
+              if (!next) {
+                setOpenFaqQuestion(null);
+              }
+              return next;
+            });
+          }}
+        >
+          {showFaq ? 'Hide FAQ' : 'Show FAQ'}
+        </button>
+      </div>
+      <div className="clips-faq__body" aria-hidden={!showFaq}>
+        <div className="clips-faq__body-inner">
+          <div className="faq-list">
+            {FAQ.map((item) => (
+              <details key={item.q} className="faq-card" open={openFaqQuestion === item.q}>
+                <summary
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setOpenFaqQuestion((current) => (current === item.q ? null : item.q));
+                  }}
+                >
+                  <span className="faq-card__summary">
+                    <span className="faq-card__icon" aria-hidden="true">
+                      ❔
+                    </span>
+                    <span className="faq-card__text">{item.q}</span>
+                    <span className="faq-card__chevron" aria-hidden="true" />
+                  </span>
+                </summary>
+                <p>{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
