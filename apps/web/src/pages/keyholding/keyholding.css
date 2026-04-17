@@ -593,16 +593,3 @@
 .kh-tier-compare tr:last-child td {
   border-bottom: 0;
 }
-
-.kh-tier-compare__badge {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border: 1px solid rgba(176, 106, 214, 0.25);
-  color: var(--accent);
-}

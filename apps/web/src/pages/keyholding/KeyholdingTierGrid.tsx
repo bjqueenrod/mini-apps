@@ -78,9 +78,6 @@ export function KeyholdingTierGrid({
                 <tr key={tier.id || String(index)}>
                   <td>
                     <strong>{tier.name}</strong>
-                    {tier.badge ? (
-                      <span className="kh-tier-compare__badge">{tier.badge}</span>
-                    ) : null}
                   </td>
                   <td>{tier.idealFor || metaBits || tier.desc || '-'}</td>
                   <td>{tier.duration || '-'}</td>
