@@ -1362,8 +1362,11 @@ button {
 }
 
 .top-sellers__cta--apply {
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  text-align: left;
+  gap: 3px;
+  text-align: center;
   border-color: rgba(255, 255, 255, 0.22);
   /* Mid → deep violet only — avoids pale stops that wash out white labels */
   background: linear-gradient(135deg, #9f6ff0 0%, #7c3aed 46%, #5b21b6 100%);
@@ -1373,13 +1376,18 @@ button {
 
 .top-sellers__cta--apply strong {
   font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
   text-shadow: 0 1px 2px rgba(15, 5, 28, 0.35);
 }
 
 .top-sellers__cta--apply span {
-  color: rgba(255, 255, 255, 0.92);
-  font-size: 0.9rem;
-  text-shadow: 0 1px 2px rgba(15, 5, 28, 0.3);
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.78);
+  text-shadow: 0 1px 2px rgba(15, 5, 28, 0.28);
 }
 
 .top-sellers__cta strong,
