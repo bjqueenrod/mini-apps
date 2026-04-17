@@ -1,23 +1,23 @@
 const STEPS = [
   {
-    title: 'Apply & choose a tier',
-    body: 'You tell me how long you want structure for and how intense contact should be. I review every application. Not everyone is accepted.',
+    title: 'Apply',
+    body: 'You choose a tier and submit—how long you want structure for, how heavy contact should be, and why you’re serious.',
   },
   {
-    title: 'Lock & hand over the timeline',
-    body: 'You stay caged. Check-in windows, proof, and messaging rules are set by the tier, not improvised day by day.',
+    title: 'Screening',
+    body: 'I review every application. Fit matters; not everyone is accepted. If we’re not a match, you’ll hear that clearly.',
   },
   {
-    title: 'Report, task, obey',
-    body: 'You show up when required. Tasks may land between check-ins to keep you sharp and compliant.',
+    title: 'Sign contract',
+    body: 'Terms, consent, and boundaries go in writing. Nothing vague once we start—you know what you’re agreeing to.',
   },
   {
-    title: 'Denial & release on my terms',
-    body: 'When, or if, you get relief is part of the dynamic. “I’m desperate” is not an automatic unlock.',
+    title: 'Pay fees',
+    body: 'Your tier price is settled up front before the dynamic opens—no “we’ll figure it out later” on money.',
   },
   {
-    title: 'Stay consistent or lose the spot',
-    body: 'Ghosting, skipping proof, or negotiating every rule breaks the container. I protect the dynamic by enforcing it.',
+    title: 'Lock the cock',
+    body: 'Your cage goes on and the container starts: check-ins, proof, and my rules from that point—not before.',
   },
 ] as const;
 
@@ -26,10 +26,10 @@ export function KeyholdingHowItWorks() {
     <section className="kh-section" id="how-it-works" aria-labelledby="kh-how-heading">
       <p className="kh-section__eyebrow">How it works</p>
       <h2 className="kh-section__title" id="kh-how-heading">
-        From application to owned calendar
+        From application to locked in
       </h2>
       <p className="kh-section__lead">
-        Five steps: quick to read when you’re deciding, binding once you’re in.
+        Apply, screening, sign contract, pay fees, lock the cock—in that order, no shortcuts.
       </p>
       <div className="kh-steps kh-plain">
         {STEPS.map((step) => (
