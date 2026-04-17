@@ -26,7 +26,7 @@ export function KeyholdingHowItWorks() {
     <section className="kh-section" id="how-it-works" aria-labelledby="kh-how-heading">
       <p className="kh-section__eyebrow">How it works</p>
       <h2 className="kh-section__title" id="kh-how-heading">
-        From application to locked in
+        From application to locked cock
       </h2>
       <p className="kh-section__lead">
         Apply, screening, sign contract, pay fees, lock the cock—in that order, no shortcuts.
