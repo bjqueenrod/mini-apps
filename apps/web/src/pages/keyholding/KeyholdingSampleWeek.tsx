@@ -20,7 +20,7 @@ export function KeyholdingSampleWeek() {
       </p>
       <figure className="kh-section-art" aria-hidden="true">
         <img
-          src="/images/wikimedia/keyholding-user-banner-week.jpg?v=20260417v"
+          src="/images/wikimedia/keyholding-user-banner-week.jpg?v=20260417w"
           alt=""
           width={1600}
           height={500}
