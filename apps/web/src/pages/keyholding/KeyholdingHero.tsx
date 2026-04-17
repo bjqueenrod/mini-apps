@@ -21,7 +21,7 @@ export function KeyholdingHero({ onApply }: KeyholdingHeroProps) {
       />
       <div className="kh-hero__panel">
         <p className="kh-section__eyebrow">Remote chastity keyholding</p>
-        <h1 className="kh-hero__title">Your cage stays on. Your keys don’t stay with you.</h1>
+        <h1 className="kh-hero__title">Your cock stays locked. I control the keys.</h1>
         <p className="kh-hero__sub">
           A structured, remote keyholding relationship: you remain locked, you report in on my terms, and release is earned,
           never assumed. Tiers set how intense contact and accountability become; entry is by application only.
