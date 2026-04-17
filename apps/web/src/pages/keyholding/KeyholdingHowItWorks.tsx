@@ -17,7 +17,7 @@ const STEPS = [
   },
   {
     title: 'Lock the cock',
-    body: 'Your cage goes on and the container starts: check-ins, proof, and my rules from that point—not before.',
+    body: 'Your cage goes on. That’s when check-ins, proof, and my rules actually start, not during apply, screening, contract, or payment.',
   },
 ] as const;
 
