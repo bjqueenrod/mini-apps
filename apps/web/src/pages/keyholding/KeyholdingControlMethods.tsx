@@ -40,7 +40,7 @@ export function KeyholdingControlMethods({ options, loading }: KeyholdingControl
         How your keys are controlled
       </h2>
       <p className="kh-section__lead">
-        Remote keyholding needs a real lock story — Chaster, a lockbox, numbered tags, or another verifiable method.
+        Remote keyholding needs a real lock story: Chaster, a lockbox, numbered tags, or another verifiable method.
         What’s available can vary; the list below reflects what’s configured for applications right now.
       </p>
       <div className="kh-options-grid">

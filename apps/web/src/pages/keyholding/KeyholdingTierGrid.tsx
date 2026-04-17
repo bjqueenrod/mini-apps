@@ -32,7 +32,7 @@ export function KeyholdingTierGrid({
           fallbackAmountPenceCandidates: [tier.pricePence, tier.paymentProductPricePence],
           fallbackAmountCandidates: [tier.priceValue, tier.price],
           fallbackLabelCandidates: [tier.priceLabel],
-          defaultLabel: '—',
+          defaultLabel: '-',
         });
         const metaBits = (tier.includes || []).slice(0, 3).join(' · ');
         return {
@@ -49,9 +49,9 @@ export function KeyholdingTierGrid({
     <section className="tasks-section kh-tier-section" id="tiers">
       <div className="kh-tiers-head">
         <p className="kh-section__eyebrow">Tiers & pricing</p>
-        <h2 className="kh-section__title">Choose intensity — then apply in that lane</h2>
+        <h2 className="kh-section__title">Choose intensity, then apply in that lane</h2>
         <p className="kh-section__lead">
-          Swipe cards for the full breakdown. Use the snapshot table to compare price and duration fast — progression
+          Swipe cards for the full breakdown. Use the snapshot table to compare price and duration fast. Progression
           should read clearly from lighter accountability to heavier contact.
         </p>
       </div>
@@ -82,8 +82,8 @@ export function KeyholdingTierGrid({
                       <span className="kh-tier-compare__badge">{tier.badge}</span>
                     ) : null}
                   </td>
-                  <td>{tier.idealFor || metaBits || tier.desc || '—'}</td>
-                  <td>{tier.duration || '—'}</td>
+                  <td>{tier.idealFor || metaBits || tier.desc || '-'}</td>
+                  <td>{tier.duration || '-'}</td>
                   <td>{priceLabel}</td>
                 </tr>
               ))}

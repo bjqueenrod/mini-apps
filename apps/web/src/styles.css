@@ -1368,7 +1368,7 @@ button {
   gap: 3px;
   text-align: center;
   border-color: rgba(255, 255, 255, 0.22);
-  /* Mid → deep violet only — avoids pale stops that wash out white labels */
+  /* Mid → deep violet only: avoids pale stops that wash out white labels */
   background: linear-gradient(135deg, #9f6ff0 0%, #7c3aed 46%, #5b21b6 100%);
   box-shadow: 0 18px 32px rgba(91, 33, 182, 0.42);
   color: #ffffff;

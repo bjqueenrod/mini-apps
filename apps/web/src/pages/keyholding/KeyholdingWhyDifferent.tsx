@@ -2,17 +2,17 @@ const POINTS = [
   {
     icon: '◎',
     title: 'Expected reporting',
-    body: 'Check-ins aren’t “when you feel like it.” They’re part of the control — missed windows mean something.',
+    body: 'Check-ins aren’t “when you feel like it.” They’re part of the control. Missed windows mean something.',
   },
   {
     icon: '◇',
     title: 'Tasks with purpose',
-    body: 'Obedience tasks aren’t filler — they keep you occupied, honest, and reminded who owns the timeline.',
+    body: 'Obedience tasks aren’t filler. They keep you occupied, honest, and reminded who owns the timeline.',
   },
   {
     icon: '✦',
     title: 'Accountability you can feel',
-    body: 'Proof, consistency, and tone of messaging are all part of the structure — not optional flavor text.',
+    body: 'Proof, consistency, and tone of messaging are all part of the structure, not optional flavor text.',
   },
   {
     icon: '⬡',
@@ -30,7 +30,7 @@ export function KeyholdingWhyDifferent() {
       </h2>
       <p className="kh-section__lead">
         Plenty of people want attention. This is for people who want a{' '}
-        <em>live keyholding dynamic</em> with reporting, structure, and outcomes — even at a distance.
+        <em>live keyholding dynamic</em> with reporting, structure, and outcomes, even at a distance.
       </p>
       <div className="kh-manifesto">
         {POINTS.map((p) => (

@@ -17,14 +17,14 @@ export function KeyholdingHero({ onApply }: KeyholdingHeroProps) {
       <img
         className="kh-hero__banner"
         src="/header-keyholding.jpeg?v=20260409a"
-        alt="Mistress BJQueen — remote chastity keyholding"
+        alt="Mistress BJQueen, remote chastity keyholding"
       />
       <div className="kh-hero__panel">
         <p className="kh-section__eyebrow">Remote chastity keyholding</p>
         <h1 className="kh-hero__title">Your cage stays on. Your keys don’t stay with you.</h1>
         <p className="kh-hero__sub">
-          A structured, remote keyholding relationship: you remain locked, you report in on my terms, and release is earned
-          — never assumed. Tiers set how intense contact and accountability become; entry is by application only.
+          A structured, remote keyholding relationship: you remain locked, you report in on my terms, and release is earned,
+          never assumed. Tiers set how intense contact and accountability become; entry is by application only.
         </p>
         <ul className="kh-value-row" aria-label="What this service is">
           {VALUE_PILLS.map((label) => (

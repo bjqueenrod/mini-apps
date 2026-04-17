@@ -1,22 +1,22 @@
 const OPTIONS = [
   {
     label: 'Curious / first lock',
-    hint: 'Jumps to the entry tier — lighter accountability.',
+    hint: 'Jumps to the entry tier (lighter accountability).',
     tierIndex: 0,
   },
   {
     label: 'I want daily structure',
-    hint: 'Jumps to the mid tier — tighter check-ins and pacing.',
+    hint: 'Jumps to the mid tier (tighter check-ins and pacing).',
     tierIndex: 1,
   },
   {
     label: 'Full enforcement',
-    hint: 'Jumps to the heavier tier — more tasks, stricter proof.',
+    hint: 'Jumps to the heavier tier (more tasks, stricter proof).',
     tierIndex: 2,
   },
   {
     label: 'Maximum control',
-    hint: 'Jumps to the most intense tier — shortest leash.',
+    hint: 'Jumps to the most intense tier (shortest leash).',
     tierIndex: 3,
   },
 ] as const;
@@ -35,7 +35,7 @@ export function KeyholdingTierFinder({ tierCount, onJumpToTier }: KeyholdingTier
         Where should you start?
       </h2>
       <p className="kh-section__lead">
-        Tap a lane — we scroll straight to that tier card below. Compare names, duration, and price; progression should
+        Tap a lane. We scroll straight to that tier card below. Compare names, duration, and price; progression should
         read from lighter to heavier contact. You still pick the exact tier in application.
       </p>
       <div className="kh-finder">
@@ -43,7 +43,7 @@ export function KeyholdingTierFinder({ tierCount, onJumpToTier }: KeyholdingTier
           {OPTIONS.map((o) => {
             const title =
               tierCount === 0
-                ? `${o.hint} (tiers loading — opens tier section)`
+                ? `${o.hint} (tiers loading; opens tier section)`
                 : `${o.hint} Opens tier ${Math.min(o.tierIndex, Math.max(0, tierCount - 1)) + 1} of ${tierCount}.`;
             return (
               <button
