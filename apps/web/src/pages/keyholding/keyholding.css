@@ -677,9 +677,16 @@
 .kh-tier-compare {
   margin-top: 16px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   border-radius: 18px;
   border: 1px solid rgba(176, 106, 214, 0.14);
   background: rgba(14, 11, 20, 0.45);
+}
+
+.kh-tier-compare::-webkit-scrollbar {
+  display: none;
 }
 
 .kh-tier-compare table {
