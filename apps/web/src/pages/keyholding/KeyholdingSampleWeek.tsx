@@ -20,10 +20,10 @@ export function KeyholdingSampleWeek() {
       </p>
       <figure className="kh-section-art" aria-hidden="true">
         <img
-          src="/images/unsplash/dark-purple.jpg?v=20260417"
+          src="/images/unsplash/padlock-chain-gate.jpg?v=20260417m"
           alt=""
-          width={1200}
-          height={800}
+          width={1600}
+          height={500}
           loading="lazy"
           decoding="async"
         />

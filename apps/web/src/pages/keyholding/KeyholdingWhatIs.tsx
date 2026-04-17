@@ -12,10 +12,10 @@ export function KeyholdingWhatIs() {
       </p>
       <figure className="kh-section-art" aria-hidden="true">
         <img
-          src="/images/unsplash/purple-abstract.jpg?v=20260417"
+          src="/images/unsplash/padlock-combination-lock.jpg?v=20260417m"
           alt=""
           width={1600}
-          height={450}
+          height={480}
           loading="lazy"
           decoding="async"
         />
