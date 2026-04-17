@@ -39,10 +39,6 @@ export function KeyholdingTierFinder({ tierCount, onJumpToTier }: KeyholdingTier
         read from lighter to heavier contact. You still pick the exact tier in application.
       </p>
       <div className="kh-finder">
-        <p className="kh-finder__label">
-          Each option opens the matching position in the tier strip (if you have fewer than four tiers, we take you to
-          the closest one).
-        </p>
         <div className="kh-finder__chips" role="group" aria-label="Jump to tier">
           {OPTIONS.map((o) => {
             const title =
