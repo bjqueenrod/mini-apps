@@ -33,14 +33,14 @@ export function KeyholdingHero({ onApply }: KeyholdingHeroProps) {
         </ul>
         <div className="kh-hero__actions">
           <div className="kh-hero__row">
-            <a className="tasks-button tasks-button--primary" href="#tiers">
+            <a className="tasks-button tasks-button--primary kh-hero__btn kh-hero__btn--view" href="#tiers">
               View tiers
             </a>
-            <a className="tasks-button tasks-button--secondary" href="#how-it-works">
+            <a className="tasks-button tasks-button--secondary kh-hero__btn kh-hero__btn--how" href="#how-it-works">
               How it works
             </a>
           </div>
-          <button className="kh-hero__apply" type="button" onClick={onApply}>
+          <button className="kh-hero__apply kh-hero__btn kh-hero__btn--apply" type="button" onClick={onApply}>
             Apply now
           </button>
         </div>
