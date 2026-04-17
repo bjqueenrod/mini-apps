@@ -65,7 +65,12 @@ export function KeyholdingControlMethods({ options, loading }: KeyholdingControl
       <div className="kh-options-grid">
         {sorted.map((option) => (
           <div key={option.id} className="kh-option">
-            <strong>{option.label}</strong>
+            <strong>
+              {option.label}
+              {option.label.trim().toLowerCase() === 'chaster + lockbox' ? (
+                <span className="kh-option__badge">Preferred</span>
+              ) : null}
+            </strong>
             <p>{option.tooltip || 'Verification and rules apply once you’re accepted into a tier.'}</p>
           </div>
         ))}

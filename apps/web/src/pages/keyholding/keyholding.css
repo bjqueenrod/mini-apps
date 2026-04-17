@@ -479,9 +479,27 @@
 .kh-option strong {
   position: relative;
   z-index: 1;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
   font-size: 1rem;
   margin-bottom: 6px;
+}
+
+.kh-option__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(193, 128, 229, 0.45);
+  background: rgba(122, 66, 169, 0.24);
+  color: #f3e6ff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1;
 }
 
 .kh-option p {
