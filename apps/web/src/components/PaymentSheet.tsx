@@ -853,7 +853,7 @@ export function PaymentSheet({
               {(cryptoReturnInvoiceId || '').trim()
                 ? 'Thanks, confirming your payment…'
                 : isTelegramWebView()
-                  ? 'Checkout opened outside Telegram (browser or new window). Leave this mini-app open; we’ll update here when payment lands.'
+                  ? 'Checkout opened outside Telegram. Keep this open for payment updates.'
                   : 'Checkout opened in your browser. Complete payment and we’ll update here.'}
             </p>
             <div className="payment-sheet__actions payment-sheet__actions--inline">
