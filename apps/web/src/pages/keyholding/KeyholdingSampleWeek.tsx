@@ -20,7 +20,7 @@ export function KeyholdingSampleWeek() {
       </p>
       <figure className="kh-section-art" aria-hidden="true">
         <img
-          src="/images/unsplash/padlock-chain-gate.jpg?v=20260417m"
+          src="/images/wikimedia/chastity-cage-banner-week.jpg?v=20260417r"
           alt=""
           width={1600}
           height={500}

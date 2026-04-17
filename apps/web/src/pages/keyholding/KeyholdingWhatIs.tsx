@@ -12,7 +12,7 @@ export function KeyholdingWhatIs() {
       </p>
       <figure className="kh-section-art" aria-hidden="true">
         <img
-          src="/images/unsplash/padlock-combination-lock.jpg?v=20260417m"
+          src="/images/wikimedia/chastity-cage-banner-whatis.jpg?v=20260417r"
           alt=""
           width={1600}
           height={480}
