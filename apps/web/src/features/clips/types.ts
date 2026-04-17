@@ -32,6 +32,7 @@ export type ClipItem = {
   botDownloadUrl: string;
   watchProductId?: number;
   downloadProductId?: number;
+  featured?: boolean;
 };
 
 export type ClipListResponse = {

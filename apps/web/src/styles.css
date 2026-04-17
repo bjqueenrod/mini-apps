@@ -2044,6 +2044,40 @@ button {
   height: 100%;
 }
 
+.clip-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid rgba(176, 106, 214, 0.35);
+  color: #ead8f7;
+  background: rgba(24, 19, 30, 0.82);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.clip-badge--inline {
+  position: static;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px;
+  font-size: 0.62rem;
+  pointer-events: none;
+}
+
+.detail-sheet__body h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
 .clip-card__media,
 .skeleton-card {
   height: clamp(190px, 24vw, 250px);

@@ -83,6 +83,15 @@ def test_new_clips_returns_highest_clip_ids_first(client) -> None:
     assert payload["hasMore"] is False
 
 
+def test_featured_clips_lists_active_featured_only(client) -> None:
+    response = client.get("/api/clips/featured")
+    assert response.status_code == 200
+    payload = response.json()
+    assert [item["id"] for item in payload["items"]] == ["BJQ0001"]
+    assert payload["items"][0]["featured"] is True
+    assert payload["hasMore"] is False
+
+
 def test_health(client) -> None:
     response = client.get("/api/health")
     assert response.status_code == 200
@@ -124,6 +133,7 @@ def test_custom_thumbnail_url_overrides_bunny_thumbnail(client) -> None:
     item = response.json()
     assert item["thumbnailUrl"] == "https://images.example/custom-1.jpg"
     assert item["previewWebpUrl"] == "https://cdn.example/preview-1/preview.webp"
+    assert item["featured"] is True
 
 
 def test_search_and_category_filter(client) -> None:

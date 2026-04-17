@@ -43,6 +43,7 @@ class ClipItemResponse(BaseModel):
     bot_download_url: str = Field(alias="botDownloadUrl")
     watch_product_id: int | None = Field(default=None, alias="watchProductId")
     download_product_id: int | None = Field(default=None, alias="downloadProductId")
+    featured: bool = False
 
     model_config = ConfigDict(populate_by_name=True)
 

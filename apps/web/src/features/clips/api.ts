@@ -58,6 +58,13 @@ export async function fetchNewClips(currency?: string): Promise<ClipListResponse
   return response.json();
 }
 
+export async function fetchFeaturedClips(currency?: string): Promise<ClipListResponse> {
+  const query = currency ? `?currency=${encodeURIComponent(currency)}` : '';
+  const response = await fetch(`${API_BASE}/clips/featured${query}`, { credentials: 'include' });
+  if (!response.ok) throw new Error('Unable to load featured clips.');
+  return response.json();
+}
+
 export async function fetchClipHashtags(): Promise<ClipHashtagListResponse> {
   const response = await fetch(`${API_BASE}/clips/hashtags`, { credentials: 'include' });
   if (!response.ok) throw new Error('Unable to load clip hashtags.');

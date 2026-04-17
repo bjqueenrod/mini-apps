@@ -21,7 +21,7 @@ export function TopSellersCarousel({
   items: ClipItem[];
   title?: string;
   loading?: boolean;
-  listType?: 'new_clips' | 'top_sellers';
+  listType?: 'new_clips' | 'top_sellers' | 'featured_clips';
   currency?: CurrencyCode;
 }) {
   const location = useLocation();
@@ -91,6 +91,11 @@ export function TopSellersCarousel({
                   }
                 >
                   <div className="top-sellers__media">
+                    {clip.featured ? (
+                      <span className="clip-badge clip-badge--featured" aria-label="Featured clip">
+                        Featured
+                      </span>
+                    ) : null}
                     {mediaUrl ? (
                       <img src={mediaUrl} alt={clip.title} loading="lazy" />
                     ) : (

@@ -153,7 +153,14 @@ export function ClipDetailSheet({
                 <span>{clip.category || 'Library'}</span>
                   <span>{formatDuration(clip.durationLabel, clip.durationSeconds)}</span>
                 </div>
-              <h2>{clip.title}</h2>
+              <h2>
+                {clip.title}
+                {clip.featured ? (
+                  <span className="clip-badge clip-badge--featured clip-badge--inline" aria-label="Featured clip">
+                    Featured
+                  </span>
+                ) : null}
+              </h2>
               <p>{clip.description || clip.shortDescription}</p>
               <div className="detail-sheet__tags">
                 {clip.tags.map((tag) => (

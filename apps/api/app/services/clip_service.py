@@ -47,6 +47,17 @@ def _text(value: Any) -> str | None:
     return text or None
 
 
+def _truthy_clip_flag(value: Any) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, bool):
+        return value
+    try:
+        return int(value) != 0
+    except (TypeError, ValueError):
+        return False
+
+
 def _first_value(data: dict[str, Any], *names: str) -> Any:
     for name in names:
         value = data.get(name)
@@ -325,6 +336,7 @@ def _row_to_item(
         "botDownloadUrl": build_clip_download_url(clip_id),
         "watchProductId": settings.clips_watch_product_id,
         "downloadProductId": settings.clips_download_product_id,
+        "featured": _truthy_clip_flag(data.get("featured")),
     }
 
 
@@ -498,6 +510,50 @@ def get_new_clips(db: Session, *, limit: int = 10) -> dict[str, Any]:
         }
 
     stmt = select(table)
+    active_col = mapping.get("active")
+    if active_col is not None:
+        stmt = stmt.where(active_col == 1)
+    stmt = stmt.order_by(clip_id_col.desc()).limit(max(1, min(limit, 20)))
+
+    rows = db.execute(stmt).all()
+    fx_snapshot = _fx_snapshot()
+    clip_ids = {str(row._mapping.get("clip_id") or row._mapping.get("id") or "").upper() for row in rows}
+    clip_pricing_by_id = _clip_pricing_map({clip_id for clip_id in clip_ids if clip_id})
+    items = [
+        _row_to_item(
+            row,
+            include_embed_url=False,
+            fx_snapshot=fx_snapshot,
+            clip_pricing=clip_pricing_by_id.get(str(row._mapping.get("clip_id") or row._mapping.get("id") or "").upper()),
+        )
+        for row in rows
+    ]
+    return {
+        "items": items,
+        "page": 1,
+        "limit": len(items) or limit,
+        "total": len(items),
+        "hasMore": False,
+        "categories": [],
+    }
+
+
+def get_featured_clips(db: Session, *, limit: int = 10) -> dict[str, Any]:
+    mapping = get_clip_mapping(engine)
+    table = mapping.table
+    clip_id_col = mapping.get("clip_id")
+    featured_col = mapping.get("featured")
+    if clip_id_col is None or featured_col is None:
+        return {
+            "items": [],
+            "page": 1,
+            "limit": limit,
+            "total": 0,
+            "hasMore": False,
+            "categories": [],
+        }
+
+    stmt = select(table).where(featured_col == 1)
     active_col = mapping.get("active")
     if active_col is not None:
         stmt = stmt.where(active_col == 1)

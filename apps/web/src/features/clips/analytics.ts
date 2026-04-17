@@ -3,7 +3,7 @@ import { ClipItem } from './types';
 
 const TRACKED_START_PARAM_PATTERN = /^l_[0-9a-z]+(?:__[A-Za-z0-9_-]{1,64})?$/;
 
-type ClipListType = 'search_results' | 'new_clips' | 'top_sellers';
+type ClipListType = 'search_results' | 'new_clips' | 'top_sellers' | 'featured_clips';
 
 function entryScreen(entryPath: string) {
   const pathname = entryPath.split('?')[0] || '/clips';

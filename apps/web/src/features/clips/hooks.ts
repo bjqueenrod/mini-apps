@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { CurrencyCode } from '../../utils/format';
-import { fetchClip, fetchClipHashtags, fetchClips, fetchNewClips, fetchTopSellers } from './api';
+import { fetchClip, fetchClipHashtags, fetchClips, fetchFeaturedClips, fetchNewClips, fetchTopSellers } from './api';
 import { ClipQueryState } from './types';
 
 /** Filters for catalog search (page is supplied by infinite query). */
@@ -54,6 +54,13 @@ export function useNewClips(currency: CurrencyCode = 'GBP') {
   return useQuery({
     queryKey: ['clips', 'new', currency],
     queryFn: () => fetchNewClips(currency),
+  });
+}
+
+export function useFeaturedClips(currency: CurrencyCode = 'GBP') {
+  return useQuery({
+    queryKey: ['clips', 'featured', currency],
+    queryFn: () => fetchFeaturedClips(currency),
   });
 }
 

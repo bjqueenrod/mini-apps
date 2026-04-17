@@ -18,7 +18,14 @@ import {
   trackClipTagSelect,
   trackMiniAppOpenAttributed,
 } from '../features/clips/analytics';
-import { useClipDetail, useClipHashtags, useClipSearchInfinite, useNewClips, useTopSellers } from '../features/clips/hooks';
+import {
+  useClipDetail,
+  useClipHashtags,
+  useClipSearchInfinite,
+  useFeaturedClips,
+  useNewClips,
+  useTopSellers,
+} from '../features/clips/hooks';
 import { readQueryState, toSearchParams } from '../features/clips/queryState';
 import { ClipItem } from '../features/clips/types';
 import { pushRecentSearch } from '../utils/storage';
@@ -166,6 +173,7 @@ export function BrowsePage() {
     [clipSearchFilters],
   );
   const clipHashtagsQuery = useClipHashtags();
+  const featuredClipsQuery = useFeaturedClips(currency);
   const newClipsQuery = useNewClips(currency);
   const topSellersQuery = useTopSellers(currency);
   const clipDetailQuery = useClipDetail(clipId, currency);
@@ -384,6 +392,22 @@ export function BrowsePage() {
   }, [searchValue, setSearchParams, urlQueryState]);
 
   useEffect(() => {
+    if (featuredClipsQuery.isFetching || !featuredClipsQuery.data?.items.length) {
+      return;
+    }
+
+    const key = `featured_clips:${featuredClipsQuery.data.items.length}`;
+    if (trackedListViewKeysRef.current.has(key)) {
+      return;
+    }
+    trackedListViewKeysRef.current.add(key);
+    trackClipListView({
+      listType: 'featured_clips',
+      itemCount: featuredClipsQuery.data.items.length,
+    });
+  }, [featuredClipsQuery.data, featuredClipsQuery.isFetching]);
+
+  useEffect(() => {
     if (newClipsQuery.isFetching || !newClipsQuery.data?.items.length) {
       return;
     }
@@ -564,6 +588,15 @@ export function BrowsePage() {
         />
       </section>
 
+      {(featuredClipsQuery.isLoading || featuredClipsQuery.data?.items?.length) ? (
+        <TopSellersCarousel
+          items={featuredClipsQuery.data?.items ?? []}
+          title="⭐ Featured Clips"
+          loading={featuredClipsQuery.isLoading}
+          listType="featured_clips"
+          currency={currency}
+        />
+      ) : null}
       {(newClipsQuery.isLoading || newClipsQuery.data?.items?.length) ? (
         <TopSellersCarousel
           items={newClipsQuery.data?.items ?? []}

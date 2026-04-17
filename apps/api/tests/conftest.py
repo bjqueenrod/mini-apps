@@ -43,6 +43,7 @@ def setup_database() -> None:
                 bunny_download_storage_path TEXT,
                 bunny_stream_preview_id TEXT,
                 active INTEGER DEFAULT 1,
+                featured INTEGER NOT NULL DEFAULT 0,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                 updated_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
@@ -79,17 +80,17 @@ def setup_database() -> None:
             INSERT INTO clips (
                 clip_id, title, description, price_pence, download_price_pence, watch_price_pence,
                 keywords, hashtags, duration, filename, thumbnail_url, category, file_id,
-                bunny_stream_video_id, bunny_download_storage_path, bunny_stream_preview_id, active
+                bunny_stream_video_id, bunny_download_storage_path, bunny_stream_preview_id, active, featured
             ) VALUES
             ('BJQ0001', 'Locked Cage Tease Control', 'Tease, denial and frustration.', 1299, 1299, 999,
              'chastity,tease,denial', '#chastity #tease #denial', '13:32', 'clip1.mp4', 'https://images.example/custom-1.jpg', 'chastity', 'tg-file-1',
-             'paid-stream-1', 'downloads/clip1.mp4', 'preview-1', 1),
+             'paid-stream-1', 'downloads/clip1.mp4', 'preview-1', 1, 1),
             ('BJQ0002', 'Strict JOI Countdown', 'Countdown game clip.', 999, 999, 799,
              'joi,countdown', '#joi #countdown', '812', 'clip2.mp4', NULL, 'joi', 'tg-file-2',
-             'paid-stream-2', 'downloads/clip2.mp4', NULL, 1),
+             'paid-stream-2', 'downloads/clip2.mp4', NULL, 1, 0),
             ('BJQ0003', 'Inactive Clip', 'Should not show.', 999, 999, 799,
              'inactive', '#inactive', '5:00', 'clip3.mp4', NULL, 'misc', 'tg-file-3',
-             'paid-stream-3', 'downloads/clip3.mp4', NULL, 0)
+             'paid-stream-3', 'downloads/clip3.mp4', NULL, 0, 1)
             """
         )
         conn.exec_driver_sql(
@@ -111,6 +112,9 @@ def setup_database() -> None:
              30, NULL, 1, 99.00, NULL, NULL, NULL, NULL, NULL, NULL, 0)
             """
         )
+    from app.db.clip_mapping import get_clip_mapping
+
+    get_clip_mapping.cache_clear()
     yield
 
 

@@ -21,7 +21,7 @@ export function ClipCard({
 }: {
   clip: ClipItem;
   position: number;
-  sourceList: 'search_results' | 'new_clips' | 'top_sellers';
+  sourceList: 'search_results' | 'new_clips' | 'top_sellers' | 'featured_clips';
   currency?: CurrencyCode;
 }) {
   const location = useLocation();
@@ -56,6 +56,11 @@ export function ClipCard({
       }
     >
       <div className="clip-card__media" style={!mediaUrl ? { backgroundImage: safeBackground() } : undefined}>
+        {clip.featured ? (
+          <span className="clip-badge clip-badge--featured" aria-label="Featured clip">
+            Featured
+          </span>
+        ) : null}
         {mediaUrl ? (
           <img
             src={mediaUrl}
