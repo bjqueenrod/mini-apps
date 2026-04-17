@@ -8,6 +8,10 @@ COPY apps/web ./apps/web
 # GA4 measurement ID is public (client-side); override at build time if needed.
 ARG VITE_GA_MEASUREMENT_ID=G-1KNSC32BX5
 ENV VITE_GA_MEASUREMENT_ID=$VITE_GA_MEASUREMENT_ID
+# Vite inlines VITE_* at `vite build` — runtime container env does not change the bundle.
+# Pass this at image build time (same as VITE_GA_MEASUREMENT_ID).
+ARG VITE_CLIP_LIBRARY_CHANNEL_URL=
+ENV VITE_CLIP_LIBRARY_CHANNEL_URL=$VITE_CLIP_LIBRARY_CHANNEL_URL
 RUN pnpm --dir apps/web build
 
 FROM python:3.12-slim AS runtime
