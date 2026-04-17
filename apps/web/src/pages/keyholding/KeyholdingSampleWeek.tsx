@@ -10,9 +10,9 @@ const ROWS = [
 export function KeyholdingSampleWeek() {
   return (
     <section className="kh-section" aria-labelledby="kh-week-heading">
-      <p className="kh-section__eyebrow">Sample rhythm</p>
+      <p className="kh-section__eyebrow">Typical subs week</p>
       <h2 className="kh-section__title" id="kh-week-heading">
-        A week inside the container
+        An example week in the life of one of my locked chastity subs
       </h2>
       <p className="kh-section__lead">
         Exact timing and intensity depend on your tier. This is the <em>shape</em> of the dynamic, not a literal
