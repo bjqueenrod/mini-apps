@@ -182,6 +182,24 @@
 }
 
 /* Plain list sections: less “card sameness” */
+/* Decorative section imagery (open-licensed stock, see /images/unsplash/README.txt) */
+.kh-section-art {
+  margin: 0 0 18px;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(176, 106, 214, 0.14);
+  box-shadow: 0 10px 28px rgba(8, 4, 14, 0.38);
+}
+
+.kh-section-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(200px, 34vh);
+  object-fit: cover;
+  object-position: center;
+}
+
 .kh-plain {
   padding: var(--kh-section-pad);
   border-radius: 26px;

@@ -18,6 +18,16 @@ export function KeyholdingSampleWeek() {
         Exact timing and intensity depend on your tier. This is the <em>shape</em> of the dynamic, not a literal
         minute-by-minute script.
       </p>
+      <figure className="kh-section-art" aria-hidden="true">
+        <img
+          src="/images/unsplash/dark-purple.jpg?v=20260417"
+          alt=""
+          width={1200}
+          height={800}
+          loading="lazy"
+          decoding="async"
+        />
+      </figure>
       <div className="kh-week">
         {ROWS.map((row) => (
           <div key={row.day} className="kh-week__row">

@@ -10,6 +10,16 @@ export function KeyholdingWhatIs() {
         release is even on the table. Obedience tasks can be part of the rhythm. Everything runs through a deliberate tier
         so expectations match your appetite for control.
       </p>
+      <figure className="kh-section-art" aria-hidden="true">
+        <img
+          src="/images/unsplash/purple-abstract.jpg?v=20260417"
+          alt=""
+          width={1600}
+          height={450}
+          loading="lazy"
+          decoding="async"
+        />
+      </figure>
       <div className="kh-plain">
         <ul className="kh-bullet-list">
           <li>You stay locked for the agreed structure. Unlocking on your whim is not how this works.</li>
