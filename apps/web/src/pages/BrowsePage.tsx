@@ -32,6 +32,7 @@ import { pushRecentSearch } from '../utils/storage';
 import { composeSearchText, extractHashtagTokens, FEATURED_TAGS, normalizeTag, setHashtagToken, stripHashtagTokens } from '../utils/tags';
 import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
 import { resolveClipIdHint, stripStartRoutingParams } from '../utils/startRouting';
+import clipStoreHero from '../assets/header-clipstore.jpeg';
 
 const CLIPS_FAQ = [
   {
@@ -581,34 +582,33 @@ export function BrowsePage() {
         onBackClick={() => navigate('/', { replace: true, state: { bypassHomeRedirect: true } })}
       />
       <section className="hero">
-        <img
-          className="hero__banner"
-          src="/header-clipstore.jpeg?v=20260417q"
-          alt="Mistress BJQueen Clip Store banner"
-        />
+        <img className="hero__banner" src={clipStoreHero} alt="Mistress BJQueen Clip Store banner" />
       </section>
 
-      {featuredClipsQuery.data?.items?.length ? (
+      {featuredClipsQuery.isLoading || featuredClipsQuery.data?.items?.length ? (
         <TopSellersCarousel
-          items={featuredClipsQuery.data.items}
+          items={featuredClipsQuery.data?.items ?? []}
           title="⭐ Featured Clips"
           listType="featured_clips"
           currency={currency}
+          loading={featuredClipsQuery.isLoading}
         />
       ) : null}
-      {newClipsQuery.data?.items?.length ? (
+      {newClipsQuery.isLoading || newClipsQuery.data?.items?.length ? (
         <TopSellersCarousel
-          items={newClipsQuery.data.items}
+          items={newClipsQuery.data?.items ?? []}
           title="🆕 New Clips"
           listType="new_clips"
           currency={currency}
+          loading={newClipsQuery.isLoading}
         />
       ) : null}
-      {topSellersQuery.data?.items?.length ? (
+      {topSellersQuery.isLoading || topSellersQuery.data?.items?.length ? (
         <TopSellersCarousel
-          items={topSellersQuery.data.items}
+          items={topSellersQuery.data?.items ?? []}
           listType="top_sellers"
           currency={currency}
+          loading={topSellersQuery.isLoading}
         />
       ) : null}
 

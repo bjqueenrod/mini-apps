@@ -14,20 +14,22 @@ function toStaticThumbnail(url?: string) {
 export function TopSellersCarousel({
   items,
   title = '⭐ Top Sellers',
+  loading = false,
   listType = 'top_sellers',
   currency = 'GBP',
 }: {
   items: ClipItem[];
   title?: string;
+  loading?: boolean;
   listType?: 'new_clips' | 'top_sellers' | 'featured_clips';
   currency?: CurrencyCode;
 }) {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const pageCount = items.length;
+  const pageCount = loading ? 3 : items.length;
   const { currentPage, scrollToPage, trackRef } = usePagedCarousel(pageCount);
 
-  if (!items.length) {
+  if (!items.length && !loading) {
     return null;
   }
 
@@ -37,7 +39,25 @@ export function TopSellersCarousel({
         <p className="hero__eyebrow">{title}</p>
       </div>
       <div ref={trackRef} className="top-sellers__track">
-        {items.map((clip, index) => {
+        {loading
+          ? Array.from({ length: 3 }, (_, index) => (
+              <div key={index} className="top-sellers__card top-sellers__card--skeleton" aria-hidden="true">
+                <div className="top-sellers__media top-sellers__media--skeleton" />
+                <div className="top-sellers__body">
+                  <div className="top-sellers__eyebrow">
+                    <span className="top-sellers__line top-sellers__line--small" />
+                  </div>
+                  <span className="top-sellers__line top-sellers__line--title" />
+                  <span className="top-sellers__line top-sellers__line--title top-sellers__line--short" />
+                  <span className="top-sellers__line top-sellers__line--body" />
+                  <span className="top-sellers__line top-sellers__line--body top-sellers__line--short" />
+                  <div className="top-sellers__prices">
+                    <span className="top-sellers__line top-sellers__line--price" />
+                  </div>
+                </div>
+              </div>
+            ))
+          : items.map((clip, index) => {
           const mediaUrl = toStaticThumbnail(clip.thumbnailUrl);
           const streamPriceLabel = resolvePriceLabel({
             currency,
@@ -97,7 +117,7 @@ export function TopSellersCarousel({
               </div>
             </Link>
           );
-        })}
+            })}
       </div>
       {pageCount > 1 ? (
         <div className="top-sellers__pagination" aria-label={`${title} pages`}>
