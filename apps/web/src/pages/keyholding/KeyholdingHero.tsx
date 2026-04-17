@@ -4,6 +4,7 @@ const VALUE_PILLS = [
   'Obedience tasks',
   'Denial & release by me',
   'Application only',
+  'Tiered intensity',
 ] as const;
 
 type KeyholdingHeroProps = {
