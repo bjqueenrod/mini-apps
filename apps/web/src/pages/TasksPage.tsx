@@ -540,7 +540,7 @@ export function TasksPage() {
       <section className="tasks-panel">
         <div className="tasks-panel__header">
           <p className="hero__eyebrow">Who this is for</p>
-          <h2>Who this is for</h2>
+          <h2>Is this you?</h2>
         </div>
         <div className="tasks-reassurance">
           <p className="tasks-panel__body-copy">
