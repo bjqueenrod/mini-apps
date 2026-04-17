@@ -9,7 +9,7 @@ import { useTelegramSession } from '../features/auth/hooks';
 import { useKeyholdingOptions, useKeyholdingTiers } from '../features/keyholding/hooks';
 import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
 import { buildKeyholdingApplyUrl } from '../utils/ga4Attribution';
-import './keyholding/keyholding.css?v=20260417i';
+import './keyholding/keyholding.css?v=20260417j';
 import { KeyholdingHero } from './keyholding/KeyholdingHero';
 import { KeyholdingWhatIs } from './keyholding/KeyholdingWhatIs';
 import { KeyholdingWhyDifferent } from './keyholding/KeyholdingWhyDifferent';
