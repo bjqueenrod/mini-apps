@@ -25,9 +25,9 @@ export function KeyholdingTierGrid({
     <section className="tasks-section kh-tier-section" id="tiers">
       <div className="kh-tiers-head">
         <p className="kh-section__eyebrow">Tiers & pricing</p>
-        <h2 className="kh-section__title">Choose intensity, then apply in that lane</h2>
+        <h2 className="kh-section__title">Choose how hard you want this held—then apply for that tier</h2>
         <p className="kh-section__lead">
-          Swipe cards for the full breakdown. Progression should read clearly from lighter accountability to heavier
+          Swipe each card for price, duration, and what’s included. Tiers step up from lighter accountability to heavier
           contact.
         </p>
       </div>
