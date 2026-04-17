@@ -61,9 +61,14 @@ async function persistTelegramCurrencyPreference(currency: CurrencyCode, telegra
   }
 }
 
-function readCurrency(isTelegramSession: boolean): CurrencyCode {
+function pick(value?: string | null): CurrencyCode | undefined {
+  const upper = value?.trim().toUpperCase();
+  return upper === 'USD' ? 'USD' : upper === 'GBP' ? 'GBP' : undefined;
+}
+
+/** Synchronous sources only — used for first paint so the toggle matches cached / URL preference. */
+function readCurrency(): CurrencyCode {
   if (typeof window === 'undefined') return 'GBP';
-  if (isTelegramSession) return 'GBP';
 
   const params = new URLSearchParams(window.location.search);
   const queryCurrency = params.get('currency') || params.get('curr') || params.get('c');
@@ -71,16 +76,14 @@ function readCurrency(isTelegramSession: boolean): CurrencyCode {
   const startParam = params.get('tgWebAppStartParam') || params.get('startapp') || '';
   const fromStartParam = /currency[:=]?([A-Za-z]{3})/i.exec(startParam)?.[1];
 
-  const pick = (value?: string | null): CurrencyCode | undefined => {
-    const upper = value?.trim().toUpperCase();
-    return upper === 'USD' ? 'USD' : upper === 'GBP' ? 'GBP' : undefined;
-  };
-
   const fromUrl = pick(queryCurrency);
   const fromStart = pick(fromStartParam);
   const stored = pick(window.localStorage.getItem(STORAGE_KEY));
 
-  return fromUrl || fromStart || stored || 'GBP';
+  const cookieMatch = typeof document !== 'undefined' ? document.cookie.match(/(?:^|; )currency=(USD|GBP)(?:;|$)/) : null;
+  const fromCookie = pick(cookieMatch?.[1]);
+
+  return fromUrl || fromStart || stored || fromCookie || 'GBP';
 }
 
 export function useCurrencyPreference(
@@ -88,28 +91,25 @@ export function useCurrencyPreference(
   telegramUserId?: number | null,
   isTelegramSession = false,
 ): [CurrencyCode, (next: CurrencyCode) => void] {
-  const [currency, setCurrency] = useState<CurrencyCode>(() => readCurrency(isTelegramSession));
+  const [currency, setCurrency] = useState<CurrencyCode>(() => readCurrency());
   const hasLocalOverrideRef = useRef(false);
 
-  const applyCurrency = useCallback((next: CurrencyCode, options?: { persist?: boolean; broadcast?: boolean }) => {
-    const persist = options?.persist ?? !isTelegramSession;
+  const applyCurrency = useCallback((next: CurrencyCode, options?: { broadcast?: boolean }) => {
     const broadcast = options?.broadcast ?? true;
-    setCurrency(next);
-    if (persist && typeof window !== 'undefined' && !isTelegramSession) {
-      try {
-        window.localStorage.setItem(STORAGE_KEY, next);
-        document.cookie = `currency=${next}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
-      } catch {
-        // ignore persistence errors
+    setCurrency((prev) => {
+      if (prev === next) return prev;
+      if (broadcast && typeof window !== 'undefined') {
+        const detail = next;
+        queueMicrotask(() => {
+          window.dispatchEvent(new CustomEvent<CurrencyCode>(CURRENCY_PREFERENCE_EVENT, { detail }));
+        });
       }
-    }
-    if (broadcast && typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent<CurrencyCode>(CURRENCY_PREFERENCE_EVENT, { detail: next }));
-    }
+      return next;
+    });
   }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || isTelegramSession) return;
+    if (typeof window === 'undefined') return;
     try {
       window.localStorage.setItem(STORAGE_KEY, currency);
       document.cookie = `currency=${currency}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
@@ -126,9 +126,8 @@ export function useCurrencyPreference(
     const syncPreference = async () => {
       const telegramLookupId = getTelegramCurrencyUserId(telegramUserId);
       const remoteCurrency = await fetchTelegramCurrencyPreference(telegramLookupId);
-      if (!cancelled && !hasLocalOverrideRef.current && remoteCurrency) {
-        applyCurrency(remoteCurrency, { persist: false, broadcast: true });
-      }
+      if (cancelled || hasLocalOverrideRef.current || !remoteCurrency) return;
+      applyCurrency(remoteCurrency, { broadcast: true });
     };
 
     void syncPreference();
@@ -148,19 +147,22 @@ export function useCurrencyPreference(
     return () => window.removeEventListener(CURRENCY_PREFERENCE_EVENT, handleChange as EventListener);
   }, []);
 
-  const setPreference = useCallback((next: CurrencyCode) => {
-    hasLocalOverrideRef.current = true;
-    applyCurrency(next, { persist: !isTelegramSession, broadcast: true });
-    if (isTelegramSession) {
-      void persistTelegramCurrencyPreference(next, getTelegramCurrencyUserId(telegramUserId)).catch(() => {
-        // keep local preference even if the server write fails
-      });
-    }
-  }, [applyCurrency, telegramUserId]);
+  const setPreference = useCallback(
+    (next: CurrencyCode) => {
+      hasLocalOverrideRef.current = true;
+      applyCurrency(next, { broadcast: true });
+      if (isTelegramSession) {
+        void persistTelegramCurrencyPreference(next, getTelegramCurrencyUserId(telegramUserId)).catch(() => {
+          // keep local preference even if the server write fails
+        });
+      }
+    },
+    [applyCurrency, isTelegramSession, telegramUserId],
+  );
 
   return [currency, setPreference];
 }
 
 export function readCurrencyPreference(): CurrencyCode {
-  return readCurrency(false);
+  return readCurrency();
 }
