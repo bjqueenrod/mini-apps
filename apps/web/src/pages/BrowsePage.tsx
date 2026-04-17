@@ -10,14 +10,12 @@ import { ErrorState } from '../components/ErrorState';
 import { CurrencyToggleBanner } from '../components/CurrencyToggleBanner';
 import { TopSellersCarousel } from '../components/TopSellersCarousel';
 import { setAnalyticsContext } from '../app/analytics';
-import { applyTelegramTheme, openTelegramExternalLink } from '../app/telegram';
-import { CLIP_LIBRARY_CHANNEL_URL } from '../config/clips';
+import { applyTelegramTheme } from '../app/telegram';
 import { useTelegramSession } from '../features/auth/hooks';
 import {
   trackClipListView,
   trackClipSearch,
   trackClipTagSelect,
-  trackClipLibraryChannelClick,
   trackMiniAppOpenAttributed,
 } from '../features/clips/analytics';
 import {
@@ -582,54 +580,25 @@ export function BrowsePage() {
         isTelegramSession={session.isTelegram}
         onBackClick={() => navigate('/', { replace: true, state: { bypassHomeRedirect: true } })}
       />
-      <section className="hero">
-        <img
-          className="hero__banner"
-          src="/header-clipstore.jpeg?v=20260409a"
-          alt="Mistress BJQueen Clip Store banner"
-        />
-      </section>
-
-      <section className="clips-channel-cta" aria-label="Clip library channel">
-        <div className="clips-channel-cta__inner">
-          <p className="clips-channel-cta__text">
-            <strong>Stay in the loop.</strong> Join the clip library channel for new drops and updates.
-          </p>
-          <button
-            type="button"
-            className="clips-channel-cta__button"
-            onClick={() => {
-              trackClipLibraryChannelClick();
-              openTelegramExternalLink(CLIP_LIBRARY_CHANNEL_URL);
-            }}
-          >
-            Join channel
-          </button>
-        </div>
-      </section>
-
-      {(featuredClipsQuery.isLoading || featuredClipsQuery.data?.items?.length) ? (
+      {featuredClipsQuery.data?.items?.length ? (
         <TopSellersCarousel
-          items={featuredClipsQuery.data?.items ?? []}
+          items={featuredClipsQuery.data.items}
           title="⭐ Featured Clips"
-          loading={featuredClipsQuery.isLoading}
           listType="featured_clips"
           currency={currency}
         />
       ) : null}
-      {(newClipsQuery.isLoading || newClipsQuery.data?.items?.length) ? (
+      {newClipsQuery.data?.items?.length ? (
         <TopSellersCarousel
-          items={newClipsQuery.data?.items ?? []}
+          items={newClipsQuery.data.items}
           title="🆕 New Clips"
-          loading={newClipsQuery.isLoading}
           listType="new_clips"
           currency={currency}
         />
       ) : null}
-      {(topSellersQuery.isLoading || topSellersQuery.data?.items?.length) ? (
+      {topSellersQuery.data?.items?.length ? (
         <TopSellersCarousel
-          items={topSellersQuery.data?.items ?? []}
-          loading={topSellersQuery.isLoading}
+          items={topSellersQuery.data.items}
           listType="top_sellers"
           currency={currency}
         />
@@ -751,9 +720,7 @@ export function BrowsePage() {
               <span className="load-more__spinner" aria-hidden="true" />
               <span>Loading more...</span>
             </>
-          ) : (
-            ''
-          )}
+          ) : null}
         </div>
       ) : null}
 
