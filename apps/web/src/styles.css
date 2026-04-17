@@ -1665,11 +1665,33 @@ button {
 .top-sellers--keyholding .top-sellers__includes-block {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
+  margin-top: 2px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(176, 106, 214, 0.2);
 }
 
-.top-sellers--keyholding .top-sellers__section-label {
+.top-sellers--keyholding .top-sellers__includes-head {
+  display: grid;
+  gap: 6px;
+}
+
+.top-sellers--keyholding .top-sellers__includes-eyebrow {
   margin: 0;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.top-sellers--keyholding .top-sellers__includes-title {
+  margin: 0;
+  font-size: 1.14rem;
+  font-weight: 700;
+  line-height: 1.18;
+  color: #f7f2fc;
+  letter-spacing: 0.03em;
 }
 
 .top-sellers--keyholding .top-sellers__pill-grid {
@@ -1683,6 +1705,10 @@ button {
 .top-sellers--keyholding .top-sellers__pill {
   padding: 12px 14px;
   line-height: 1.5;
+  /* Slightly quieter than the section title so hierarchy reads: heading → items */
+  background: rgba(120, 70, 160, 0.14);
+  border-color: rgba(176, 106, 214, 0.22);
+  color: rgba(248, 242, 255, 0.95);
 }
 
 .top-sellers--keyholding .top-sellers__price-block--keyholding {

@@ -104,7 +104,10 @@ export function KeyholdingTierCarousel({
                     )}
                     {includes.length ? (
                       <div className="top-sellers__includes-block">
-                        <p className="top-sellers__section-label">What you get</p>
+                        <header className="top-sellers__includes-head">
+                          <p className="top-sellers__includes-eyebrow">Included in this tier</p>
+                          <h4 className="top-sellers__includes-title">What you get</h4>
+                        </header>
                         <div className="top-sellers__pill-grid">
                           {includes.map((item) => (
                             <span key={item} className="top-sellers__pill">
