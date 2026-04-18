@@ -759,6 +759,7 @@ export function BrowsePage() {
           currency={currency}
           clipPaymentResume={clipPaymentResume}
           onClipPaymentResumeConsumed={() => setClipPaymentResume(null)}
+          authReady={session.ready}
         />
       )}
     </AppShell>

@@ -22,11 +22,13 @@ export function TierDetailSheet({
   loading,
   artworkVariant = 'base',
   currency = 'GBP',
+  authReady = true,
 }: {
   tier?: TierItem;
   loading?: boolean;
   artworkVariant?: TierArtworkVariant;
   currency?: CurrencyCode;
+  authReady?: boolean;
 }) {
   const lastTrackedTierIdRef = useRef('');
   const [showPayment, setShowPayment] = useState(false);
@@ -180,6 +182,7 @@ export function TierDetailSheet({
                 priceLabel={tierPriceLabel}
                 botFallbackUrl={tier.botBuyUrl}
                 preferredCurrency={currency}
+                authReady={authReady}
                 onClose={() => setShowPayment(false)}
               />
             ) : null}

@@ -506,7 +506,12 @@ export function TasksPage() {
 
         {tiersQuery.isError && <ErrorState message={(tiersQuery.error as Error).message} />}
         {(tiersQuery.isLoading || (tiersQuery.data && tiersQuery.data.items.length > 0)) && (
-          <TierCarousel items={tiersQuery.data?.items ?? []} loading={tiersQuery.isLoading} currency={currency} />
+          <TierCarousel
+            items={tiersQuery.data?.items ?? []}
+            loading={tiersQuery.isLoading}
+            currency={currency}
+            authReady={session.ready}
+          />
         )}
         {!tiersQuery.isLoading && tiersQuery.data && tiersQuery.data.items.length === 0 && (
           <EmptyState

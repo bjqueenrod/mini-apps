@@ -42,6 +42,8 @@ export function PaymentSheet({
   itemContext,
   preferredCurrency,
   cryptoReturnInvoiceId,
+  /** When false, waits to load payment methods until session cookie exists (e.g. after /auth/telegram). */
+  authReady = true,
 }: {
   productId: string;
   quantity?: number;
@@ -56,6 +58,7 @@ export function PaymentSheet({
   itemContext?: Record<string, unknown>;
   preferredCurrency?: CurrencyCode;
   cryptoReturnInvoiceId?: string;
+  authReady?: boolean;
 }) {
   const [state, setState] = useState<SheetState>('loading');
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
@@ -311,6 +314,9 @@ export function PaymentSheet({
   }, [clipTitle, currency, deliveryMode, mode, productId, quantity, selectedMethod, selectedMethodInfo?.label, selectedTributeCode]);
 
   useEffect(() => {
+    if (!authReady) {
+      return;
+    }
     let cancelled = false;
     (async () => {
       try {
@@ -350,7 +356,7 @@ export function PaymentSheet({
     return () => {
       cancelled = true;
     };
-  }, [productId, quantity, mode, itemContextKey, storageKey, currency]);
+  }, [authReady, productId, quantity, mode, itemContextKey, storageKey, currency]);
 
   const selectedLabel = useMemo(
     () => selectedMethodInfo?.label || 'Pay',
