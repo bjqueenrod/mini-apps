@@ -70,7 +70,7 @@ export function HomePage() {
       <section className="hero">
         <img
           className="hero__banner"
-          src="/header-telegram.jpeg?v=20260409a"
+          src="/header-telegram.jpeg?v=20260419a"
           alt="Mistress BJQueen Telegram Mini-app banner"
         />
       </section>
