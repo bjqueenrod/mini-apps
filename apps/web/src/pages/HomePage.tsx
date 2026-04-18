@@ -3,7 +3,7 @@ import { AppShell } from '../components/AppShell';
 import { CurrencyToggleBanner } from '../components/CurrencyToggleBanner';
 import { setAnalyticsContext } from '../app/analytics';
 import { trackInteraction } from '../app/analytics';
-import { applyTelegramTheme } from '../app/telegram';
+import { applyRuntimeTheme } from '../app/runtime';
 import { useTelegramSession } from '../features/auth/hooks';
 import { useEffect } from 'react';
 import { resolveClipIdHint, resolveStartappHint, stripStartRoutingParams } from '../utils/startRouting';
@@ -32,7 +32,7 @@ export function HomePage() {
   const telegramUserId = session.user?.id ?? null;
 
   useEffect(() => {
-    applyTelegramTheme();
+    applyRuntimeTheme();
   }, []);
 
   useEffect(() => {

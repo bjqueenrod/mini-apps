@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { pollInvoice } from '../features/payments/api';
 import type { InvoiceStatusResponse } from '../features/payments/types';
-import { isTelegramWebView } from '../app/telegram';
+import { closeMiniApp, isTelegramRuntime } from '../app/runtime';
+import { paymentReturnNoDeliveryMessage, paymentReturnTimeoutMessage } from '../app/runtimeCopy';
 
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
 
@@ -53,7 +54,7 @@ export function PaymentReturnPage() {
       const elapsed = Date.now() - startedAt;
       if (elapsed > POLL_TIMEOUT_MS) {
         setStatus('error');
-        setErrorText('Still waiting for confirmation. If you paid, it may take a minute. Try again or continue in the bot.');
+        setErrorText(paymentReturnTimeoutMessage());
         return;
       }
 
@@ -68,13 +69,8 @@ export function PaymentReturnPage() {
   }, [invoiceId]);
 
   const handleClose = () => {
-    if (isTelegramWebView()) {
-      try {
-        window.Telegram?.WebApp?.close?.();
-        return;
-      } catch {
-        /* ignore */
-      }
+    if (isTelegramRuntime()) {
+      closeMiniApp();
     }
   };
 
@@ -134,7 +130,7 @@ export function PaymentReturnPage() {
                 </button>
               ) : null}
               {!result.deliveryUrl ? (
-                <p className="payment-sheet__muted-text">You can close this window or continue in the bot.</p>
+                <p className="payment-sheet__muted-text">{paymentReturnNoDeliveryMessage()}</p>
               ) : null}
               <button type="button" className="payment-sheet__ghost" onClick={handleClose}>
                 Close

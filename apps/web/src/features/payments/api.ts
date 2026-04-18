@@ -110,7 +110,9 @@ export async function startCheckout(
     body: JSON.stringify({ productId, paymentMethod, quantity, mode, ...extras }),
   });
   if (!response.ok) {
-    throw new Error(await readFriendlyErrorMessage(response, 'Unable to start checkout. Try again or pay in bot.'));
+    throw new Error(
+      await readFriendlyErrorMessage(response, 'Unable to start checkout. Try again or use another payment option.'),
+    );
   }
   return response.json();
 }

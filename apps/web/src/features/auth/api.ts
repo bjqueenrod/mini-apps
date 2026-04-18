@@ -27,7 +27,7 @@ export async function authenticate(
     body: JSON.stringify(body),
   });
   if (!response.ok) {
-    throw new Error('Unable to initialize Telegram session.');
+    throw new Error('Unable to initialize session.');
   }
   return response.json();
 }

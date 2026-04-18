@@ -1,0 +1,19 @@
+/* Website layout layer: only when <html> has .runtime--browser (see app/runtime.ts). */
+
+.runtime--browser .app-shell__content {
+  max-width: 1180px;
+  padding-left: clamp(16px, 4vw, 40px);
+  padding-right: clamp(16px, 4vw, 40px);
+}
+
+@media (min-width: 720px) {
+  .runtime--browser .chooser-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .runtime--browser .chooser-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

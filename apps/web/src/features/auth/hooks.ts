@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { authenticate } from './api';
+import { getBrowserGuestUser } from '../../app/browserGuest';
 import { getTelegramContext } from '../../app/telegram';
+import { authenticate } from './api';
 
 const AUTH_RETRY_DELAYS_MS = [0, 120, 350];
 
@@ -13,8 +14,6 @@ export function useTelegramSession() {
     window.Telegram?.WebApp?.ready?.();
 
     let mounted = true;
-    const fallbackDevUser = { id: 1, username: 'local-preview', firstName: 'Local' };
-
     (async () => {
       for (let i = 0; i < AUTH_RETRY_DELAYS_MS.length; i += 1) {
         if (i > 0) {
@@ -32,7 +31,7 @@ export function useTelegramSession() {
         const ctx = getTelegramContext();
         setContext(ctx);
 
-        const fallbackUser = ctx.isTelegram ? undefined : ctx.user ?? fallbackDevUser;
+        const fallbackUser = ctx.isTelegram ? undefined : ctx.user ?? getBrowserGuestUser();
         const waitForInitData =
           ctx.isTelegram && !ctx.initData?.trim() && i < AUTH_RETRY_DELAYS_MS.length - 1;
 

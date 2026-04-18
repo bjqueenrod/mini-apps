@@ -53,6 +53,7 @@ class Settings(BaseSettings):
     tracking_clip_stream_slug: str = Field(default='', alias='TRACKING_CLIP_STREAM_SLUG')
     tracking_clip_download_slug: str = Field(default='', alias='TRACKING_CLIP_DOWNLOAD_SLUG')
     tracking_product_buy_slug: str = Field(default='', alias='TRACKING_PRODUCT_BUY_SLUG')
+    browser_guest_auth_enabled: bool = Field(default=False, alias='BROWSER_GUEST_AUTH_ENABLED')
 
     @property
     def is_dev(self) -> bool:
@@ -89,6 +90,11 @@ class Settings(BaseSettings):
     @property
     def featured_tier_product_ids(self) -> list[str]:
         return [item.strip() for item in self.featured_tier_product_ids_raw.split(',') if item.strip()]
+
+    @property
+    def allow_browser_guest_auth(self) -> bool:
+        """Allow cookie sessions from synthetic dev_user payloads when not inside Telegram."""
+        return self.is_dev or self.browser_guest_auth_enabled
 
 
 @lru_cache(maxsize=1)

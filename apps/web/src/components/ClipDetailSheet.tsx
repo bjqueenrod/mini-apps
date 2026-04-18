@@ -1,6 +1,6 @@
 import { MouseEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { isTelegramWebView, openBotDeepLink, sendBotWebAppData } from '../app/telegram';
+import { isTelegramRuntime, openBotDeepLink, sendBotWebAppData } from '../app/runtime';
 import { trackClipBotCtaClick, trackClipDetailView, trackClipTagSelect } from '../features/clips/analytics';
 import { ClipItem } from '../features/clips/types';
 import { CurrencyCode, formatDuration } from '../utils/format';
@@ -42,7 +42,7 @@ export function ClipDetailSheet({
       trackClipBotCtaClick({ clip, ctaType });
     }
     const payload = ctaType === 'stream' ? `stream_${clip?.id}` : `download_${clip?.id}`;
-    const isTelegramWebApp = isTelegramWebView();
+    const isTelegramWebApp = isTelegramRuntime();
     const productId = ctaType === 'stream' ? clip?.watchProductId : clip?.downloadProductId;
 
     if (productId) {
@@ -126,8 +126,8 @@ export function ClipDetailSheet({
     currency: 'GBP',
     pricings: clip ? [clip.downloadPricing, clip.pricing] : [],
   });
-  const showStreamButton = Boolean(clip?.watchProductId || isTelegramWebView());
-  const showDownloadButton = Boolean(clip?.downloadProductId || isTelegramWebView());
+  const showStreamButton = Boolean(clip?.watchProductId || isTelegramRuntime());
+  const showDownloadButton = Boolean(clip?.downloadProductId || isTelegramRuntime());
 
   return (
     <div className="detail-sheet__backdrop">

@@ -1,5 +1,5 @@
 import { MouseEvent, useState } from 'react';
-import { isTelegramWebView, openBotDeepLink, sendBotWebAppData } from '../app/telegram';
+import { isTelegramRuntime, openBotDeepLink, sendBotWebAppData } from '../app/runtime';
 import { trackTierBotCtaClick } from '../features/tiers/analytics';
 import { getTierArtwork, getTierArtworkVariant } from '../features/tiers/artwork';
 import {
@@ -105,7 +105,7 @@ export function TierCarousel({
     }
 
     const payloadId = tier.productId || tier.id;
-    const isTelegramWebApp = isTelegramWebView();
+    const isTelegramWebApp = isTelegramRuntime();
     if (payloadId && isTelegramWebApp && sendBotWebAppData(`buy_${payloadId}`)) {
       return;
     }
@@ -114,7 +114,7 @@ export function TierCarousel({
     }
     openBotDeepLink(url);
   };
-  const showTelegramCta = isTelegramWebView();
+  const showTelegramCta = isTelegramRuntime();
 
   return (
     <section className="top-sellers top-sellers--tiers">

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { isTelegramWebView } from '../app/telegram';
+import { isTelegramRuntime } from '../app/runtime';
 import { CurrencyCode } from '../utils/format';
 
 const STORAGE_KEY = 'currencyPreference';
@@ -8,7 +8,7 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
 function getTelegramCurrencyUserId(telegramUserId?: number | null): number | null {
-  if (!isTelegramWebView()) {
+  if (!isTelegramRuntime()) {
     return telegramUserId ?? null;
   }
   return window.Telegram?.WebApp?.initDataUnsafe?.user?.id ?? telegramUserId ?? null;

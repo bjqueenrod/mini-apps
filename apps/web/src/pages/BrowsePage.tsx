@@ -10,7 +10,7 @@ import { ErrorState } from '../components/ErrorState';
 import { CurrencyToggleBanner } from '../components/CurrencyToggleBanner';
 import { TopSellersCarousel } from '../components/TopSellersCarousel';
 import { setAnalyticsContext } from '../app/analytics';
-import { applyTelegramTheme, openTelegramExternalLink } from '../app/telegram';
+import { applyRuntimeTheme, openTelegramExternalLink } from '../app/runtime';
 import { useTelegramSession } from '../features/auth/hooks';
 import {
   trackClipListView,
@@ -239,7 +239,7 @@ export function BrowsePage() {
   const lastTrackedSearchPageRef = useRef(0);
 
   useEffect(() => {
-    applyTelegramTheme();
+    applyRuntimeTheme();
   }, []);
 
   useEffect(() => {

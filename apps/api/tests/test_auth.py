@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import hashlib
+
+import pytest
 import hmac
 import json
 import urllib.parse
@@ -50,6 +52,34 @@ def test_auth_telegram_dev_mode(client) -> None:
     payload = response.json()
     assert payload["user"]["id"] == 99
     assert "clip_session=" in response.headers.get("set-cookie", "")
+
+
+def test_auth_browser_guest_disabled_in_production_without_flag(client, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.delenv("BROWSER_GUEST_AUTH_ENABLED", raising=False)
+    get_settings.cache_clear()
+    try:
+        response = client.post("/api/auth/telegram", json={"devUser": {"id": 99, "username": "guest"}})
+        assert response.status_code == 400
+    finally:
+        monkeypatch.setenv("APP_ENV", "test")
+        get_settings.cache_clear()
+
+
+def test_auth_browser_guest_allowed_in_production_with_flag(client, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setenv("BROWSER_GUEST_AUTH_ENABLED", "true")
+    get_settings.cache_clear()
+    try:
+        response = client.post("/api/auth/telegram", json={"devUser": {"id": 99, "username": "guest", "firstName": "Guest"}})
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload["user"]["id"] == 99
+        assert "clip_session=" in response.headers.get("set-cookie", "")
+    finally:
+        monkeypatch.setenv("APP_ENV", "test")
+        monkeypatch.delenv("BROWSER_GUEST_AUTH_ENABLED", raising=False)
+        get_settings.cache_clear()
 
 
 def test_auth_telegram_tracked_start_param_notifies_cms(client, monkeypatch) -> None:

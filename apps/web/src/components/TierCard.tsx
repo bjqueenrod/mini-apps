@@ -1,6 +1,6 @@
 import { MouseEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { isTelegramWebView, openBotDeepLink, sendBotWebAppData } from '../app/telegram';
+import { isTelegramRuntime, openBotDeepLink, sendBotWebAppData } from '../app/runtime';
 import { trackTierBotCtaClick, trackTierSelect } from '../features/tiers/analytics';
 import { TierItem } from '../features/tiers/types';
 import { getTierDurationLabel, getTierSummary, getTierTasksLabel } from '../features/tiers/presentation';
@@ -24,7 +24,7 @@ export function TierCard({
     pricings: [tier.pricing],
     defaultLabel: 'Price on request',
   });
-  const showBotCta = Boolean(tier.productId || isTelegramWebView());
+  const showBotCta = Boolean(tier.productId || isTelegramRuntime());
   const ctaLabel = tier.productId ? 'Continue to Payment' : 'Choose in Bot';
 
   const handleBotAction = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -40,7 +40,7 @@ export function TierCard({
       return;
     }
     const payloadId = tier.productId || tier.id;
-    const isTelegramWebApp = isTelegramWebView();
+    const isTelegramWebApp = isTelegramRuntime();
     if (payloadId && isTelegramWebApp && sendBotWebAppData(`buy_${payloadId}`)) {
       return;
     }

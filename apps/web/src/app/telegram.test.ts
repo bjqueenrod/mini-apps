@@ -138,6 +138,24 @@ describe('getTelegramContext', () => {
     const ctx = getTelegramContext();
     expect(ctx.startParam).toBe('clips_BJQ0169__l_e');
   });
+
+  it('returns browser context when Telegram WebApp is absent (does not call retrieveLaunchParams)', () => {
+    sdk.retrieveLaunchParamsMock.mockClear();
+    vi.stubGlobal('window', {
+      location: {
+        href: 'https://app.test/?startapp=clips&clipId=BJQ0001',
+        search: '?startapp=clips&clipId=BJQ0001',
+        hash: '',
+      },
+      performance: { getEntriesByType: () => [] },
+      sessionStorage: { getItem: () => null },
+    });
+    const ctx = getTelegramContext();
+    expect(ctx.isTelegram).toBe(false);
+    expect(ctx.initData).toBeUndefined();
+    expect(ctx.startParam).toBe('clips');
+    expect(sdk.retrieveLaunchParamsMock).not.toHaveBeenCalled();
+  });
 });
 
 describe('sendBotWebAppData', () => {

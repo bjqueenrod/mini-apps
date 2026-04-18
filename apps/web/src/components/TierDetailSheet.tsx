@@ -1,6 +1,6 @@
 import { MouseEvent, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { isTelegramWebView, openBotDeepLink, sendBotWebAppData } from '../app/telegram';
+import { isTelegramRuntime, openBotDeepLink, sendBotWebAppData } from '../app/runtime';
 import { getTierArtwork, TierArtworkVariant } from '../features/tiers/artwork';
 import { trackTierBotCtaClick, trackTierDetailView } from '../features/tiers/analytics';
 import { getTierDurationLabel, getTierSummary, getTierTasksLabel } from '../features/tiers/presentation';
@@ -38,7 +38,7 @@ export function TierDetailSheet({
       })
     : 'Price on request';
   const hasTierPrice = Boolean(tier?.pricing);
-  const showBotCta = Boolean(tier?.productId || isTelegramWebView());
+  const showBotCta = Boolean(tier?.productId || isTelegramRuntime());
 
   const handleBotAction = (url?: string) => (event: MouseEvent<HTMLAnchorElement>) => {
     if (tier?.productId) {
@@ -56,7 +56,7 @@ export function TierDetailSheet({
       trackTierBotCtaClick({ tier, source: 'detail_sheet' });
     }
     const payloadId = tier?.productId || tier?.id;
-    const isTelegramWebApp = isTelegramWebView();
+    const isTelegramWebApp = isTelegramRuntime();
     if (payloadId && isTelegramWebApp && sendBotWebAppData(`buy_${payloadId}`)) {
       return;
     }

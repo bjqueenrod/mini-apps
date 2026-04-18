@@ -6,7 +6,7 @@ import { ErrorState } from '../components/ErrorState';
 import { TierCarousel } from '../components/TierCarousel';
 import { CurrencyToggleBanner } from '../components/CurrencyToggleBanner';
 import { setAnalyticsContext } from '../app/analytics';
-import { applyTelegramTheme } from '../app/telegram';
+import { applyRuntimeTheme } from '../app/runtime';
 import { useTelegramSession } from '../features/auth/hooks';
 import { trackMiniAppOpenAttributed } from '../features/clips/analytics';
 import { useTiers } from '../features/tiers/hooks';
@@ -356,7 +356,7 @@ export function TasksPage() {
   const [openFaqQuestion, setOpenFaqQuestion] = useState<string | null>(null);
 
   useEffect(() => {
-    applyTelegramTheme();
+    applyRuntimeTheme();
   }, []);
 
   useEffect(() => {

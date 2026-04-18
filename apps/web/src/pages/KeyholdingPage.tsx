@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
 import { CurrencyToggleBanner } from '../components/CurrencyToggleBanner';
 import { ErrorState } from '../components/ErrorState';
-import { applyTelegramTheme } from '../app/telegram';
+import { applyRuntimeTheme } from '../app/runtime';
 import { setAnalyticsContext, trackPremiumEvent } from '../app/analytics';
 import { useTelegramSession } from '../features/auth/hooks';
 import { useKeyholdingOptions, useKeyholdingTiers } from '../features/keyholding/hooks';
@@ -34,7 +34,7 @@ export function KeyholdingPage() {
   const [stickyVisible, setStickyVisible] = useState(true);
 
   useEffect(() => {
-    applyTelegramTheme();
+    applyRuntimeTheme();
   }, []);
 
   useEffect(() => {

@@ -171,10 +171,23 @@ function resolveSignedInitData(webAppInitData: string | undefined | null): strin
 
 export function getTelegramContext(): TelegramContext {
   const webApp = window.Telegram?.WebApp;
-  webApp?.ready?.();
-  webApp?.expand?.();
   const queryParams = new URLSearchParams(window.location.search);
-  const initDataStr = resolveSignedInitData(webApp?.initData);
+  if (!webApp) {
+    return {
+      isTelegram: false,
+      initData: undefined,
+      startParam: coalesceStartParamCandidates(
+        queryParams.get('tgWebAppStartParam'),
+        queryParams.get('startapp'),
+        startParamFromLocationHash(),
+      ),
+      user: undefined,
+      close: undefined,
+    };
+  }
+  webApp.ready?.();
+  webApp.expand?.();
+  const initDataStr = resolveSignedInitData(webApp.initData);
   try {
     const launch = retrieveLaunchParams() as {
       tgWebAppData?: { user?: { id: number; username?: string; firstName?: string } };

@@ -19,12 +19,12 @@ from app.services.auth_service import authenticate_telegram, build_session_paylo
 from app.services.tracking_service import notify_miniapp_open, resolve_effective_start_param
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
 def _resolve_telegram_identity(payload: TelegramAuthRequest) -> tuple[TelegramUser, str | None, str]:
     """Return Telegram user, effective start_param, and session source label."""
+    settings = get_settings()
     if payload.init_data:
         try:
             result = authenticate_telegram(payload.init_data)
@@ -35,14 +35,15 @@ def _resolve_telegram_identity(payload: TelegramAuthRequest) -> tuple[TelegramUs
         # client-sent field can be missing when launch params are not exposed to JS reliably.
         effective_start_param = resolve_effective_start_param(result.start_param, payload.start_param)
         return user, effective_start_param, "telegram"
-    if settings.is_dev and payload.dev_user:
+    if settings.allow_browser_guest_auth and payload.dev_user:
         user = TelegramUser(
             id=payload.dev_user.id,
             username=payload.dev_user.username,
             first_name=payload.dev_user.first_name,
         )
         effective_start_param = (payload.start_param or "").strip() or None
-        return user, effective_start_param, "development"
+        source = "development" if settings.is_dev else "browser_guest"
+        return user, effective_start_param, source
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="initData is required")
 
 
@@ -60,6 +61,7 @@ def telegram_track_open(payload: TelegramAuthRequest) -> TelegramTrackOpenRespon
 
 @router.post("/telegram", response_model=TelegramAuthResponse)
 def auth_telegram(payload: TelegramAuthRequest, response: Response) -> TelegramAuthResponse:
+    settings = get_settings()
     user, effective_start_param, source = _resolve_telegram_identity(payload)
 
     notify_miniapp_open(effective_start_param, user)

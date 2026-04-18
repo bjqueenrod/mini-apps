@@ -4,33 +4,23 @@ import type { InvoiceStatusResponse } from '../features/payments/types';
 import { PaymentMethod } from '../features/payments/types';
 import { CurrencyCode } from '../utils/format';
 import { resolvePriceLabelOptional } from '../utils/pricing';
-import { isTelegramWebView, openBotDeepLink } from '../app/telegram';
+import {
+  closeMiniApp,
+  isTelegramRuntime,
+  openBotDeepLink,
+  openPaymentCheckoutUrl,
+} from '../app/runtime';
+import {
+  labelOpenBot,
+  labelPayInBotInstead,
+  paymentWaitingCheckoutMessage,
+  paymentSuccessGenericBodyMessage,
+} from '../app/runtimeCopy';
 import { useCurrencyPreference } from '../hooks/useCurrencyPreference';
 import { trackInteraction, trackOrderEvent } from '../app/analytics';
 
 type SheetState = 'loading' | 'select' | 'confirm' | 'submitting' | 'waiting' | 'success' | 'error';
 const WAITING_TIMEOUT_MS = 5 * 60 * 1000;
-
-function openPaymentUrl(url?: string | null) {
-  if (!url) return false;
-  try {
-    const win = window.open(url, '_blank', 'noopener,noreferrer');
-    if (win) return true;
-  } catch (error) {
-    // ignore and try fallbacks
-  }
-  try {
-    window.Telegram?.WebApp?.openLink?.(url);
-    return true;
-  } catch (error) {
-    try {
-      window.Telegram?.WebApp?.openTelegramLink?.(url);
-      return true;
-    } catch (err) {
-      return false;
-    }
-  }
-}
 
 /** Navigate the current webview to the delivery URL (stream/download after payment). */
 function navigateDeliveryUrl(url?: string | null): void {
@@ -188,7 +178,7 @@ export function PaymentSheet({
     selectedInstructionsTemplate?.replace(/\{price\}/g, () => selectedPriceLabel || '') || undefined;
   const selectedTributeCode = savedPaymentCode?.trim() || selectedMethodInfo?.tributeCode?.trim();
   const botFallbackLink = botFallbackUrl || '';
-  const showBotFallbackActions = Boolean(botFallbackLink && isTelegramWebView());
+  const showBotFallbackActions = Boolean(botFallbackLink);
   const showPaymentDetails = state !== 'select';
   const requiresCode = Boolean(selectedMethodInfo?.requiresCode);
   const hasInstructions = Boolean(selectedInstructions || selectedTributeCode || requiresCode);
@@ -660,7 +650,7 @@ export function PaymentSheet({
         orderId: res.orderId,
         waitingStartedAt,
       });
-      openPaymentUrl(url);
+      openPaymentCheckoutUrl(url);
       setState('waiting');
     } catch (err) {
       setError(err instanceof Error && err.message ? err.message : 'Unable to start checkout. Try again or pay in bot.');
@@ -723,13 +713,9 @@ export function PaymentSheet({
 
   const showRetry = state === 'error' && showBotFallbackActions;
   const handleSuccessClose = useCallback(() => {
-    if (isTelegramWebView()) {
-      try {
-        window.Telegram?.WebApp?.close?.();
-        return;
-      } catch {
-        // fall through to the local close handlers
-      }
+    if (isTelegramRuntime()) {
+      closeMiniApp();
+      return;
     }
     if (onClosePreview) {
       onClosePreview();
@@ -802,7 +788,7 @@ export function PaymentSheet({
             {paymentButton}
             {showBotFallbackActions ? (
               <button type="button" className="payment-sheet__ghost" onClick={() => openBotDeepLink(botFallbackLink)}>
-                Pay in bot instead
+                {labelPayInBotInstead()}
               </button>
             ) : null}
           </div>
@@ -850,11 +836,7 @@ export function PaymentSheet({
               </span>
             </div>
             <p className="payment-sheet__muted-text">
-              {(cryptoReturnInvoiceId || '').trim()
-                ? 'Thanks, confirming your payment…'
-                : isTelegramWebView()
-                  ? 'Checkout opened outside Telegram. Keep this open for payment updates.'
-                  : 'Checkout opened in your browser. Complete payment and we’ll update here.'}
+              {paymentWaitingCheckoutMessage(Boolean((cryptoReturnInvoiceId || '').trim()))}
             </p>
             <div className="payment-sheet__actions payment-sheet__actions--inline">
               {paymentUrl ? (
@@ -863,7 +845,7 @@ export function PaymentSheet({
                   className="payment-sheet__primary payment-sheet__primary--compact"
                   onClick={() => {
                     trackPaymentPayTap('open_again');
-                    openPaymentUrl(paymentUrl);
+                    openPaymentCheckoutUrl(paymentUrl);
                   }}
                 >
                   Open again
@@ -879,7 +861,7 @@ export function PaymentSheet({
               {paymentNotes}
               {showBotFallbackActions ? (
                 <button type="button" className="payment-sheet__ghost" onClick={() => openBotDeepLink(botFallbackLink)}>
-                  Pay in bot instead
+                  {labelPayInBotInstead()}
                 </button>
               ) : null}
             </div>
@@ -937,13 +919,13 @@ export function PaymentSheet({
             ) : (
               <>
                 <div className="payment-sheet__success">Payment received!</div>
-                <p>You can close this window. If needed, continue in the bot.</p>
+                <p>{paymentSuccessGenericBodyMessage()}</p>
                 <button type="button" className="payment-sheet__primary" onClick={onClose}>
                   Close
                 </button>
                 {showBotFallbackActions ? (
                   <button type="button" className="payment-sheet__ghost" onClick={() => openBotDeepLink(botFallbackLink)}>
-                    Open bot
+                    {labelOpenBot()}
                   </button>
                 ) : null}
               </>
@@ -967,7 +949,7 @@ export function PaymentSheet({
             </button>
             {showRetry ? (
               <button type="button" className="payment-sheet__ghost" onClick={() => openBotDeepLink(botFallbackUrl!)}>
-                Pay in bot instead
+                {labelPayInBotInstead()}
               </button>
             ) : null}
           </div>
