@@ -12,10 +12,10 @@ export function KeyholdingWhatIs() {
       </p>
       <figure className="kh-section-art" aria-hidden="true">
         <img
-          src="/images/wikimedia/chastity-cage-banner-whatis.jpg?v=20260417r"
+          src="/images/keyholding/keyholding-structured-distance.png?v=20260418a"
           alt=""
-          width={1600}
-          height={480}
+          width={1024}
+          height={642}
           loading="lazy"
           decoding="async"
         />

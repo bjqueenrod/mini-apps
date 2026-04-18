@@ -198,10 +198,11 @@
 .kh-section-art img {
   display: block;
   width: 100%;
-  height: auto;
-  max-height: min(200px, 34vh);
+  /* Fixed strip height matches previous banner row; wide/tall assets scale down and crop with object-fit */
+  height: min(200px, 34vh);
   object-fit: cover;
-  object-position: center;
+  /* Vertical + horizontal center of source image within the strip (incl. “example week” banner) */
+  object-position: center center;
 }
 
 .kh-plain {
