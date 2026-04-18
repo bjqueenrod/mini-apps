@@ -198,10 +198,10 @@
 .kh-section-art img {
   display: block;
   width: 100%;
-  /* Fixed height so object-fit: cover crops predictably; center keeps the middle band visible */
-  height: min(200px, 34vh);
+  height: auto;
+  max-height: min(200px, 34vh);
   object-fit: cover;
-  object-position: center center;
+  object-position: center;
 }
 
 .kh-plain {
