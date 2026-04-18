@@ -36,6 +36,8 @@ def _looks_like_html_error(text: str) -> bool:
 def _response_error_message(response: httpx.Response, fallback: str) -> str:
     """Extract a message from JSON error bodies even for 5xx (e.g. NOWPayments details on 502)."""
     status_code = getattr(response, "status_code", None)
+    chosen: str | None = None
+
     payload: dict[str, Any] | None = None
     try:
         raw = response.json()
@@ -48,33 +50,42 @@ def _response_error_message(response: httpx.Response, fallback: str) -> str:
         details = str(payload.get("details") or "").strip()
         err = str(payload.get("error") or "").strip()
         if details:
-            if err and err.lower() not in details.lower():
-                return f"{err}: {details}"
-            return details
-        for key in ("detail", "error", "message"):
-            value = payload.get(key)
-            if value not in (None, ""):
-                return str(value)
-
-    text = (response.text or "").strip()
-    if text and not _looks_like_html_error(text):
-        try:
-            parsed = json.loads(text)
-        except Exception:
-            parsed = None
-        if isinstance(parsed, dict):
-            details = str(parsed.get("details") or "").strip()
-            if details:
-                return details
+            chosen = f"{err}: {details}" if err and err.lower() not in details.lower() else details
+        else:
             for key in ("detail", "error", "message"):
-                value = parsed.get(key)
+                value = payload.get(key)
                 if value not in (None, ""):
-                    return str(value)
-        if isinstance(status_code, int) and status_code < 500:
-            return text
+                    chosen = str(value)
+                    break
+
+    if chosen is None:
+        text = (response.text or "").strip()
+        if text and not _looks_like_html_error(text):
+            try:
+                parsed = json.loads(text)
+            except Exception:
+                parsed = None
+            if isinstance(parsed, dict):
+                details = str(parsed.get("details") or "").strip()
+                if details:
+                    chosen = details
+                else:
+                    for key in ("detail", "error", "message"):
+                        value = parsed.get(key)
+                        if value not in (None, ""):
+                            chosen = str(value)
+                            break
+            if chosen is None and isinstance(status_code, int) and status_code < 500:
+                chosen = text
 
     if isinstance(status_code, int) and status_code >= 500:
-        return fallback
+        if chosen is None or _looks_like_html_error(chosen):
+            return fallback
+        return chosen
+
+    if chosen is not None:
+        return chosen
+
     return fallback
 
 
