@@ -2,6 +2,36 @@ import { AuthResponse, SessionUser } from './types';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
+async function readApiErrorMessage(response: Response): Promise<string | undefined> {
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    return undefined;
+  }
+  try {
+    const data = (await response.json()) as { detail?: unknown };
+    if (typeof data.detail === 'string') {
+      return data.detail;
+    }
+    if (Array.isArray(data.detail)) {
+      return data.detail
+        .map((item) => {
+          if (typeof item === 'string') return item;
+          if (item && typeof item === 'object' && 'msg' in item) {
+            return String((item as { msg: unknown }).msg);
+          }
+          return JSON.stringify(item);
+        })
+        .join('; ');
+    }
+    if (data.detail != null) {
+      return String(data.detail);
+    }
+  } catch {
+    /* ignore malformed JSON */
+  }
+  return undefined;
+}
+
 export async function authenticate(
   initData?: string,
   fallbackUser?: SessionUser,
@@ -27,7 +57,9 @@ export async function authenticate(
     body: JSON.stringify(body),
   });
   if (!response.ok) {
-    throw new Error('Unable to initialize session.');
+    const fromBody = await readApiErrorMessage(response);
+    const fallback = `Unable to initialize session (${response.status}).`;
+    throw new Error(fromBody?.trim() || fallback);
   }
   return response.json();
 }

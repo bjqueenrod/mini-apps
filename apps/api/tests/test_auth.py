@@ -60,7 +60,8 @@ def test_auth_browser_guest_disabled_in_production_without_flag(client, monkeypa
     get_settings.cache_clear()
     try:
         response = client.post("/api/auth/telegram", json={"devUser": {"id": 99, "username": "guest"}})
-        assert response.status_code == 400
+        assert response.status_code == 403
+        assert "Browser sign-in" in response.json()["detail"]
     finally:
         monkeypatch.setenv("APP_ENV", "test")
         get_settings.cache_clear()

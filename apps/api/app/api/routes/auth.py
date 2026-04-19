@@ -35,7 +35,15 @@ def _resolve_telegram_identity(payload: TelegramAuthRequest) -> tuple[TelegramUs
         # client-sent field can be missing when launch params are not exposed to JS reliably.
         effective_start_param = resolve_effective_start_param(result.start_param, payload.start_param)
         return user, effective_start_param, "telegram"
-    if settings.allow_browser_guest_auth and payload.dev_user:
+    if payload.dev_user:
+        if not settings.allow_browser_guest_auth:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=(
+                    "Browser sign-in is not enabled for this server. "
+                    "Open the site from the Telegram mini app, or set BROWSER_GUEST_AUTH_ENABLED on the API."
+                ),
+            )
         user = TelegramUser(
             id=payload.dev_user.id,
             username=payload.dev_user.username,
