@@ -760,6 +760,7 @@ export function BrowsePage() {
           clipPaymentResume={clipPaymentResume}
           onClipPaymentResumeConsumed={() => setClipPaymentResume(null)}
           authReady={session.ready}
+          authError={session.authResolved ? session.error : null}
         />
       )}
     </AppShell>

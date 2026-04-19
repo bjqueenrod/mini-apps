@@ -14,11 +14,13 @@ export function TierCard({
   guideLabel,
   currency = 'GBP',
   authReady = true,
+  authError = null,
 }: {
   tier: TierItem;
   guideLabel?: string;
   currency?: CurrencyCode;
   authReady?: boolean;
+  authError?: string | null;
 }) {
   const [showPayment, setShowPayment] = useState(false);
   const tierPriceLabel = resolvePriceLabel({
@@ -87,6 +89,7 @@ export function TierCard({
           botFallbackUrl={tier.botBuyUrl}
           preferredCurrency={currency}
           authReady={authReady}
+          authError={authError}
           itemContext={{ tierId: tier.id }}
           onClose={() => setShowPayment(false)}
         />

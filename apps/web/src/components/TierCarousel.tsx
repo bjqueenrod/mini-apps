@@ -78,12 +78,14 @@ export function TierCarousel({
   loading = false,
   currency = 'GBP',
   authReady = true,
+  authError = null,
 }: {
   items: TierItem[];
   title?: string;
   loading?: boolean;
   currency?: CurrencyCode;
   authReady?: boolean;
+  authError?: string | null;
 }) {
   if (!items.length && !loading) {
     return null;
@@ -232,6 +234,7 @@ export function TierCarousel({
           botFallbackUrl={paymentTier.botBuyUrl}
           preferredCurrency={currency}
           authReady={authReady}
+          authError={authError}
           itemContext={{ tierId: paymentTier.id }}
           onClose={() => setPaymentTier(null)}
         />

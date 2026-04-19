@@ -44,6 +44,8 @@ export function PaymentSheet({
   cryptoReturnInvoiceId,
   /** When false, waits to load payment methods until session cookie exists (e.g. after /auth/telegram). */
   authReady = true,
+  /** Shown when auth finished without a session (browser guest off, etc.). */
+  authError = null,
 }: {
   productId: string;
   quantity?: number;
@@ -59,6 +61,7 @@ export function PaymentSheet({
   preferredCurrency?: CurrencyCode;
   cryptoReturnInvoiceId?: string;
   authReady?: boolean;
+  authError?: string | null;
 }) {
   const [state, setState] = useState<SheetState>('loading');
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
@@ -315,11 +318,16 @@ export function PaymentSheet({
 
   useEffect(() => {
     if (!authReady) {
+      if (authError?.trim()) {
+        setError(authError);
+        setState('error');
+      }
       return;
     }
     let cancelled = false;
     (async () => {
       try {
+        setError('');
         let persistedOrderId: number | undefined;
         let persistedSelectedMethod = '';
         try {
@@ -345,7 +353,7 @@ export function PaymentSheet({
         if (!selectedMethod && !persistedSelectedMethod) {
           setSelectedMethod((data.paymentMethods || [])[0]?.paymentMethod || '');
         }
-        setState((prev) => (prev === 'loading' ? 'select' : prev));
+        setState((prev) => (prev === 'loading' || prev === 'error' ? 'select' : prev));
       } catch (err) {
         if (cancelled) return;
         const message = err instanceof Error ? err.message : 'Payment options unavailable.';
@@ -356,7 +364,7 @@ export function PaymentSheet({
     return () => {
       cancelled = true;
     };
-  }, [authReady, productId, quantity, mode, itemContextKey, storageKey, currency]);
+  }, [authReady, authError, productId, quantity, mode, itemContextKey, storageKey, currency]);
 
   const selectedLabel = useMemo(
     () => selectedMethodInfo?.label || 'Pay',

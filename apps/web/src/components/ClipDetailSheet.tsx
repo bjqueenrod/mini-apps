@@ -17,6 +17,7 @@ export function ClipDetailSheet({
   clipPaymentResume,
   onClipPaymentResumeConsumed,
   authReady = true,
+  authError = null,
 }: {
   clip?: ClipItem;
   loading?: boolean;
@@ -26,6 +27,7 @@ export function ClipDetailSheet({
   onClipPaymentResumeConsumed?: () => void;
   /** Wait for session before loading /api/payments/checkout-options (avoids 401 in browser). */
   authReady?: boolean;
+  authError?: string | null;
 }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -225,6 +227,7 @@ export function ClipDetailSheet({
                 preferredCurrency={currency}
                 cryptoReturnInvoiceId={clipPaymentResume?.invoiceId}
                 authReady={authReady}
+                authError={authError}
                 itemContext={{
                   unitPriceCents: showPayment === 'stream' ? streamUnitPence : downloadUnitPence,
                   clipId: clip.id,

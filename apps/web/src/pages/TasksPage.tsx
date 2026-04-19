@@ -511,6 +511,7 @@ export function TasksPage() {
             loading={tiersQuery.isLoading}
             currency={currency}
             authReady={session.ready}
+            authError={session.authResolved ? session.error : null}
           />
         )}
         {!tiersQuery.isLoading && tiersQuery.data && tiersQuery.data.items.length === 0 && (

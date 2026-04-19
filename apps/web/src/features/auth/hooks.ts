@@ -8,6 +8,8 @@ const AUTH_RETRY_DELAYS_MS = [0, 120, 350];
 export function useTelegramSession() {
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  /** True once the auth retry loop has finished (success or final failure). */
+  const [authResolved, setAuthResolved] = useState(false);
   const [context, setContext] = useState(() => getTelegramContext());
 
   useEffect(() => {
@@ -15,6 +17,7 @@ export function useTelegramSession() {
 
     let mounted = true;
     (async () => {
+      let sessionEstablished = false;
       for (let i = 0; i < AUTH_RETRY_DELAYS_MS.length; i += 1) {
         if (i > 0) {
           await new Promise<void>((resolve) => {
@@ -41,6 +44,10 @@ export function useTelegramSession() {
 
         try {
           await authenticate(ctx.initData, fallbackUser, ctx.startParam);
+          if (mounted) {
+            setError(null);
+          }
+          sessionEstablished = true;
           break;
         } catch (err) {
           const retry =
@@ -56,7 +63,8 @@ export function useTelegramSession() {
       }
 
       if (mounted) {
-        setReady(true);
+        setReady(sessionEstablished);
+        setAuthResolved(true);
       }
     })();
 
@@ -65,5 +73,5 @@ export function useTelegramSession() {
     };
   }, []);
 
-  return { ...context, ready, error };
+  return { ...context, ready, error, authResolved };
 }
