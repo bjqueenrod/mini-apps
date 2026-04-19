@@ -1243,10 +1243,6 @@ button {
   overscroll-behavior-x: contain;
 }
 
-.top-sellers--tiers .top-sellers__card {
-  touch-action: pan-y;
-}
-
 .top-sellers--tiers .top-sellers__media {
   height: clamp(210px, 42vw, 260px);
   padding: 8px 8px 4px;
