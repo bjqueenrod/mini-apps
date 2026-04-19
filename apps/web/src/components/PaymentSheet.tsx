@@ -183,8 +183,9 @@ export function PaymentSheet({
   const selectedInstructions =
     selectedInstructionsTemplate?.replace(/\{price\}/g, () => selectedPriceLabel || '') || undefined;
   const selectedTributeCode = savedPaymentCode?.trim() || selectedMethodInfo?.tributeCode?.trim();
-  const botFallbackLink = botFallbackUrl || '';
-  const showBotFallbackActions = Boolean(botFallbackLink);
+  const botFallbackLink = (botFallbackUrl || '').trim();
+  /** Bot deep links only work inside Telegram; hide on the public website. */
+  const showBotFallbackActions = isTelegramRuntime() && Boolean(botFallbackLink);
   const showPaymentDetails = state !== 'select';
   const requiresCode = Boolean(selectedMethodInfo?.requiresCode);
   const hasInstructions = Boolean(selectedInstructions || selectedTributeCode || requiresCode);
@@ -267,10 +268,10 @@ export function PaymentSheet({
         has_saved_code: Boolean(selectedTributeCode),
         order_id: orderId ?? undefined,
         clip_title: clipTitle || undefined,
-        has_bot_fallback: Boolean(botFallbackUrl),
+        has_bot_fallback: showBotFallbackActions,
       },
     });
-  }, [botFallbackUrl, clipTitle, currency, deliveryMode, hasInstructions, mode, orderId, productId, quantity, requiresCode, selectedMethod, selectedMethodInfo?.label, selectedPriceLabel, selectedTributeCode]);
+  }, [showBotFallbackActions, clipTitle, currency, deliveryMode, hasInstructions, mode, orderId, productId, quantity, requiresCode, selectedMethod, selectedMethodInfo?.label, selectedPriceLabel, selectedTributeCode]);
 
   const trackPaymentPayTap = useCallback((source: 'confirm' | 'quick' | 'retry' | 'open_again', freshCheckout?: boolean) => {
     if (!selectedMethod) return;
@@ -293,10 +294,10 @@ export function PaymentSheet({
         order_id: orderId ?? undefined,
         fresh_checkout: Boolean(freshCheckout),
         clip_title: clipTitle || undefined,
-        has_bot_fallback: Boolean(botFallbackUrl),
+        has_bot_fallback: showBotFallbackActions,
       },
     });
-  }, [botFallbackUrl, clipTitle, currency, deliveryMode, hasInstructions, mode, orderId, productId, quantity, requiresCode, selectedMethod, selectedMethodInfo?.label, selectedPriceLabel, selectedTributeCode]);
+  }, [showBotFallbackActions, clipTitle, currency, deliveryMode, hasInstructions, mode, orderId, productId, quantity, requiresCode, selectedMethod, selectedMethodInfo?.label, selectedPriceLabel, selectedTributeCode]);
 
   const trackTributeCodeCopyTap = useCallback(() => {
     if (!selectedTributeCode) return;
@@ -667,7 +668,13 @@ export function PaymentSheet({
       openPaymentCheckoutUrl(url);
       setState('waiting');
     } catch (err) {
-      setError(err instanceof Error && err.message ? err.message : 'Unable to start checkout. Try again or pay in bot.');
+      setError(
+        err instanceof Error && err.message
+          ? err.message
+          : isTelegramRuntime()
+            ? 'Unable to start checkout. Try again or pay in bot.'
+            : 'Unable to start checkout. Try again.',
+      );
       setState('error');
     }
   }, [clearTimedOutCheckout, currency, itemContext, mode, orderId, productId, quantity, saveProgress, selectedMethod, selectedTributeCode]);
@@ -962,7 +969,7 @@ export function PaymentSheet({
               Retry checkout
             </button>
             {showRetry ? (
-              <button type="button" className="payment-sheet__ghost" onClick={() => openBotDeepLink(botFallbackUrl!)}>
+              <button type="button" className="payment-sheet__ghost" onClick={() => openBotDeepLink(botFallbackLink)}>
                 {labelPayInBotInstead()}
               </button>
             ) : null}

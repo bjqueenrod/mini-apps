@@ -32,9 +32,9 @@ export function paymentSuccessGenericBodyMessage(): string {
 }
 
 export function labelPayInBotInstead(): string {
-  return isTelegramRuntime() ? 'Pay in bot instead' : 'Pay in Telegram bot';
+  return 'Pay in bot instead';
 }
 
 export function labelOpenBot(): string {
-  return isTelegramRuntime() ? 'Open bot' : 'Open Telegram bot';
+  return 'Open bot';
 }
