@@ -1248,6 +1248,24 @@ button {
   padding: 8px 8px 4px;
 }
 
+/* Tasks packages carousel: on wider viewports, let tier artwork span full card width (no letterbox gutters). */
+@media (min-width: 720px) {
+  .tasks-section#packages .top-sellers--tiers .top-sellers__track {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .tasks-section#packages .top-sellers--tiers .top-sellers__media {
+    padding: 0;
+    border-radius: 28px 28px 0 0;
+  }
+
+  .tasks-section#packages .top-sellers--tiers .top-sellers__media--tier img {
+    object-fit: cover;
+    object-position: center center;
+  }
+}
+
 .top-sellers--tiers .top-sellers__body--tier {
   gap: 8px;
   padding: 10px 16px 14px;
