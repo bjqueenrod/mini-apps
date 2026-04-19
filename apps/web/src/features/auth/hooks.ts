@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getBrowserGuestUser } from '../../app/browserGuest';
+import { isBrowserRuntime } from '../../app/runtime';
 import { getTelegramContext } from '../../app/telegram';
 import { authenticate } from './api';
 
@@ -35,11 +36,15 @@ export function useTelegramSession() {
         setContext(ctx);
 
         const trimmedInit = ctx.initData?.trim() ?? '';
-        // When WebApp exists but signed initData is missing (common outside a real mini-app open),
-        // we must still send devUser for browser-guest auth — never omit both initData and devUser.
+        const inPlainBrowser = isBrowserRuntime();
+        // Signed initData exists only inside a real Telegram WebApp launch; plain browser uses guest
+        // (devUser). When WebApp is present without initData (e.g. in-app browser), still send devUser.
         const fallbackUser = trimmedInit ? undefined : (ctx.user ?? getBrowserGuestUser());
         const waitForInitData =
-          ctx.isTelegram && !trimmedInit && i < AUTH_RETRY_DELAYS_MS.length - 1;
+          !inPlainBrowser &&
+          ctx.isTelegram &&
+          !trimmedInit &&
+          i < AUTH_RETRY_DELAYS_MS.length - 1;
 
         if (waitForInitData) {
           continue;
@@ -54,7 +59,10 @@ export function useTelegramSession() {
           break;
         } catch (err) {
           const retry =
-            ctx.isTelegram && !trimmedInit && i < AUTH_RETRY_DELAYS_MS.length - 1;
+            !inPlainBrowser &&
+            ctx.isTelegram &&
+            !trimmedInit &&
+            i < AUTH_RETRY_DELAYS_MS.length - 1;
           if (retry) {
             continue;
           }
