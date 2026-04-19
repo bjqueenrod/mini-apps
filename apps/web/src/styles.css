@@ -1260,9 +1260,10 @@ button {
     border-radius: 28px 28px 0 0;
   }
 
+  /* Anchor to top so cover-crop removes lower decoration first; title lives in upper SVG band */
   .tasks-section#packages .top-sellers--tiers .top-sellers__media--tier img {
     object-fit: cover;
-    object-position: center center;
+    object-position: center top;
   }
 }
 
