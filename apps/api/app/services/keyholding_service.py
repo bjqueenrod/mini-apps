@@ -88,7 +88,7 @@ def fetch_keyholding_tiers() -> dict[str, Any]:
                 "paymentProductPricing": item.get("payment_product_pricing")
                 if isinstance(item.get("payment_product_pricing"), dict)
                 else (item.get("paymentProductPricing") if isinstance(item.get("paymentProductPricing"), dict) else None),
-                "badge": item.get("badge") or item.get("ideal_for") or item.get("idealFor") or None,
+                "badge": item.get("badge") or None,
                 "durationWeeksOptions": item.get("duration_weeks_options")
                 or item.get("durationWeeksOptions")
                 or [],

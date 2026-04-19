@@ -3,13 +3,19 @@ import { KeyholdingTier } from '../features/keyholding/types';
 import { CurrencyCode } from '../utils/format';
 import { resolvePriceLabel } from '../utils/pricing';
 
+/** Normalize tier copy for duplicate detection (whitespace, unicode, case). */
+function normalizeTierCopy(s: string | undefined): string {
+  if (!s) return '';
+  return s.replace(/\s+/g, ' ').trim().normalize('NFKC').toLowerCase();
+}
+
 /** Avoid repeating the same copy in the intro line and the “Ideal for” fact when CMS sends duplicates. */
 function shouldShowTierDescriptor(desc: string | undefined, idealFor: string | undefined): boolean {
-  const d = desc?.replace(/\s+/g, ' ').trim();
+  const d = normalizeTierCopy(desc);
   if (!d) return false;
-  const i = idealFor?.replace(/\s+/g, ' ').trim();
+  const i = normalizeTierCopy(idealFor);
   if (!i) return true;
-  return d.toLowerCase() !== i.toLowerCase();
+  return d !== i;
 }
 
 export function KeyholdingTierCarousel({
@@ -63,9 +69,8 @@ export function KeyholdingTierCarousel({
                 fallbackLabelCandidates: [tier.pricePerWeek],
                 defaultLabel: 'Price on request',
               });
-              const controlLabel =
-                tier.badge ||
-                (index === 0
+              const indexFallbackBadge =
+                index === 0
                   ? 'Newbie trial'
                   : index === 1
                     ? 'Daily discipline'
@@ -73,7 +78,12 @@ export function KeyholdingTierCarousel({
                       ? 'Full enforcement'
                       : index === 3
                         ? 'Total submission'
-                        : undefined);
+                        : undefined;
+              const rawBadge = tier.badge?.trim() ? tier.badge : undefined;
+              const badgeDuplicatesIdealFor =
+                Boolean(rawBadge && tier.idealFor) &&
+                normalizeTierCopy(rawBadge) === normalizeTierCopy(tier.idealFor);
+              const controlLabel = (!badgeDuplicatesIdealFor && rawBadge) || indexFallbackBadge;
               return (
                 <article
                   id={`keyholding-tier-${index}`}
