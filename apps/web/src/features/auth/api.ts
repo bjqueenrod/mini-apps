@@ -1,3 +1,4 @@
+import { getBrowserGuestUser } from '../../app/browserGuest';
 import { AuthResponse, SessionUser } from './types';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api';
@@ -37,14 +38,17 @@ export async function authenticate(
   fallbackUser?: SessionUser,
   startParam?: string,
 ): Promise<AuthResponse> {
-  const body = initData ? { initData, startParam } : { devUser: fallbackUser, startParam };
-  if (initData) {
+  const signedInit = initData?.trim() ?? '';
+  const body = signedInit
+    ? { initData: signedInit, startParam }
+    : { devUser: fallbackUser ?? getBrowserGuestUser(), startParam };
+  if (signedInit) {
     try {
       await fetch(`${API_BASE}/auth/telegram/track-open`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ initData, startParam }),
+        body: JSON.stringify({ initData: signedInit, startParam }),
       });
     } catch {
       /* Session auth below still runs notify_miniapp_open as a fallback. */

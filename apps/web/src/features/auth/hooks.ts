@@ -34,16 +34,19 @@ export function useTelegramSession() {
         const ctx = getTelegramContext();
         setContext(ctx);
 
-        const fallbackUser = ctx.isTelegram ? undefined : ctx.user ?? getBrowserGuestUser();
+        const trimmedInit = ctx.initData?.trim() ?? '';
+        // When WebApp exists but signed initData is missing (common outside a real mini-app open),
+        // we must still send devUser for browser-guest auth — never omit both initData and devUser.
+        const fallbackUser = trimmedInit ? undefined : (ctx.user ?? getBrowserGuestUser());
         const waitForInitData =
-          ctx.isTelegram && !ctx.initData?.trim() && i < AUTH_RETRY_DELAYS_MS.length - 1;
+          ctx.isTelegram && !trimmedInit && i < AUTH_RETRY_DELAYS_MS.length - 1;
 
         if (waitForInitData) {
           continue;
         }
 
         try {
-          await authenticate(ctx.initData, fallbackUser, ctx.startParam);
+          await authenticate(trimmedInit || undefined, fallbackUser, ctx.startParam);
           if (mounted) {
             setError(null);
           }
@@ -51,7 +54,7 @@ export function useTelegramSession() {
           break;
         } catch (err) {
           const retry =
-            ctx.isTelegram && !ctx.initData?.trim() && i < AUTH_RETRY_DELAYS_MS.length - 1;
+            ctx.isTelegram && !trimmedInit && i < AUTH_RETRY_DELAYS_MS.length - 1;
           if (retry) {
             continue;
           }
